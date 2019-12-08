@@ -9,25 +9,24 @@
 import SwiftUI
 
 struct VideoUploadStatus: View {
-    @ObservedObject var uploadData: UploadData
+    @ObservedObject var videoService: VideoServiceObservableWrapper
     
     var body: some View {
         VStack(spacing: 20) {
             // Text($uploadData.statusMessage)
             ZStack {
-                LoadingCircle(value: $uploadData.uploadProgress)
-                
+                LoadingCircle(value: $videoService.videoUploadData.uploadProgress)
             }
         }
         .onAppear {
-            self.uploadData.startUpload()
+            self.videoService.runUpload()
         }
-        .navigationBarTitle("Upload \(uploadData.title ?? "")")
+        .navigationBarTitle("Upload \(videoService.videoUploadData.title ?? "")")
     }
 }
 
 struct VideoUploadStatus_Previews: PreviewProvider {
     static var previews: some View {
-        VideoUploadStatus(uploadData: UploadData())
+        VideoUploadStatus(videoService: VideoServiceObservableWrapper())
     }
 }

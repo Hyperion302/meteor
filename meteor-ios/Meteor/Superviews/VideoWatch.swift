@@ -15,7 +15,7 @@ struct VideoWatch: View {
     
     init(video: Video) {
         self.video = video
-        self.player = AVPlayer(url: URL(string: "https://stream.mux.com/\(video.muxPlaybackId).m3u8")!)
+        self.player = AVPlayer(url: URL(string: "https://stream.mux.com/\(video.muxPlaybackId ?? "").m3u8")!)
         self.player.play()
     }
     

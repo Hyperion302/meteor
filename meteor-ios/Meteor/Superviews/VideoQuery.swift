@@ -9,17 +9,17 @@
 import SwiftUI
 
 struct VideoQuery: View {
-    @ObservedObject var videoQueryData: VideoQueryData
+    @ObservedObject var videoService: VideoServiceObservableWrapper
     
     var body: some View {
         NavigationView {
             VStack {
-                SearchBar(searchText: $videoQueryData.query, searchCallback: { _ in
-                    self.videoQueryData.runQuery()
+                SearchBar(searchText: $videoService.videoSearchTerm, searchCallback: { _ in
+                    self.videoService.runSearch()
                 })
                     .padding()
                 List {
-                    ForEach(videoQueryData.queryResults) { video in
+                    ForEach(videoService.videoSearchResults) { video in
                         NavigationLink(destination: VideoWatch(video: video)) {
                             VideoQueryRow(name: video.title)
                         }
@@ -38,6 +38,6 @@ struct VideoQuery: View {
 
 struct VideoQuery_Previews: PreviewProvider {
     static var previews: some View {
-        VideoQuery(videoQueryData: VideoQueryData())
+        VideoQuery(videoService: VideoServiceObservableWrapper())
     }
 }

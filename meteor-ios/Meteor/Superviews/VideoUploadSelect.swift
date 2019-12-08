@@ -9,17 +9,17 @@
 import SwiftUI
 
 struct VideoUploadSelect: View {
-    @ObservedObject var uploadData: UploadData
+    @ObservedObject var videoService: VideoServiceObservableWrapper
     
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
-                NavigationLink(destination: VideoUploadPickerController(uploadData: uploadData)) {
+                NavigationLink(destination: VideoUploadPickerController(videoService: videoService)) {
                     LargeButton(text: "Select from camera roll")
                 }
                 Spacer()
-                if(uploadData.fsURL != nil) {
-                    NavigationLink(destination: VideoUploadDetails(uploadData: uploadData)) {
+                if(videoService.videoUploadData.fsUrl != nil) {
+                    NavigationLink(destination: VideoUploadDetails(videoService: videoService)) {
                         LargeButton(text: "Next")
                     }
                 }
@@ -31,6 +31,6 @@ struct VideoUploadSelect: View {
 
 struct VideoUploadSelect_Previews: PreviewProvider {
     static var previews: some View {
-        VideoUploadSelect(uploadData: UploadData())
+        VideoUploadSelect(videoService: VideoServiceObservableWrapper())
     }
 }

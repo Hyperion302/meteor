@@ -13,7 +13,7 @@ import Photos
 struct VideoUploadPickerController: UIViewControllerRepresentable {
     typealias UIViewControllerType = UIImagePickerController
     
-    @ObservedObject var uploadData: UploadData
+    @ObservedObject var videoService: VideoServiceObservableWrapper
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
     func makeCoordinator() -> Coordinator {
@@ -55,7 +55,7 @@ struct VideoUploadPickerController: UIViewControllerRepresentable {
                 return
             }
             print(url.absoluteString)
-            self.parent.uploadData.fsURL = url
+            self.parent.videoService.videoUploadData.fsUrl = url
             self.parent.presentationMode.wrappedValue.dismiss()
             picker.dismiss(animated: true, completion: nil)
         }
@@ -66,6 +66,6 @@ struct VideoUploadPickerController: UIViewControllerRepresentable {
 struct VideoUploadPickerController_Previews: PreviewProvider {
     @State static var url: String = "/private/var/mobile/Containers/Data/PluginKitPlugin/088E4344-D8A2-4A55-8C18-3D11A7AE315E/tmp/trim.FBB04910-C420-4E52-9AA5-25AD25790F4E.MOV"
     static var previews: some View {
-        VideoUploadPickerController(uploadData: UploadData())
+        VideoUploadPickerController(videoService: VideoServiceObservableWrapper())
     }
 }

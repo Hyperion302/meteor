@@ -10,19 +10,18 @@ import SwiftUI
 
 struct Home: View {
     @ObservedObject var session: AuthSession
-    @State var uploadData: UploadData = UploadData()
-    @State var videoQueryData: VideoQueryData = VideoQueryData()
+    @State var videoService: VideoServiceObservableWrapper = VideoServiceObservableWrapper()
     
     var body: some View {
         Group {
             if(session.user != nil) {
                 TabView {
-                    VideoQuery(videoQueryData: videoQueryData)
+                    VideoQuery(videoService: videoService)
                         .tabItem {
                             Image(systemName: "play.rectangle.fill")
                             Text("Watch")
                         }
-                    VideoUploadSelect(uploadData: uploadData)
+                    VideoUploadSelect(videoService: videoService)
                         .tabItem {
                             Image(systemName: "plus.square.fill")
                             Text("Upload")
