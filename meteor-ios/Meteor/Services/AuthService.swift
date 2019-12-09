@@ -8,18 +8,42 @@
 
 // Big thanks to https://benmcmahen.com/authentication-with-swiftui-and-firebase/
 
+// TODO: CLEAN UP THIS MESS
+
 import Foundation
 import Combine
 import Firebase
 
 class AuthService {
     var handle: AuthStateDidChangeListenerHandle?
+    var handleUserEvent: (_ user: FirebaseAuth.User?) -> Void
     var user: User?
+    
+    init(handleUserEvent: @escaping (_ user: FirebaseAuth.User?) -> Void) {
+        self.handleUserEvent = handleUserEvent
+    }
     
     func bind() {
         handle = Auth.auth().addStateDidChangeListener { (auth, user) in
             self.handleUserEvent(user)
         }
+    }
+    
+    func unbind() {
+        if let handle = handle {
+            Auth.auth().removeStateDidChangeListener(handle)
+        }
+    }
+}
+
+class AuthServiceObservableWrapper: ObservableObject {
+    @Published var user: User?
+    
+    private var authService: AuthService?
+    
+    init(user: User? = nil) {
+        self.user = user
+        self.authService = AuthService(handleUserEvent: handleUserEvent)
     }
     
     func handleUserEvent(_ user: FirebaseAuth.User?) {
@@ -35,33 +59,16 @@ class AuthService {
         }
     }
     
-    func unbind() {
-        if let handle = handle {
-            Auth.auth().removeStateDidChangeListener(handle)
-        }
-    }
-}
-
-class AuthServiceObservableWrapper: ObservableObject {
-    @Published var user: User?
-    
-    private var authService: AuthService
-    
-    init(user: User? = nil) {
-        self.user = user
-        self.authService = AuthService()
-    }
-    
     deinit {
-        authService.unbind()
+        authService!.unbind()
     }
     
     func listen() {
-        authService.bind()
+        authService!.bind()
     }
     
     func unbind() {
-        authService.unbind()
+        authService!.unbind()
     }
     
     func signUp(
