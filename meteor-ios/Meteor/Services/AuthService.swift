@@ -1,8 +1,8 @@
 //
-//  AuthSession.swift
+//  AuthService.swift
 //  Meteor
 //
-//  Created by Joseph Shetaye on 11/30/19.
+//  Created by Joseph Shetaye on 12/8/19.
 //  Copyright © 2019 Joseph Shetaye. All rights reserved.
 //
 
@@ -12,45 +12,26 @@ import Foundation
 import Combine
 import Firebase
 
-struct User {
-    var uid: String
-    var email: String?
+class AuthService {
+    var handle: AuthStateDidChangeListenerHandle?
+    var user: User?
     
-    static let `default` = Self(
-        uid: "asdfa",
-        email: "you@example.com"
-    )
-    
-    init(uid: String, email: String?) {
-        self.uid = uid
-        self.email = email
-    }
-}
-
-class AuthSession: ObservableObject {
-    @Published var user: User?
-    @Published var handle: AuthStateDidChangeListenerHandle?
-    
-    init(user: User? = nil) {
-        self.user = user
-    }
-    
-    deinit {
-        unbind()
-    }
-    
-    func listen() {
+    func bind() {
         handle = Auth.auth().addStateDidChangeListener { (auth, user) in
-            if let user = user {
-                print("Got user: \(user)")
-                self.user = User(
-                    uid: user.uid,
-                    email: nil
-                )
-            }
-            else {
-                self.user = nil
-            }
+            self.handleUserEvent(user)
+        }
+    }
+    
+    func handleUserEvent(_ user: FirebaseAuth.User?) {
+        if let user = user {
+            print("Got user: \(user)")
+            self.user = User(
+                uid: user.uid,
+                email: nil
+            )
+        }
+        else {
+            self.user = nil
         }
     }
     
@@ -58,6 +39,29 @@ class AuthSession: ObservableObject {
         if let handle = handle {
             Auth.auth().removeStateDidChangeListener(handle)
         }
+    }
+}
+
+class AuthServiceObservableWrapper: ObservableObject {
+    @Published var user: User?
+    
+    private var authService: AuthService
+    
+    init(user: User? = nil) {
+        self.user = user
+        self.authService = AuthService()
+    }
+    
+    deinit {
+        authService.unbind()
+    }
+    
+    func listen() {
+        authService.bind()
+    }
+    
+    func unbind() {
+        authService.unbind()
     }
     
     func signUp(
@@ -85,4 +89,5 @@ class AuthSession: ObservableObject {
             return false
         }
     }
+
 }

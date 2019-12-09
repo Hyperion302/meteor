@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct Home: View {
-    @ObservedObject var session: AuthSession
+    @ObservedObject var authService: AuthServiceObservableWrapper
     @State var videoService: VideoServiceObservableWrapper = VideoServiceObservableWrapper()
     
     var body: some View {
@@ -30,7 +30,7 @@ struct Home: View {
                 }
             }
             else {
-                Authentication(session: session)
+                Authentication(authService: authService)
             }
         }
         .onAppear {
@@ -44,7 +44,7 @@ struct Home: View {
 
 struct Home_Previews: PreviewProvider {
     static var previews: some View {
-        Home(session: AuthSession())
+        Home(authService: AuthServiceObservableWrapper())
     }
 }
 
