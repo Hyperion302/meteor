@@ -10,16 +10,22 @@ import SwiftUI
 
 struct VideoUploadDetails: View {
     @ObservedObject var videoService: VideoServiceObservableWrapper
+    @Binding var uploadViewState: UploadViewState
     @State var title: String = ""
     
     var body: some View {
             VStack() {
                 TextField("Title", text: $title, onEditingChanged: { _ in
                     self.videoService.videoUploadData.title = self.title
+                    print(self.title)
                 })
                     .padding()
                 if(title.count > 0) {
-                    NavigationLink(destination: VideoUploadStatus(videoService: videoService)) {
+                    Button(action: {
+                        print(self.title)
+                        self.uploadViewState = .uploading
+                        print(self.title)
+                    }) {
                         LargeButton(text: "Upload")
                     }
                 }
@@ -30,6 +36,6 @@ struct VideoUploadDetails: View {
 
 struct VideoUploadDetails_Previews: PreviewProvider {
     static var previews: some View {
-        VideoUploadDetails(videoService: VideoServiceObservableWrapper())
+        VideoUploadDetails(videoService: VideoServiceObservableWrapper(), uploadViewState: .constant(.details))
     }
 }

@@ -59,13 +59,20 @@ class VideoService {
             completion(nil, .invalidParameter)
             return
         }
+        print(title)
         createVideoCallable.call([
             "title": title
         ]) { (result, error) in
+            // Check for error
+            guard error == nil else {
+                completion(nil, .fbError(error: error))
+                return
+            }
+            
             // Get ID
             let optionalVId = (result?.data as? [String: Any])?["id"] as? String
             guard let vId = optionalVId else {
-                completion(nil, .invalidResponse)
+                completion(nil, .invalidResponse(response: optionalVId as Any))
                 return
             }
             progress(0.1)
@@ -123,6 +130,7 @@ class VideoServiceObservableWrapper: ObservableObject {
         videoService.searchVideos(query: videoSearchTerm) { (results, error) in
             guard results != nil else {
                 // TODO: Error Handling
+                print(error as Any)
                 print("Error searching videos")
                 return
             }
@@ -134,8 +142,10 @@ class VideoServiceObservableWrapper: ObservableObject {
         videoService.uploadVideo(upload: videoUploadData, { p in
             self.videoUploadData.uploadProgress = p
         }) { (results, error) in
+            
             guard results != nil else {
                 // TODO: Error Handling
+                print(error as Any)
                 print("Error uploading video")
                 return
             }

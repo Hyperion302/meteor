@@ -36,7 +36,7 @@ struct VideoUpload {
 
 enum VideoUploadError: Error {
     case invalidParameter
-    case invalidResponse
+    case invalidResponse(response: Any)
     case dataNotReachable
     case fbError(error: Error?)
 }

@@ -21,7 +21,6 @@ struct VideoUploadStatus: View {
         .onAppear {
             self.videoService.runUpload()
         }
-        .navigationBarTitle("Upload \(videoService.videoUploadData.title ?? "")")
     }
 }
 

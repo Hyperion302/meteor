@@ -10,11 +10,19 @@ import SwiftUI
 import UIKit
 import Photos
 
+struct VideoUploadPickerControllerWrapper: View {
+    @ObservedObject var videoService: VideoServiceObservableWrapper
+    @Binding var uploadViewState: UploadViewState
+    var body: some View {
+        VideoUploadPickerController(videoService: videoService, uploadViewState: $uploadViewState)
+    }
+}
+
 struct VideoUploadPickerController: UIViewControllerRepresentable {
     typealias UIViewControllerType = UIImagePickerController
     
     @ObservedObject var videoService: VideoServiceObservableWrapper
-    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    @Binding var uploadViewState: UploadViewState
     
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
@@ -42,7 +50,7 @@ struct VideoUploadPickerController: UIViewControllerRepresentable {
         }
         
         func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            self.parent.presentationMode.wrappedValue.dismiss()
+            parent.uploadViewState = .select
             picker.dismiss(animated: true, completion: nil)
             print("Cancelled")
         }
@@ -50,13 +58,11 @@ struct VideoUploadPickerController: UIViewControllerRepresentable {
         func imagePickerController(_ picker: UIImagePickerController,
                                    didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
             guard let url = info[UIImagePickerController.InfoKey.mediaURL] as? URL else {
-                self.parent.presentationMode.wrappedValue.dismiss()
                 picker.dismiss(animated: true, completion: nil)
                 return
             }
-            print(url.absoluteString)
             self.parent.videoService.videoUploadData.fsUrl = url
-            self.parent.presentationMode.wrappedValue.dismiss()
+            self.parent.uploadViewState = .select
             picker.dismiss(animated: true, completion: nil)
         }
     }
@@ -66,6 +72,6 @@ struct VideoUploadPickerController: UIViewControllerRepresentable {
 struct VideoUploadPickerController_Previews: PreviewProvider {
     @State static var url: String = "/private/var/mobile/Containers/Data/PluginKitPlugin/088E4344-D8A2-4A55-8C18-3D11A7AE315E/tmp/trim.FBB04910-C420-4E52-9AA5-25AD25790F4E.MOV"
     static var previews: some View {
-        VideoUploadPickerController(videoService: VideoServiceObservableWrapper())
+        VideoUploadPickerController(videoService: VideoServiceObservableWrapper(), uploadViewState: .constant(.cameraRoll))
     }
 }

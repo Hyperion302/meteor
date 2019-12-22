@@ -8,25 +8,32 @@
 
 import SwiftUI
 
+enum HomeViewState {
+    case videoSearch
+    case videoUpload
+}
+
 struct Home: View {
     @ObservedObject var authService: AuthServiceObservableWrapper
     @State var videoService: VideoServiceObservableWrapper = VideoServiceObservableWrapper()
+    @State var homeViewState: HomeViewState = .videoUpload
     
     var body: some View {
         Group {
-            if(session.user != nil) {
-                TabView {
+            if authService.user != nil {
+                if homeViewState == .videoSearch {
                     VideoQuery(videoService: videoService)
-                        .tabItem {
+                        tabItem {
                             Image(systemName: "play.rectangle.fill")
                             Text("Watch")
-                        }
-                    VideoUploadSelect(videoService: videoService)
+                    }
+                }
+                if homeViewState == .videoUpload {
+                    VideoUploadView(videoService: videoService)
                         .tabItem {
                             Image(systemName: "plus.square.fill")
                             Text("Upload")
                         }
-                    
                 }
             }
             else {
@@ -34,7 +41,7 @@ struct Home: View {
             }
         }
         .onAppear {
-            self.session.listen()
+            self.authService.listen()
         }
         
     }
