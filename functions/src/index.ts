@@ -61,7 +61,7 @@ exports.createVideo = functions.https.onCall(async (data, context) => {
     return video;
 });
 
-exports.masterUploadComplete = functions.storage.bucket('meteor-videos').object().onFinalize(async object => {
+exports.masterUploadComplete = functions.storage.bucket('meteor-247517.appspot.com').object().onFinalize(async object => {
     if(!object.name) { return; }
     await addLog(log, 'masterUploadComplete', {
         eventSource: 'video',
@@ -76,7 +76,7 @@ exports.masterUploadComplete = functions.storage.bucket('meteor-videos').object(
         const data = doc.data() as IVideo;
         if(!doc.exists || data.status !== 'master-upload-ready') {
             // Delete video, invalid upload ID or invalid state
-            await admin.storage().bucket('meteor-videos').file(object.name).delete();
+            await admin.storage().bucket('meteor-247517.appspot.com').file(object.name).delete();
             return;
         }
         // Change status
@@ -89,9 +89,9 @@ exports.masterUploadComplete = functions.storage.bucket('meteor-videos').object(
             message: `Video ${videoId}'s master uploaded`
         });
         // Make file public
-        await admin.storage().bucket('meteor-videos').file(object.name).makePublic();
+        await admin.storage().bucket('meteor-247517.appspot.com').file(object.name).makePublic();
         // Send to Mux
-        const url = `https://storage.googleapis.com/meteor-videos/${object.name}`
+        const url = `https://storage.googleapis.com/meteor-247517.appspot.com/${object.name}`
         const muxResponse = await axios.default.post('https://api.mux.com/video/v1/assets', {
             input: url,
             playback_policy: ["public"],
