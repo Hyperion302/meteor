@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:meteor/routes.dart';
 
 // NOTE:
 // "Channel" name used interchangably with "User" before phase 2
 
 
 class MeteorChannelScreenArguments {
-  String userId;
+  FirebaseUser user;
 
-  MeteorChannelScreenArguments(this.userId);
+  MeteorChannelScreenArguments(this.user);
 }
 
 class MeteorChannelScreen extends StatefulWidget {
@@ -30,7 +32,7 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
             children: <Widget>[
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Channel ${navigationArguments.userId}',
+                child: Text('Channel ${navigationArguments.user.uid}',
                   style: TextStyle(
                     fontSize: 32.0,
                     fontWeight: FontWeight.bold,
@@ -40,6 +42,12 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamedAndRemoveUntil(context, uploadRoute, (Route<dynamic> route) => false);
+        },
+        child: Icon(Icons.add),
       ),
     );
   }

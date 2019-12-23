@@ -4,6 +4,7 @@ import 'package:meteor/screens/home.dart';
 import 'package:meteor/screens/login.dart';
 import 'package:meteor/screens/splash.dart';
 import 'package:meteor/routes.dart';
+import 'package:meteor/screens/upload.dart';
 
 void main() => runApp(MeteorApp());
 
@@ -21,6 +22,7 @@ class MeteorApp extends StatelessWidget {
         splashRoute: (context) => MeteorSplashScreen(),
         loginRoute: (context) => MeteorLoginScreen(),
         channelRoute: (context) => MeteorChannelScreen(),
+        uploadRoute: (context) => MeteorUploadScreen(),
       }
     );
   }

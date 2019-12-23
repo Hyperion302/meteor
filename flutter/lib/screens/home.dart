@@ -40,12 +40,12 @@ class _MeteorHomeScreenState extends State<MeteorHomeScreen> {
                   FutureBuilder<FirebaseUser>(
                     future: _currentUser,
                     builder: (context, snapshot) {
-                      if(snapshot.hasData) {
+                      if(snapshot.hasData && snapshot.data != null) {
                         return IconButton(
                           icon: Icon(Icons.account_circle, size: 32.0),
                           tooltip: 'Go to my channel',
                           onPressed: () {
-                            Navigator.pushNamed(context, channelRoute, arguments: MeteorChannelScreenArguments(snapshot.data.uid));
+                            Navigator.pushNamed(context, channelRoute, arguments: MeteorChannelScreenArguments(snapshot.data));
                           },
                         );
                       }
