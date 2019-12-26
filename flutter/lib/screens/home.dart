@@ -19,16 +19,14 @@ class _MeteorHomeScreenState extends State<MeteorHomeScreen> {
           padding: EdgeInsets.all(20.0),
           child: Column(
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text('Home',
-                    style: TextStyle(
-                      fontSize: 32.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                ],
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text('Home',
+                  style: TextStyle(
+                    fontSize: 32.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                )
               )
             ],
           ),

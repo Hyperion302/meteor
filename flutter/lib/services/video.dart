@@ -11,6 +11,7 @@ Future< StorageUploadTask > uploadVideo(VideoUpload video) async {
   // Allocate ID
   dynamic resp = await callable.call(<String, dynamic>{
     'title': video.title,
+    'channel': video.channel,
   });
   // Upload Video
   String authorId = resp.data['author'];

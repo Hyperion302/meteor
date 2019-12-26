@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:meteor/models/channel.dart';
 import 'package:meteor/routes.dart';
+import 'package:meteor/screens/upload.dart';
 
 // NOTE:
 // "Channel" name used interchangably with "User" before phase 2
 
 
 class MeteorChannelScreenArguments {
-  FirebaseUser user;
+  Channel channel;
 
-  MeteorChannelScreenArguments(this.user);
+  MeteorChannelScreenArguments(this.channel);
 }
 
 class MeteorChannelScreen extends StatefulWidget {
@@ -27,17 +28,27 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.all(20.0),
+          padding: EdgeInsets.symmetric(
+            horizontal: 20.0,
+          ),
           child: Column(
             children: <Widget>[
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text('Channel ${navigationArguments.user.uid}',
-                  style: TextStyle(
-                    fontSize: 32.0,
-                    fontWeight: FontWeight.bold,
+              Row(
+                children: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.arrow_back_ios),
+                    tooltip: 'Go Back',
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                   ),
-                ),
+                  Text('${navigationArguments.channel.name}',
+                    style: TextStyle(
+                      fontSize: 32.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -45,7 +56,7 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.pushNamedAndRemoveUntil(context, uploadRoute, (Route<dynamic> route) => false);
+          Navigator.pushNamed(context, uploadRoute, arguments: MeteorUploadScreenArguments(navigationArguments.channel));
         },
         child: Icon(Icons.add),
       ),

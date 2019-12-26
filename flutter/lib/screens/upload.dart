@@ -3,11 +3,18 @@ import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:meteor/models/channel.dart';
 import 'package:meteor/models/video.dart';
 import 'package:meteor/routes.dart';
 import 'package:meteor/services/video.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:video_player/video_player.dart';
+
+class MeteorUploadScreenArguments {
+  final Channel channel;
+
+  MeteorUploadScreenArguments(this.channel);
+}
 
 enum _UploadPhase {
   select,
@@ -39,7 +46,14 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
   }
 
   @override
+  void dispose() {
+    // TODO: Cancel upload if still running
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+
     List<Widget> currentStack;
     switch(_phase) {
       case _UploadPhase.select:
@@ -68,7 +82,7 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
           progressIndicator(),
           RaisedButton(
             onPressed: () {
-              Navigator.pushNamedAndRemoveUntil(context, homeRoute, (Route<dynamic> route) => false);
+              Navigator.pop(context);
             },
             child: Text('Back'),
           ),
@@ -105,13 +119,15 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
   }
 
   Future< void > _uploadVideo() async {
+    MeteorUploadScreenArguments navigationArguments = ModalRoute.of(context).settings.arguments;
+
     if(!_formKey.currentState.validate()) {
       return null;
     }
     setState(() {
       _phase = _UploadPhase.upload;
     });
-    VideoUpload upload = VideoUpload(title: _titleInputController.text, video: _video);
+    VideoUpload upload = VideoUpload(title: _titleInputController.text, video: _video, channel: navigationArguments.channel.id);
     StorageUploadTask uploadTask = await uploadVideo(upload);
     setState(() {
       _uploadEventStream = uploadTask.events;

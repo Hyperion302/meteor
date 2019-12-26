@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meteor/screens/channel.dart';
+import 'package:meteor/screens/create_channel.dart';
 import 'package:meteor/screens/home.dart';
 import 'package:meteor/screens/login.dart';
 import 'package:meteor/screens/splash.dart';
@@ -25,6 +26,7 @@ class MeteorApp extends StatelessWidget {
         channelRoute: (context) => MeteorChannelScreen(),
         uploadRoute: (context) => MeteorUploadScreen(),
         tabHostRoute: (context) => MeteorTabHostScreen(),
+        createChannelRoute: (context) => MeteorCreateChannelScreen(),
       }
     );
   }
