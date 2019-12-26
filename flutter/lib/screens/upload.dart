@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -26,7 +25,6 @@ class MeteorUploadScreen extends StatefulWidget {
 
 class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
   File _video;
-  String _debug = 'None';
   Stream<StorageTaskEvent> _uploadEventStream;
   VideoPlayerController _previewPlayerController;
   _UploadPhase _phase = _UploadPhase.select;
@@ -34,6 +32,12 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
   final _titleInputController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   
+  @override
+  void initState() {
+    super.initState();
+    _chooseVideo();
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> currentStack;
@@ -106,7 +110,6 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
     }
     setState(() {
       _phase = _UploadPhase.upload;
-      _debug = 'Uploading Video';
     });
     VideoUpload upload = VideoUpload(title: _titleInputController.text, video: _video);
     StorageUploadTask uploadTask = await uploadVideo(upload);
@@ -115,7 +118,6 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
     });
     await uploadTask.onComplete;
     setState(() {
-      _debug = 'Upload complete';
       _phase = _UploadPhase.uploaded;
     });
   }
