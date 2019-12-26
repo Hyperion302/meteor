@@ -3,6 +3,7 @@ export interface IVideo {
     //  TODO: Collect far more metadata (original orientation, resolution, fr, etc.)
     id: string,
     author: string,
+    channel: string,
     title: string,
     titleKeys: string[],
     status: 'master-upload-ready' | 'master-upload-complete' | 'transcoded'
@@ -10,9 +11,15 @@ export interface IVideo {
     muxPlaybackId?: string
 }
 
+export interface IChannel {
+    id: string,
+    owner: string,
+    name: string,
+}
+
 export interface ILog {
     // TODO: Better log types with subtypes for video, error, etc.
-    eventSource: 'video' | 'error'
+    eventSource: 'video' | 'error' | 'channel'
     value: any
     message: string
 }

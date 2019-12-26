@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as uuid from 'uuid/v4';
-import { IVideo, ILog } from './definitions';
+import { IVideo, ILog, IChannel } from './definitions';
 import * as path from 'path';
 import { Logging, Log } from '@google-cloud/logging';
 import * as axios from 'axios';
@@ -39,6 +39,16 @@ exports.createVideo = functions.https.onCall(async (data, context) => {
     if(!(typeof title === 'string') || title.length === 0) {
         throw new functions.https.HttpsError('invalid-argument', 'Invalid title');
     }
+    // Check channel existence
+    const channelId = data.channel;
+    if(!(typeof channelId === 'string') || channelId.length === 0) {
+        throw new functions.https.HttpsError('invalid-argument', 'Invalid title');
+    }
+    const channelDoc = db.doc(`channels/${channelId}`);
+    const channelSnap = await channelDoc.get();
+    if(!channelSnap.exists) {
+        throw new functions.https.HttpsError('invalid-argument', 'Channel does not exist');
+    }
     // TODO: Better keys
     const keywords = title.split(' ');
     // Create video
@@ -47,6 +57,7 @@ exports.createVideo = functions.https.onCall(async (data, context) => {
     const video: IVideo = {
         id: videoId,
         author: userId,
+        channel: channelId,
         title: title,
         titleKeys: keywords,
         status: 'master-upload-ready'
@@ -60,6 +71,51 @@ exports.createVideo = functions.https.onCall(async (data, context) => {
     });
     return video;
 });
+
+exports.createChannel = functions.https.onCall(async (data, context) => {
+    if(!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated to make this request');
+    }
+    // Channel name
+    const name = data.name;
+    if(!(typeof name === 'string') || name.length === 0) {
+        throw new functions.https.HttpsError('invalid-argument', 'Invalid channel name');
+    }
+    // Create channel
+    const userId = context.auth.uid;
+    const channelId = uuid();
+    const channel: IChannel = {
+        id: channelId,
+        owner: userId,
+        name: name,
+    };
+    const doc = db.doc(`channels/${channelId}`);
+    await doc.set(channel);
+    await addLog(log, 'createChannel', {
+        eventSource: 'channel',
+        value: channel,
+        message: `Channel ${channelId} : ${name}`
+    });
+    return channel
+});
+
+exports.getChannels = functions.https.onCall(async (data, context) => {
+    if(!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated to make this request');
+    }
+    // Check User
+    const user = data.user;
+    try {
+        await admin.auth().getUser(user);
+    }
+    catch {
+        throw new functions.https.HttpsError('invalid-argument', 'User could not found');
+    }
+    const query = db.collection('channels').where('owner', '==', user).limit(100);
+    const querySnapshot = await query.get();
+    const channels = querySnapshot.docs.map(docSnap => docSnap.data());
+    return channels;
+})
 
 exports.masterUploadComplete = functions.storage.bucket('meteor-247517.appspot.com').object().onFinalize(async object => {
     if(!object.name) { return; }
