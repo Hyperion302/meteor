@@ -4,6 +4,7 @@ import 'package:meteor/screens/home.dart';
 import 'package:meteor/screens/login.dart';
 import 'package:meteor/screens/splash.dart';
 import 'package:meteor/routes.dart';
+import 'package:meteor/screens/tab_host.dart';
 import 'package:meteor/screens/upload.dart';
 
 void main() => runApp(MeteorApp());
@@ -23,6 +24,7 @@ class MeteorApp extends StatelessWidget {
         loginRoute: (context) => MeteorLoginScreen(),
         channelRoute: (context) => MeteorChannelScreen(),
         uploadRoute: (context) => MeteorUploadScreen(),
+        tabHostRoute: (context) => MeteorTabHostScreen(),
       }
     );
   }

@@ -44,7 +44,7 @@ class _MeteorLoginScreenState extends State<MeteorLoginScreen> {
       email: emailInputController.text,
       password: pwdInputController.text,
     );
-    Navigator.pushNamedAndRemoveUntil(context, homeRoute, (Route<dynamic> route) => false);
+    Navigator.pushNamedAndRemoveUntil(context, tabHostRoute, (Route<dynamic> route) => false);
   }
 
   @override

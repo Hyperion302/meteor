@@ -25,7 +25,7 @@ class _MeteorSplashScreenState extends State<MeteorSplashScreen> {
     else {
       print('Already logged in');
       print(currentUser.email);
-      Navigator.pushNamedAndRemoveUntil(context, homeRoute, (Route<dynamic> route) => false);
+      Navigator.pushNamedAndRemoveUntil(context, tabHostRoute, (Route<dynamic> route) => false);
     }
   }
 

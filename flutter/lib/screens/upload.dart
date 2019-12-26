@@ -71,7 +71,7 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
               Navigator.pushNamedAndRemoveUntil(context, homeRoute, (Route<dynamic> route) => false);
             },
             child: Text('Back'),
-          )
+          ),
         ];
         break;
     }
