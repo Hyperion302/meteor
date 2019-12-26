@@ -4,7 +4,9 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:meteor/models/video.dart';
 import 'package:meteor/routes.dart';
+import 'package:meteor/services/video.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:video_player/video_player.dart';
 
@@ -31,9 +33,6 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
 
   final _titleInputController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
-    functionName: 'createVideo',
-  );
   
   @override
   Widget build(BuildContext context) {
@@ -107,20 +106,10 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
     }
     setState(() {
       _phase = _UploadPhase.upload;
-      _debug = 'Allocating ID';
+      _debug = 'Uploading Video';
     });
-    // Allocate ID
-    dynamic resp = await callable.call(<String, dynamic>{
-      'title': _titleInputController.text,
-    });
-    // Upload Video
-    String authorId = resp.data['author'];
-    String videoId = resp.data['id'];
-    setState(() {
-      _debug = 'Starting upload to gs://meteor-videos/masters/$authorId/$videoId';
-    });
-    StorageReference videoRef = FirebaseStorage.instance.ref().child('masters/$authorId/$videoId');
-    StorageUploadTask uploadTask = videoRef.putFile(_video);
+    VideoUpload upload = VideoUpload(title: _titleInputController.text, video: _video);
+    StorageUploadTask uploadTask = await uploadVideo(upload);
     setState(() {
       _uploadEventStream = uploadTask.events;
     });
