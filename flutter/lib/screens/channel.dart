@@ -72,7 +72,12 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
                       return Text('This channel has no videos');
                     }
                     List< Widget > mappedVideos = <Widget>[...snapshot.data.map((Video video) {
-                      return MeteorVideoListItem(video);
+                      return InkWell(
+                        child: MeteorVideoListItem(video),
+                        onTap: () {
+                          Navigator.pushNamed(context, playerRoute, arguments: video);
+                        }
+                      );
                     })];
                     return Column(
                       children: mappedVideos,

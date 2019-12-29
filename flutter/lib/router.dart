@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:meteor/models/video.dart';
 import 'package:meteor/routes.dart';
 import 'package:meteor/screens/channel.dart';
 import 'package:meteor/screens/create_channel.dart';
 import 'package:meteor/screens/login.dart';
+import 'package:meteor/screens/player.dart';
 import 'package:meteor/screens/splash.dart';
 import 'package:meteor/models/channel.dart';
 import 'package:meteor/screens/tab_host.dart';
@@ -24,6 +26,9 @@ Route< dynamic > generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (BuildContext context) => MeteorTabHostScreen());
     case createChannelRoute:
       return MaterialPageRoute(builder: (BuildContext context) => MeteorCreateChannelScreen());
+    case playerRoute:
+      Video displayedVideo = settings.arguments;
+      return MaterialPageRoute(builder: (BuildContext context) => MeteorPlayerScreen(video: displayedVideo));
     default:
       return MaterialPageRoute(builder: (context) => Container());
   }

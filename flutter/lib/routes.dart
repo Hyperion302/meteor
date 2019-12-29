@@ -5,3 +5,4 @@ const String channelRoute = '/channel';
 const String uploadRoute = '/upload';
 const String tabHostRoute = '/tabhost';
 const String createChannelRoute = '/createChannel';
+const String playerRoute = '/player';
