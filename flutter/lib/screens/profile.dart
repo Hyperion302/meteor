@@ -65,7 +65,7 @@ class _MeteorProfileScreenState extends State<MeteorProfileScreen> {
                         // Margin can be found \/
                         child: MeteorChannelListItem(channel),
                         onTap: () {
-                          Navigator.pushNamed(context, channelRoute, arguments: MeteorChannelScreenArguments(channel));
+                          Navigator.pushNamed(context, channelRoute, arguments: channel);
                         }
                       );
                     }).toList()];

@@ -5,16 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:meteor/models/channel.dart';
 import 'package:meteor/models/video.dart';
-import 'package:meteor/routes.dart';
 import 'package:meteor/services/video.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:video_player/video_player.dart';
-
-class MeteorUploadScreenArguments {
-  final Channel channel;
-
-  MeteorUploadScreenArguments(this.channel);
-}
 
 enum _UploadPhase {
   select,
@@ -24,7 +17,9 @@ enum _UploadPhase {
 }
 
 class MeteorUploadScreen extends StatefulWidget {
-  MeteorUploadScreen({Key key}) : super(key: key);
+  final Channel videoChannel;
+
+  MeteorUploadScreen({Key key, this.videoChannel}) : super(key: key);
 
   @override
   _MeteorUploadScreenState createState() => _MeteorUploadScreenState();
@@ -119,7 +114,6 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
   }
 
   Future< void > _uploadVideo() async {
-    MeteorUploadScreenArguments navigationArguments = ModalRoute.of(context).settings.arguments;
 
     if(!_formKey.currentState.validate()) {
       return null;
@@ -127,7 +121,7 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
     setState(() {
       _phase = _UploadPhase.upload;
     });
-    VideoUpload upload = VideoUpload(title: _titleInputController.text, video: _video, channel: navigationArguments.channel.id);
+    VideoUpload upload = VideoUpload(title: _titleInputController.text, video: _video, channel: widget.videoChannel.id);
     StorageUploadTask uploadTask = await uploadVideo(upload);
     setState(() {
       _uploadEventStream = uploadTask.events;
