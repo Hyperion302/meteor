@@ -9,9 +9,13 @@ class MeteorChannelListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: EdgeInsets.symmetric(
+        vertical: 10.0
+      ),
+      height: 100,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20.0),
-        color: Theme.of(context).primaryColor,
+        color: Colors.white,
         boxShadow: <BoxShadow>[
           BoxShadow(
             color: Colors.black12,
@@ -23,11 +27,11 @@ class MeteorChannelListItem extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.all(20.0),
         child: Align(
-          alignment: Alignment.centerLeft,
+          alignment: Alignment.topLeft,
           child: Text(
             channel.name,
             style: TextStyle(
-              fontSize: 16.0,
+              fontSize: 24.0,
             ),
           ),
         ),

@@ -41,12 +41,14 @@ class _MeteorProfileScreenState extends State<MeteorProfileScreen> {
                   ),
                 ),
               ),
+              SizedBox(
+                height: 20.0
+              ),
               Align(
                 alignment: Alignment.centerLeft,
                 child: Text('Channels',
                   style: TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 20.0,
                   ),
                 ),
               ),
@@ -60,6 +62,7 @@ class _MeteorProfileScreenState extends State<MeteorProfileScreen> {
                     // Weird but sound way to go from List< Channel > to List< Widget >
                     List< Widget > mappedChannels = <Widget>[...snapshot.data.map((Channel channel) {
                       return InkWell(
+                        // Margin can be found \/
                         child: MeteorChannelListItem(channel),
                         onTap: () {
                           Navigator.pushNamed(context, channelRoute, arguments: MeteorChannelScreenArguments(channel));
@@ -81,7 +84,7 @@ class _MeteorProfileScreenState extends State<MeteorProfileScreen> {
                       ]
                     );
                   }
-                  return Text('Loading...');
+                  return CircularProgressIndicator();
                 },
               ),
             ],
