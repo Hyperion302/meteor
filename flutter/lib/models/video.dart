@@ -5,10 +5,10 @@ class Video {
   final String author;
   final String title;
   final String channel;
-  String muxPlaybackId;
-  String muxAssetId;
+  final String muxPlaybackId;
+  final String muxAssetId;
 
-  Video({this.channel, this.videoId, this.author, this.title});
+  Video({this.channel, this.videoId, this.author, this.title, this.muxPlaybackId, this.muxAssetId});
 }
 
 class VideoUpload {

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:meteor/models/channel.dart';
+import 'package:meteor/models/video.dart';
 import 'package:meteor/routes.dart';
+import 'package:meteor/services/channel.dart';
+import 'package:meteor/stateless_widgets/video_list_item.dart';
 
 class MeteorChannelScreen extends StatefulWidget {
   final Channel channel;
@@ -11,6 +14,13 @@ class MeteorChannelScreen extends StatefulWidget {
 }
 
 class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
+  Future< List< Video > > _videos;
+
+  @override
+  void initState() {
+    _videos = getVideos(widget.channel);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +49,38 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
                   ),
                 ],
               ),
+              SizedBox(
+                height: 20.0
+              ),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text('Videos',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                  ),
+                ),
+              ),
+              FutureBuilder(
+                future: _videos,
+                builder: (context, snapshot) {
+                  if(snapshot.hasError) {
+                    print(snapshot.error);
+                    return Text('Error');
+                  }
+                  if(snapshot.hasData) {
+                    if(snapshot.data.length == 0) {
+                      return Text('This channel has no videos');
+                    }
+                    List< Widget > mappedVideos = <Widget>[...snapshot.data.map((Video video) {
+                      return MeteorVideoListItem(video);
+                    })];
+                    return Column(
+                      children: mappedVideos,
+                    );
+                  }
+                  return CircularProgressIndicator();
+                }
+              )
             ],
           ),
         ),
