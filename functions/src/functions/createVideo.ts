@@ -16,7 +16,7 @@ export const createVideo = functions.https.onCall(async (data, context) => {
     // Check channel existence
     const channelId = data.channel;
     if(!(typeof channelId === 'string') || channelId.length === 0) {
-        throw new functions.https.HttpsError('invalid-argument', 'Invalid title');
+        throw new functions.https.HttpsError('invalid-argument', 'Channel does not exist');
     }
     const channelDoc = db.doc(`channels/${channelId}`);
     const channelSnap = await channelDoc.get();
