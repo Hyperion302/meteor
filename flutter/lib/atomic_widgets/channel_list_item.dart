@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meteor/models/channel.dart';
+import 'package:meteor/routes.dart';
+import 'package:meteor/atomic_widgets/custom_card.dart';
 
 class MeteorChannelListItem extends StatelessWidget {
   final Channel channel;
@@ -7,6 +9,19 @@ class MeteorChannelListItem extends StatelessWidget {
   MeteorChannelListItem(this.channel);
 
   @override
+  Widget build(BuildContext context) {
+    return CustomCard(
+      child: ListTile(
+        leading: FlutterLogo(),
+        title: Text(channel.name),
+        subtitle: Text('Lorem Ipsum'),
+        onTap: () {
+          Navigator.pushNamed(context, channelRoute, arguments: channel);
+        }
+      ),
+    );
+  }
+  /*@override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(
@@ -38,5 +53,5 @@ class MeteorChannelListItem extends StatelessWidget {
       ),
     );
   }
-  
+  */
 }

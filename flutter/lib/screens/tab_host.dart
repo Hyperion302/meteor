@@ -47,7 +47,7 @@ class _MeteorTabHostScreenState extends State<MeteorTabHostScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.account_circle),
-            title: Text('Me'),
+            title: Text('Profile'),
           ),
         ],
       ),

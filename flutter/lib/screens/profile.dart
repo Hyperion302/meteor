@@ -33,7 +33,7 @@ class _MeteorProfileScreenState extends State<MeteorProfileScreen> {
             children: <Widget>[
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Me',
+                child: Text('Profile',
                   style: TextStyle(
                     fontSize: 32.0,
                     fontWeight: FontWeight.bold,
@@ -60,16 +60,13 @@ class _MeteorProfileScreenState extends State<MeteorProfileScreen> {
                   if(snapshot.hasData) {
                     // Weird but sound way to go from List< Channel > to List< Widget >
                     List< Widget > mappedChannels = <Widget>[...snapshot.data.map((Channel channel) {
-                      return InkWell(
-                        // Margin can be found \/
-                        child: MeteorChannelListItem(channel),
-                        onTap: () {
-                          Navigator.pushNamed(context, channelRoute, arguments: channel);
-                        }
-                      );
+                      return MeteorChannelListItem(channel);
                     }).toList()];
                     return Column(
-                      children: [...mappedChannels,
+                      children: [
+                        Column(
+                          children: mappedChannels,
+                        ),
                         RaisedButton(
                           onPressed: () {
                             Navigator.pushNamed(context, createChannelRoute);

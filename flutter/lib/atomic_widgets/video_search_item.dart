@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meteor/models/video.dart';
 import 'package:meteor/routes.dart';
 import 'package:meteor/services/video.dart';
+import 'package:meteor/atomic_widgets/custom_card.dart';
 
 class MeteorVideoSearchItem extends StatefulWidget {
   final VideoSearchResult searchResult;
@@ -24,7 +25,7 @@ class _MeteorVideoSearchItemState extends State<MeteorVideoSearchItem> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return CustomCard(
       child: FutureBuilder(
         future: _video,
         builder: (BuildContext context, snap) {

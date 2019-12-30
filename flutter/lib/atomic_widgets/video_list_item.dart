@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meteor/atomic_widgets/custom_card.dart';
 import 'package:meteor/models/video.dart';
 
 class MeteorVideoListItem extends StatelessWidget {
@@ -8,21 +9,7 @@ class MeteorVideoListItem extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(
-        vertical: 10.0
-      ),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.0),
-        color: Colors.white,
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10.0,
-            offset: Offset(0.0, 10.0),
-          )
-        ],
-      ),
+    return CustomCard(
       child: Row(
         children: <Widget>[
           Container(
