@@ -2,9 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:meteor/models/channel.dart';
 import 'package:meteor/routes.dart';
-import 'package:meteor/screens/channel.dart';
 import 'package:meteor/services/user.dart';
-import 'package:meteor/stateless_widgets/channel_list_item.dart';
+import 'package:meteor/atomic_widgets/channel_list_item.dart';
 
 class MeteorProfileScreen extends StatefulWidget {
   MeteorProfileScreen({Key key}) : super(key: key);

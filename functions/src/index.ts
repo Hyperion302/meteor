@@ -10,3 +10,4 @@ export { getChannels } from './functions/getChannels';
 export { masterUploadComplete } from './functions/masterUploadComplete';
 export { muxWebhook } from './functions/muxWebhook';
 export { getVideos } from './functions/getVideos';
+export { getVideo } from './functions/getVideo';

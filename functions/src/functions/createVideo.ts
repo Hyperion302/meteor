@@ -23,8 +23,6 @@ export const createVideo = functions.https.onCall(async (data, context) => {
     if(!channelSnap.exists) {
         throw new functions.https.HttpsError('invalid-argument', 'Channel does not exist');
     }
-    // TODO: Better keys
-    const keywords = title.split(' ');
     // Create video
     const userId = context.auth.uid;
     const videoId = uuid();
@@ -33,7 +31,6 @@ export const createVideo = functions.https.onCall(async (data, context) => {
         author: userId,
         channel: channelId,
         title: title,
-        titleKeys: keywords,
         status: 'master-upload-ready'
     };
     const doc = db.doc(`videos/${videoId}`);

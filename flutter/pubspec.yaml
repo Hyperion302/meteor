@@ -24,12 +24,16 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
 
-  # Media Plugins
+  # Widgets
   image_picker: ^0.6.2+3
   video_player: ^0.10.2+1
+  flappy_search_bar: 1.4.1
 
   # Other
   percent_indicator: ^2.1.1
+
+  # Algolia
+  algolia: ^0.1.6+1
 
   # Add the dependency for the FlutterFire plugin for Google Analytics
   firebase_analytics: ^5.0.2

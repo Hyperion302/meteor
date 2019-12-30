@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meteor/screens/home.dart';
 import 'package:meteor/screens/profile.dart';
+import 'package:meteor/screens/search.dart';
 
 class MeteorTabHostScreen extends StatefulWidget {
   MeteorTabHostScreen({Key key}) : super(key: key);
@@ -12,7 +13,7 @@ class MeteorTabHostScreen extends StatefulWidget {
 class _MeteorTabHostScreenState extends State<MeteorTabHostScreen> {
   final List<Widget> _subviews = <Widget>[
     MeteorHomeScreen(),
-    Container(),
+    MeteorSearchScreen(),
     MeteorProfileScreen(),
   ];
   int _currentIndex;

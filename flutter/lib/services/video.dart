@@ -20,3 +20,21 @@ Future< StorageUploadTask > uploadVideo(VideoUpload video) async {
   StorageUploadTask uploadTask = videoRef.putFile(video.video);
   return uploadTask;
 }
+
+Future< Video > getVideoById(String id) async {
+  final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
+    functionName: 'getVideo',
+  );
+  // Allocate ID
+  dynamic resp = await callable.call(<String, dynamic>{
+    'video': id,
+  });
+  return Video(
+    videoId: resp.data['id'],
+    author: resp.data['author'],
+    channel: resp.data['channel'],
+    title: resp.data['title'],
+    muxAssetId: resp.data['muxAssetId'],
+    muxPlaybackId: resp.data['muxPlaybackId'],
+  );
+}

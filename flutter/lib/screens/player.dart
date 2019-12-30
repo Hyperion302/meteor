@@ -33,6 +33,16 @@ class _MeteorPlayerScreenState extends State<MeteorPlayerScreen>{
       body: SafeArea(
         child: Column(
           children: <Widget>[
+            Align(
+              alignment: Alignment.centerLeft,
+              child: IconButton(
+                icon: Icon(Icons.arrow_back_ios),
+                tooltip: 'Go Back',
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
             buildPlayer(),
             buildVideoInfo(),
           ],

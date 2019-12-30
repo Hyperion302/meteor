@@ -3,7 +3,7 @@ import 'package:meteor/models/channel.dart';
 import 'package:meteor/models/video.dart';
 import 'package:meteor/routes.dart';
 import 'package:meteor/services/channel.dart';
-import 'package:meteor/stateless_widgets/video_list_item.dart';
+import 'package:meteor/atomic_widgets/video_list_item.dart';
 
 class MeteorChannelScreen extends StatefulWidget {
   final Channel channel;
