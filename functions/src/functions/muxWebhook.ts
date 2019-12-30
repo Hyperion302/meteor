@@ -17,7 +17,7 @@ export const muxWebhook = functions.https.onRequest(async (req, res) => {
             status: 'transcoded'
         });
         const data = (await docRef.get()).data() as IVideo;
-        await admin.storage().bucket('meteor-videos').file(`masters/${data.author}/${data.id}`).makePrivate();
+        await admin.storage().bucket('meteor-247517.appspot.com').file(`masters/${data.author}/${data.id}`).makePrivate();
         await addLog(log, 'muxWebhook', {
             eventSource: 'video',
             value: videoId,
