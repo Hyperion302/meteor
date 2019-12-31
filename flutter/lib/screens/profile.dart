@@ -78,7 +78,7 @@ class _MeteorProfileScreenState extends State<MeteorProfileScreen> {
                         ),
                         RaisedButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, createChannelRoute);
+                            _navigateToChannelCreate();
                           },
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(20.0),
@@ -97,6 +97,16 @@ class _MeteorProfileScreenState extends State<MeteorProfileScreen> {
         )
       ),
     );
+  }
+
+  _navigateToChannelCreate() async {
+    var shouldReload = await Navigator.pushNamed(context, createChannelRoute);
+    if(shouldReload) {
+      await Future.delayed(Duration(seconds: 1));
+      setState(() {
+        _channels = _currentUser.then(getChannels);
+      });
+    }
   }
 
   _promptForDelete(Channel channel) async {

@@ -47,7 +47,7 @@ class _MeteorCreateChannelScreenState extends State<MeteorCreateChannelScreen> {
                   icon: Icon(Icons.cancel),
                   tooltip: 'Go Back',
                   onPressed: () {
-                    Navigator.pop(context);
+                    Navigator.pop(context, false);
                   },
                 ),
               ),
@@ -75,7 +75,7 @@ class _MeteorCreateChannelScreenState extends State<MeteorCreateChannelScreen> {
             return;
           }
           create();
-          Navigator.pop(context);
+          Navigator.pop(context, true);
         },
         icon: Icon(Icons.check),
         label: Text('Create'),
