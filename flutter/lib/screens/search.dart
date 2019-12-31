@@ -21,9 +21,9 @@ class _MeteorSearchScreenState extends State<MeteorSearchScreen> {
           padding: EdgeInsets.symmetric(
             horizontal: 20.0,
           ),
-          child: SearchBar<VideoSearchResult>(
+          child: SearchBar<AlgoliaVideo>(
             onSearch: searchVideos,
-            onItemFound: (VideoSearchResult result, int index) {
+            onItemFound: (AlgoliaVideo result, int index) {
               return MeteorVideoSearchItem(searchResult: result);
             },
           ),

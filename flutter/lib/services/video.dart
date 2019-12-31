@@ -14,9 +14,8 @@ Future< StorageUploadTask > uploadVideo(VideoUpload video) async {
     'channel': video.channel,
   });
   // Upload Video
-  String authorId = resp.data['author'];
-  String videoId = resp.data['id'];
-  StorageReference videoRef = FirebaseStorage.instance.ref().child('masters/$authorId/$videoId');
+  Video uploadedVideo = Video.fromFirestore(resp.data);
+  StorageReference videoRef = FirebaseStorage.instance.ref().child('masters/${uploadedVideo.author}/${uploadedVideo.id}');
   StorageUploadTask uploadTask = videoRef.putFile(video.video);
   return uploadTask;
 }
@@ -29,12 +28,5 @@ Future< Video > getVideoById(String id) async {
   dynamic resp = await callable.call(<String, dynamic>{
     'video': id,
   });
-  return Video(
-    videoId: resp.data['id'],
-    author: resp.data['author'],
-    channel: resp.data['channel'],
-    title: resp.data['title'],
-    muxAssetId: resp.data['muxAssetId'],
-    muxPlaybackId: resp.data['muxPlaybackId'],
-  );
+  return Video.fromFirestore(resp.data);
 }

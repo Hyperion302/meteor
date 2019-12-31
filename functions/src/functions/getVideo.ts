@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import { db } from '../globals';
-import { IVideo } from '../definitions';
+import { videoFromFirestore } from '../converters';
 
 export const getVideo = functions.https.onCall(async (data, context) => {
     if(!context.auth) {
@@ -9,7 +9,7 @@ export const getVideo = functions.https.onCall(async (data, context) => {
     // Check ID
     const videoId = data.video;
     if(!(typeof videoId === 'string') || videoId.length === 0) {
-        throw new functions.https.HttpsError('invalid-argument', 'Invalid title');
+        throw new functions.https.HttpsError('invalid-argument', 'Invalid video id');
     }
 
     const query = db.doc(`videos/${videoId}`);
@@ -18,14 +18,5 @@ export const getVideo = functions.https.onCall(async (data, context) => {
     if(!querySnapshot.exists || !videoData) {
         throw new functions.https.HttpsError('not-found', 'Video not found or could not be retrieved');
     }
-    const castedVideo: IVideo = {
-        id: videoData.id,
-        author: videoData.author,
-        channel: videoData.channel,
-        title: videoData.title,
-        status: videoData.status,
-        muxAssetId: videoData.status === 'transcoded' ? videoData.muxAssetId : null,
-        muxPlaybackId: videoData.status === 'transcoded' ? videoData.muxPlaybackId : null,
-    }
-    return castedVideo;
+    return videoFromFirestore(videoData);
 });

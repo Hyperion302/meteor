@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meteor/atomic_widgets/channel_list_item.dart';
 import 'package:meteor/models/video.dart';
 import 'package:video_player/video_player.dart';
 
@@ -18,7 +19,7 @@ class _MeteorPlayerScreenState extends State<MeteorPlayerScreen>{
   
   @override
   void initState() {
-    _playerController = VideoPlayerController.network('https://stream.mux.com/${widget.video.muxPlaybackId}.m3u8');
+    _playerController = VideoPlayerController.network('https://stream.mux.com/${widget.video.muxData.playbackID}.m3u8');
     _playerController.initialize().then((_) {
       setState(() {
         // Display first frame...
@@ -33,16 +34,26 @@ class _MeteorPlayerScreenState extends State<MeteorPlayerScreen>{
       body: SafeArea(
         child: Column(
           children: <Widget>[
-            Align(
-              alignment: Alignment.centerLeft,
-              child: IconButton(
-                icon: Icon(Icons.arrow_back_ios),
-                tooltip: 'Go Back',
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+            Row(
+                children: <Widget>[
+                  IconButton(
+                    icon: Icon(Icons.arrow_back_ios),
+                    tooltip: 'Go Back',
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  Flexible(
+                    child: Text(widget.video.title,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 32.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
             buildPlayer(),
             buildVideoInfo(),
           ],
@@ -52,14 +63,23 @@ class _MeteorPlayerScreenState extends State<MeteorPlayerScreen>{
   }
 
   Widget buildVideoInfo() {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Text(widget.video.title,
-        style: TextStyle(
-          fontSize: 24.0,
-          fontWeight: FontWeight.bold,
-        ),
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 12.0
       ),
+      child: Column(
+        children: <Widget>[
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text('Uploaded On',
+              style: TextStyle(
+                fontSize: 20.0,
+              ),
+            ),
+          ),
+          MeteorChannelListItem(widget.video.channel),
+        ],
+      )
     );
   }
 

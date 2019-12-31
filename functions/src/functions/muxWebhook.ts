@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import { addLog, log, db } from '../globals';
-import { IVideo } from '../definitions';
+import { videoFromFirestore } from '../converters';
 
 export const muxWebhook = functions.https.onRequest(async (req, res) => {
     const eventType = req.body.type
@@ -14,10 +14,14 @@ export const muxWebhook = functions.https.onRequest(async (req, res) => {
         const videoId = req.body.data.passthrough
         const docRef = db.doc(`videos/${videoId}`);
         await docRef.update({
-            status: 'transcoded'
+            'muxData.status': 'transcoded',
         });
-        const data = (await docRef.get()).data() as IVideo;
-        await admin.storage().bucket('meteor-247517.appspot.com').file(`masters/${data.author}/${data.id}`).makePrivate();
+        const data = (await docRef.get()).data();
+        if(!data) {
+            throw new functions.https.HttpsError('not-found', 'Video not found or could not be retrieved');
+        }
+        const video = videoFromFirestore(data);
+        await admin.storage().bucket('meteor-247517.appspot.com').file(`masters/${video.author}/${video.id}`).makePrivate();
         await addLog(log, 'muxWebhook', {
             eventSource: 'video',
             value: videoId,

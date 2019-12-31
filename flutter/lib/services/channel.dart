@@ -11,7 +11,7 @@ Future< Channel > createChannel(String name) async {
     'name': name,
   });
   // return
-  return resp.data;
+  return Channel.fromFirestore(resp.data);
 }
 
 Future< List< Video > > getVideos(Channel channel) async {
@@ -25,7 +25,7 @@ Future< List< Video > > getVideos(Channel channel) async {
   // Map response data
   List rawVideos = resp.data;
   List< Video > videos = rawVideos.map((video) {
-    return Video(author: video['author'], videoId: video['id'], channel: video['channel'], title: video['title'], muxPlaybackId: video['muxPlaybackId'], muxAssetId: video['muxAssetId']);
+    return Video.fromFirestore(video);
   }).toList();
   return videos;
 }

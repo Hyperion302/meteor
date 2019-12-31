@@ -8,17 +8,12 @@ class AlgoliaInstance {
   );
 }
 
-Future< List< VideoSearchResult > > searchVideos(String search) async {
+Future< List< AlgoliaVideo > > searchVideos(String search) async {
   Algolia algolia = AlgoliaInstance.algolia;
   AlgoliaQuery query = algolia.instance.index('dev_videos').search(search);
   AlgoliaQuerySnapshot snap = await query.getObjects();
-  List< VideoSearchResult > videos = snap.hits.map((AlgoliaObjectSnapshot objectSnap) {
-    return VideoSearchResult(
-      title: objectSnap.data['title'],
-      channelId: objectSnap.data['channel']['objectId'],
-      videoId: objectSnap.data['objectId'],
-      channelName: objectSnap.data['channel']['name'],
-    );
+  List< AlgoliaVideo > videos = snap.hits.map((AlgoliaObjectSnapshot objectSnap) {
+    return AlgoliaVideo.fromAlgolia(objectSnap.data);
   }).toList();
 
   return videos;

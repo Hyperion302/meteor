@@ -1,28 +1,37 @@
+export type tID = string;
+export type tMuxID = string;
+export type tUser = string;
+
+export interface IMuxData {
+    status: 'upload-ready' | 'upload-complete' | 'transcoded',
+    assetID: tMuxID | null,
+    playbackID: tMuxID | null,
+}
+
 export interface IVideo {
-    //  TODO: Collect far more metadata (original orientation, resolution, fr, etc.)
-    id: string,
-    author: string,
-    channel: string,
+    id: tID,
+    author: tUser,
+    channel: IChannel,
     title: string,
-    status: 'master-upload-ready' | 'master-upload-complete' | 'transcoded'
-    muxAssetId?: string,
-    muxPlaybackId?: string,
+    muxData: IMuxData,
 }
 
 export interface IAlgoliaVideoObject {
-    objectId: string,
     channel: IAlgoliaChannelObject,
     title: string,
+    id: tID,
+    author: tUser,
 }
 
 export interface IAlgoliaChannelObject {
-    objectId: string,
     name: string,
+    id: tID,
+    owner: tUser,
 }
 
 export interface IChannel {
-    id: string,
-    owner: string,
+    id: tID,
+    owner: tUser,
     name: string,
 }
 

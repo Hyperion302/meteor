@@ -1,3 +1,4 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:meteor/models/channel.dart';
 import 'package:meteor/models/video.dart';
@@ -64,7 +65,8 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
                 future: _videos,
                 builder: (context, snapshot) {
                   if(snapshot.hasError) {
-                    print(snapshot.error);
+                    CloudFunctionsException e = snapshot.error;
+                    print(e.message);
                     return Text('Error');
                   }
                   if(snapshot.hasData) {

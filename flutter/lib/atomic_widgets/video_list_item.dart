@@ -27,7 +27,7 @@ class MeteorVideoListItem extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20.0),
               child: Image.network(
-                'https://image.mux.com/${video.muxPlaybackId}/thumbnail.png',
+                'https://image.mux.com/${video.muxData.playbackID}/thumbnail.png',
                 width: 128,
                 height: 72,
               ),

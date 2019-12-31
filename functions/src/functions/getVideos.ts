@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions';
 import { db } from '../globals';
+import { videoFromFirestore } from '../converters';
 
 export const getVideos = functions.https.onCall(async (data, context) => {
     if(!context.auth) {
@@ -17,8 +18,10 @@ export const getVideos = functions.https.onCall(async (data, context) => {
         throw new functions.https.HttpsError('invalid-argument', 'Channel does not exist');
     }
 
-    const query = db.collection('videos').where('channel', '==', channel); // TODO: Pagination
+    const query = db.collection('videos').where('channel.id', '==', channel); // TODO: Pagination
     const querySnapshot = await query.get();
-    const videos = querySnapshot.docs.map(docSnap => docSnap.data());
+    const videos = querySnapshot.docs.map(docSnap => {
+        return videoFromFirestore(docSnap.data());
+    });
     return videos;
 });

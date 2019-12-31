@@ -11,9 +11,9 @@ Future< List< Channel > > getChannels(FirebaseUser user) async {
     'user': user.uid,
   });
   // Map response data
-  List rawChannels = resp.data;
+  List< dynamic > rawChannels = resp.data;
   List< Channel > channels = rawChannels.map((channel) {
-    return Channel(channel['id'], channel['owner'], channel['name']);
+    return Channel.fromFirestore(channel);
   }).toList();
   return channels;
 }
