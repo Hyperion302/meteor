@@ -31,3 +31,13 @@ Future< Video > getVideoById(String id) async {
   });
   return Video.fromFirestore(resp.data);
 }
+
+Future< void > deleteVideo(Video video) async {
+  final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
+    functionName: 'deleteVideo',
+  );
+  // Call
+  await callable.call(<String, dynamic>{
+    'video': video.id,
+  });
+}

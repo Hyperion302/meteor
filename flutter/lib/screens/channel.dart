@@ -5,6 +5,7 @@ import 'package:meteor/models/video.dart';
 import 'package:meteor/routes.dart';
 import 'package:meteor/services/channel.dart';
 import 'package:meteor/atomic_widgets/video_list_item.dart';
+import 'package:meteor/services/video.dart';
 
 class MeteorChannelScreen extends StatefulWidget {
   final Channel channel;
@@ -76,7 +77,41 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
                     }
                     List< Widget > mappedVideos = <Widget>[...snapshot.data.map((Video video) {
                       return InkWell(
-                        child: MeteorVideoListItem(video),
+                        child: MeteorVideoListItem(
+                          video: video, 
+                          trailingAction: FutureBuilder(
+                            future: _currentUser,
+                            builder: (BuildContext context, snap) {
+                              if(snap.hasError) {
+                                return Container(
+                                  width: 0,
+                                  height: 0,
+                                );
+                              }
+                              if(snap.hasData) {
+                                if(snap.data.uid == widget.channel.owner) {
+                                  return IconButton(
+                                    onPressed: () {
+                                      _promptForDelete(video);
+                                    },
+                                    icon: Icon(
+                                      Icons.delete_forever,
+                                      color: Colors.black38,
+                                    ),
+                                  );
+                                }
+                                return Container(
+                                  width: 0,
+                                  height: 0,
+                                );
+                              }
+                              return Container(
+                                  width: 0,
+                                  height: 0,
+                                );
+                            },
+                          ),
+                        ),
                         onTap: () {
                           Navigator.pushNamed(context, playerRoute, arguments: video);
                         }
@@ -117,12 +152,52 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
             );
           }
           return Container(
-              width: 0,
-              height: 0,
-            );
+            width: 0,
+            height: 0,
+          );
         },
       ),
     );
+  }
+
+  _promptForDelete(Video video) async {
+    bool shouldReload = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete \'${video.title}\'?'),
+          content: Text('This will delete all of it\'s videos and can\'t be undone.'),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: Text('Cancel'),
+            ),
+            RaisedButton(
+              onPressed: () {
+                deleteVideo(video).then((_) {
+                  Navigator.pop(context, true);
+                });
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              color: Theme.of(context).primaryColor,
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+    if(shouldReload) {
+      setState(() {
+        _videos = getVideos(widget.channel);
+      });
+    }
   }
 
   _navigateToCreateVideo() async {
