@@ -31,6 +31,7 @@ dependencies:
 
   # Other
   percent_indicator: ^2.1.1
+  intl: ^0.16.0
 
   # Algolia
   algolia: ^0.1.6+1

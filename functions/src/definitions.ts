@@ -1,6 +1,7 @@
 export type tID = string;
 export type tMuxID = string;
 export type tUser = string;
+export type tTimestamp = number;
 
 export interface IMuxData {
     status: 'upload-ready' | 'upload-complete' | 'transcoded',
@@ -14,6 +15,7 @@ export interface IVideo {
     channel: IChannel,
     title: string,
     muxData: IMuxData,
+    uploadDate: tTimestamp,
 }
 
 export interface IAlgoliaVideoObject {
@@ -21,6 +23,7 @@ export interface IAlgoliaVideoObject {
     title: string,
     id: tID,
     author: tUser,
+    uploadDate: tTimestamp
 }
 
 export interface IAlgoliaChannelObject {

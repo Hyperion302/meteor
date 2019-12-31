@@ -29,25 +29,26 @@ export const createVideo = functions.https.onCall(async (data, context) => {
     
     // Create video
     const userId = context.auth.uid;
-    const videoId = uuid();
+    const id = uuid();
     const mux: IMuxData = {
         status: 'upload-ready',
         assetID: null,
         playbackID: null,
     };
     const video: IVideo = {
-        id: videoId,
+        id: id,
         author: userId,
         channel: channel,
         title: title,
         muxData: mux,
+        uploadDate: parseInt((new Date().getTime() / 1000).toFixed(0)), // Now in unix timestamp
     };
-    const doc = db.doc(`videos/${videoId}`);
+    const doc = db.doc(`videos/${id}`);
     await doc.set(video);
     await addLog(log, 'createVideo', {
         eventSource: 'video',
         value: video,
-        message: `Video ${videoId} : ${title} created in DB`
+        message: `Video ${id} : ${title} created in DB`
     });
     return video;
 });

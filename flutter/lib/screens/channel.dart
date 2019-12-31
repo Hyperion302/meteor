@@ -65,8 +65,7 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
                 future: _videos,
                 builder: (context, snapshot) {
                   if(snapshot.hasError) {
-                    CloudFunctionsException e = snapshot.error;
-                    print(e.message);
+                    print(snapshot.error);
                     return Text('Error');
                   }
                   if(snapshot.hasData) {

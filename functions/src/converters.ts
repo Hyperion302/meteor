@@ -25,6 +25,7 @@ export function videoFromFirestore(data: FirebaseFirestore.DocumentData): IVideo
         author: data['author'],
         channel: channel,
         muxData: muxData,
+        uploadDate: data['uploadDate'],
     };
 }
 
@@ -39,6 +40,7 @@ export function algoliaFromVideo(video: IVideo): IAlgoliaVideoObject {
         title: video.title,
         author: video.author,
         channel: channel,
+        uploadDate: video.uploadDate
     };
 }
 

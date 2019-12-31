@@ -22,8 +22,9 @@ class Video {
   String title;
   Channel channel;
   MuxData muxData;
+  int uploadDate;
 
-  Video({this.channel, this.id, this.author, this.title, this.muxData});
+  Video({this.channel, this.id, this.author, this.title, this.muxData, this.uploadDate});
 
   Video.fromFirestore(dynamic data) {
     id = data['id'];
@@ -31,6 +32,7 @@ class Video {
     title = data['title'];
     channel = Channel.fromFirestore(data['channel']);
     muxData = MuxData.fromFirestore(data['muxData']);
+    uploadDate = data['uploadDate'];
   }
 
 }
@@ -39,6 +41,7 @@ class AlgoliaVideo {
   String id;
   String title;
   String author;
+  int uploadDate;
   AlgoliaChannel channel;
 
   AlgoliaVideo({this.id, this.title, this.author, this.channel});
@@ -48,6 +51,7 @@ class AlgoliaVideo {
     title = data['title'];
     author = data['author'];
     channel = AlgoliaChannel.fromAlgolia(data);
+    uploadDate = data['uploadDate'];
   }
 }
 

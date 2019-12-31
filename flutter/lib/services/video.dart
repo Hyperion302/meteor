@@ -15,6 +15,7 @@ Future< StorageUploadTask > uploadVideo(VideoUpload video) async {
   });
   // Upload Video
   Video uploadedVideo = Video.fromFirestore(resp.data);
+  print(uploadedVideo.uploadDate);
   StorageReference videoRef = FirebaseStorage.instance.ref().child('masters/${uploadedVideo.author}/${uploadedVideo.id}');
   StorageUploadTask uploadTask = videoRef.putFile(video.video);
   return uploadTask;
