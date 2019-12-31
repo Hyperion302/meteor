@@ -75,6 +75,7 @@ class _MeteorCreateChannelScreenState extends State<MeteorCreateChannelScreen> {
             return;
           }
           create();
+          Navigator.pop(context);
         },
         icon: Icon(Icons.check),
         label: Text('Create'),
