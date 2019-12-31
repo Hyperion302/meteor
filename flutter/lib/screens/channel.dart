@@ -1,4 +1,4 @@
-import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:meteor/models/channel.dart';
 import 'package:meteor/models/video.dart';
@@ -16,9 +16,11 @@ class MeteorChannelScreen extends StatefulWidget {
 
 class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
   Future< List< Video > > _videos;
+  Future< FirebaseUser > _currentUser;
 
   @override
   void initState() {
+    _currentUser = FirebaseAuth.instance.currentUser();
     _videos = getVideos(widget.channel);
     super.initState();
   }
@@ -91,11 +93,34 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, uploadRoute, arguments: widget.channel);
+      floatingActionButton: FutureBuilder(
+        future: _currentUser,
+        builder: (BuildContext context, snap) {
+          if(snap.hasError) {
+            return Container(
+              width: 0,
+              height: 0,
+            );
+          }
+          if(snap.hasData) {
+            if(snap.data.uid == widget.channel.owner) {
+              return FloatingActionButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, uploadRoute, arguments: widget.channel);
+                },
+                child: Icon(Icons.add),
+              );
+            }
+            return Container(
+              width: 0,
+              height: 0,
+            );
+          }
+          return Container(
+              width: 0,
+              height: 0,
+            );
         },
-        child: Icon(Icons.add),
       ),
     );
   }

@@ -26,6 +26,11 @@ export const createVideo = functions.https.onCall(async (data, context) => {
         throw new functions.https.HttpsError('invalid-argument', 'Channel does not exist');
     }
     const channel: IChannel = channelFromFirestore(channelData);
+
+    // Check ownership
+    if(context.auth.uid != channel.owner) {
+        throw new functions.https.HttpsError('permission-denied', 'Only the channel owner can upload videos');
+    }
     
     // Create video
     const userId = context.auth.uid;
