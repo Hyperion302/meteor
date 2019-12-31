@@ -106,7 +106,7 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
             if(snap.data.uid == widget.channel.owner) {
               return FloatingActionButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, uploadRoute, arguments: widget.channel);
+                  _navigateToCreateVideo();
                 },
                 child: Icon(Icons.add),
               );
@@ -123,5 +123,14 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
         },
       ),
     );
+  }
+
+  _navigateToCreateVideo() async {
+    var shouldRefresh = await Navigator.pushNamed(context, uploadRoute, arguments: widget.channel);
+    if(shouldRefresh) {
+      setState(() {
+        _videos = getVideos(widget.channel);
+      });
+    }
   }
 }

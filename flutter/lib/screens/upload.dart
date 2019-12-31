@@ -77,7 +77,7 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
           progressIndicator(),
           RaisedButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(context, true);
             },
             child: Text('Back'),
           ),
