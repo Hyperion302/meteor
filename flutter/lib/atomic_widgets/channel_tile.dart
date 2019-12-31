@@ -3,11 +3,11 @@ import 'package:meteor/models/channel.dart';
 import 'package:meteor/routes.dart';
 import 'package:meteor/atomic_widgets/custom_card.dart';
 
-class MeteorChannelListItem extends StatelessWidget {
+class MeteorChannelTile extends StatelessWidget {
   final Channel channel;
   final Widget trailingAction;
 
-  MeteorChannelListItem({this.channel, this.trailingAction});
+  MeteorChannelTile({this.channel, this.trailingAction});
 
   @override
   Widget build(BuildContext context) {

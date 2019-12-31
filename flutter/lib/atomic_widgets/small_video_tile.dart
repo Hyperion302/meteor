@@ -3,11 +3,11 @@ import 'package:meteor/atomic_widgets/custom_card.dart';
 import 'package:meteor/models/video.dart';
 import 'package:meteor/utils.dart';
 
-class MeteorVideoListItem extends StatelessWidget {
+class MeteorSmallVideoTile extends StatelessWidget {
   final Video video;
   final Widget trailingAction;
 
-  MeteorVideoListItem({this.video, this.trailingAction});
+  MeteorSmallVideoTile({this.video, this.trailingAction});
   
   @override
   Widget build(BuildContext context) {

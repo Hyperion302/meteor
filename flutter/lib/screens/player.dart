@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:meteor/atomic_widgets/channel_list_item.dart';
+import 'package:meteor/atomic_widgets/channel_tile.dart';
 import 'package:meteor/models/video.dart';
 import 'package:video_player/video_player.dart';
 
@@ -92,7 +92,7 @@ class _MeteorPlayerScreenState extends State<MeteorPlayerScreen>{
               ),
             ),
           ),
-          MeteorChannelListItem(
+          MeteorChannelTile(
             channel: widget.video.channel,
             trailingAction: SizedBox(),
           ),

@@ -4,7 +4,7 @@ import 'package:meteor/models/channel.dart';
 import 'package:meteor/models/video.dart';
 import 'package:meteor/routes.dart';
 import 'package:meteor/services/channel.dart';
-import 'package:meteor/atomic_widgets/video_list_item.dart';
+import 'package:meteor/atomic_widgets/small_video_tile.dart';
 import 'package:meteor/services/video.dart';
 
 class MeteorChannelScreen extends StatefulWidget {
@@ -77,7 +77,7 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
                     }
                     List< Widget > mappedVideos = <Widget>[...snapshot.data.map((Video video) {
                       return InkWell(
-                        child: MeteorVideoListItem(
+                        child: MeteorSmallVideoTile(
                           video: video, 
                           trailingAction: FutureBuilder(
                             future: _currentUser,
