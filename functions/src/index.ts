@@ -11,3 +11,4 @@ export { masterUploadComplete } from './functions/masterUploadComplete';
 export { muxWebhook } from './functions/muxWebhook';
 export { getVideos } from './functions/getVideos';
 export { getVideo } from './functions/getVideo';
+export { deleteChannel } from './functions/deleteChannel';

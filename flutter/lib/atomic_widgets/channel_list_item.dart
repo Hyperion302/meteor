@@ -5,14 +5,16 @@ import 'package:meteor/atomic_widgets/custom_card.dart';
 
 class MeteorChannelListItem extends StatelessWidget {
   final Channel channel;
+  final Widget trailingAction;
 
-  MeteorChannelListItem(this.channel);
+  MeteorChannelListItem({this.channel, this.trailingAction});
 
   @override
   Widget build(BuildContext context) {
     return CustomCard(
       child: ListTile(
         leading: FlutterLogo(),
+        trailing: trailingAction,
         title: Text(channel.name),
         subtitle: Text('Lorem Ipsum'),
         onTap: () {
@@ -21,37 +23,4 @@ class MeteorChannelListItem extends StatelessWidget {
       ),
     );
   }
-  /*@override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(
-        vertical: 10.0
-      ),
-      height: 100,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.0),
-        color: Colors.white,
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 10.0,
-            offset: Offset(0.0, 10.0),
-          )
-        ]
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(20.0),
-        child: Align(
-          alignment: Alignment.topLeft,
-          child: Text(
-            channel.name,
-            style: TextStyle(
-              fontSize: 24.0,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-  */
 }

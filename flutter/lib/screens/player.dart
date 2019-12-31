@@ -92,7 +92,10 @@ class _MeteorPlayerScreenState extends State<MeteorPlayerScreen>{
               ),
             ),
           ),
-          MeteorChannelListItem(widget.video.channel),
+          MeteorChannelListItem(
+            channel: widget.video.channel,
+            trailingAction: SizedBox(),
+          ),
         ],
       )
     );

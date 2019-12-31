@@ -21,7 +21,6 @@ class _MeteorVideoSearchItemState extends State<MeteorVideoSearchItem> {
 
   @override
   void initState() {
-    print(widget.searchResult.id);
     _video = getVideoById(widget.searchResult.id);
     super.initState();
   }

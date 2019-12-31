@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:meteor/models/channel.dart';
 import 'package:meteor/routes.dart';
+import 'package:meteor/services/channel.dart';
 import 'package:meteor/services/user.dart';
 import 'package:meteor/atomic_widgets/channel_list_item.dart';
 
@@ -60,7 +61,15 @@ class _MeteorProfileScreenState extends State<MeteorProfileScreen> {
                   if(snapshot.hasData) {
                     // Weird but sound way to go from List< Channel > to List< Widget >
                     List< Widget > mappedChannels = <Widget>[...snapshot.data.map((Channel channel) {
-                      return MeteorChannelListItem(channel);
+                      return MeteorChannelListItem(
+                        channel: channel,
+                        trailingAction: IconButton(
+                          onPressed: () {
+                            _promptForDelete(channel);
+                          },
+                          icon: Icon(Icons.delete_forever),
+                        ),
+                      );
                     }).toList()];
                     return Column(
                       children: [
@@ -76,7 +85,7 @@ class _MeteorProfileScreenState extends State<MeteorProfileScreen> {
                           ),
                           color: Theme.of(context).primaryColor,
                           child: Text('New Channel'),
-                        )
+                        ),
                       ]
                     );
                   }
@@ -88,5 +97,45 @@ class _MeteorProfileScreenState extends State<MeteorProfileScreen> {
         )
       ),
     );
+  }
+
+  _promptForDelete(Channel channel) async {
+    bool shouldReload = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete \'${channel.name}\'?'),
+          content: Text('This will delete all of it\'s videos and can\'t be undone.'),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: Text('Cancel'),
+            ),
+            RaisedButton(
+              onPressed: () {
+                deleteChannel(channel).then((_) {
+                  Navigator.pop(context, true);
+                });
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              color: Theme.of(context).primaryColor,
+              child: Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+    if(shouldReload) {
+      setState(() {
+        _channels = _currentUser.then(getChannels);
+      });
+    }
   }
 }

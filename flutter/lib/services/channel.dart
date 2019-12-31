@@ -14,6 +14,16 @@ Future< Channel > createChannel(String name) async {
   return Channel.fromFirestore(resp.data);
 }
 
+Future< void > deleteChannel(Channel channel) async {
+  final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
+    functionName: 'deleteChannel',
+  );
+  // Call
+  await callable.call(<String, dynamic>{
+    'channel': channel.id,
+  });
+}
+
 Future< List< Video > > getVideos(Channel channel) async {
   final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
     functionName: 'getVideos',
