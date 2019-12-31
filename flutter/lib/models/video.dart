@@ -50,7 +50,7 @@ class AlgoliaVideo {
     id = data['id'];
     title = data['title'];
     author = data['author'];
-    channel = AlgoliaChannel.fromAlgolia(data);
+    channel = AlgoliaChannel.fromAlgolia(data['channel']);
     uploadDate = data['uploadDate'];
   }
 }

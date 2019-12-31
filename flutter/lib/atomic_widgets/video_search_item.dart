@@ -33,8 +33,6 @@ class _MeteorVideoSearchItemState extends State<MeteorVideoSearchItem> {
         future: _video,
         builder: (BuildContext context, snap) {
           if(snap.hasError) {
-            CloudFunctionsException error = snap.error;
-            print(error.message);
             return Text('error');
           }
           if(snap.hasData) {
