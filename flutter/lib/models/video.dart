@@ -42,15 +42,15 @@ class AlgoliaVideo {
   String title;
   String author;
   int uploadDate;
-  AlgoliaChannel channel;
+  String channelID;
 
-  AlgoliaVideo({this.id, this.title, this.author, this.channel});
+  AlgoliaVideo({this.id, this.title, this.author, this.channelID});
 
   AlgoliaVideo.fromAlgolia(Map<String, dynamic> data) {
     id = data['id'];
     title = data['title'];
     author = data['author'];
-    channel = AlgoliaChannel.fromAlgolia(data['channel']);
+    channelID = data['channelID'];
     uploadDate = data['uploadDate'];
   }
 }

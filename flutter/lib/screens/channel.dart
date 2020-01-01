@@ -50,7 +50,7 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
                         icon: Icon(Icons.arrow_back_ios),
                         tooltip: 'Go Back',
                         onPressed: () {
-                          Navigator.pop(context);
+                          Navigator.pop(context, false);
                         },
                       ),
                       Text('${widget.channel.name}',

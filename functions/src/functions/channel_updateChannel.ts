@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
-import { IChannel } from '../definitions';
+import { ISchemaChannel } from '../definitions';
 import { db, addLog, log } from '../globals';
-import { channelFromFirestore } from '../converters';
+import { channelSchemaFromFirestore } from '../converters';
 
 export const channel_updateChannel = functions.https.onCall(async (data, context) => {
     if(!context.auth) {
@@ -18,7 +18,7 @@ export const channel_updateChannel = functions.https.onCall(async (data, context
     if(!channelSnap.exists || !channelData) {
         throw new functions.https.HttpsError('invalid-argument', 'Channel does not exist');
     }
-    const channel: IChannel = channelFromFirestore(channelData);
+    const channel = channelSchemaFromFirestore(channelData);
 
     // Check owner
     if(context.auth.uid != channel.owner) {
@@ -27,7 +27,7 @@ export const channel_updateChannel = functions.https.onCall(async (data, context
 
     // Get fields to edit
     let willEditName = false;
-    let newChannel: IChannel = channel;
+    let newChannel: ISchemaChannel = channel;
 
     if(data.name) {
         if(!(typeof data.name === 'string') || data.name.length === 0) {

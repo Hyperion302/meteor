@@ -1,12 +1,12 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import { IVideo, IAlgoliaVideoObject } from '../definitions';
 import * as path from 'path';
 import * as axios from 'axios';
 import { addLog, log, db, algoliaIndex } from '../globals';
-import { videoFromFirestore, algoliaFromVideo } from '../converters';
+import { algoliaFromVideo, videoSchemaFromFirestore, resolveVideo } from '../converters';
+import { ISchemaVideo } from '../definitions';
 
-async function addToMux(video: IVideo, bucketPath: string, docRef: FirebaseFirestore.DocumentReference) {
+async function addToMux(video: ISchemaVideo, bucketPath: string, docRef: FirebaseFirestore.DocumentReference) {
     // Make file public
     await admin.storage().bucket('meteor-247517.appspot.com').file(bucketPath).makePublic();
     // Send to Mux
@@ -36,8 +36,9 @@ async function addToMux(video: IVideo, bucketPath: string, docRef: FirebaseFires
     };
 }
 
-async function addToAlgolia(video: IVideo) {
-    const videoObj: IAlgoliaVideoObject = algoliaFromVideo(video);
+async function addToAlgolia(video: ISchemaVideo) {
+    const resolvedVideo = await resolveVideo(db, video);
+    const videoObj = algoliaFromVideo(resolvedVideo);
     await algoliaIndex.addObject(videoObj, video.id);
     return videoObj;
 }
@@ -64,7 +65,7 @@ export const event_masterUploadComplete = functions.storage.bucket('meteor-24751
         if(!data) { 
             throw new functions.https.HttpsError('not-found', 'Video unable to be found');
         }
-        const video: IVideo = videoFromFirestore(data);
+        const video = videoSchemaFromFirestore(data);
         if(video.muxData.status !== 'upload-ready') {
             // Invalid state
             await admin.storage().bucket('meteor-247517.appspot.com').file(object.name).delete();

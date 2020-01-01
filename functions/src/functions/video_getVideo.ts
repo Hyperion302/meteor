@@ -1,6 +1,6 @@
 import * as functions from 'firebase-functions';
 import { db } from '../globals';
-import { videoFromFirestore } from '../converters';
+import { videoSchemaFromFirestore, resolveVideo } from '../converters';
 
 export const video_getVideo = functions.https.onCall(async (data, context) => {
     if(!context.auth) {
@@ -18,5 +18,7 @@ export const video_getVideo = functions.https.onCall(async (data, context) => {
     if(!querySnapshot.exists || !videoData) {
         throw new functions.https.HttpsError('not-found', 'Video not found or could not be retrieved');
     }
-    return videoFromFirestore(videoData);
+    const videoSchema = videoSchemaFromFirestore(videoData);
+    const video = await resolveVideo(db, videoSchema);
+    return video;
 });

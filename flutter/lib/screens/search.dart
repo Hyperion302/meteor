@@ -44,7 +44,7 @@ class _MeteorSearchScreenState extends State<MeteorSearchScreen> {
                   }
                   return ListTile(
                     title: Text(result.title),
-                    subtitle: Text(result.channel.name),
+                    subtitle: Text('Loading'),
                     leading: CircularProgressIndicator(),
                   );
                 },

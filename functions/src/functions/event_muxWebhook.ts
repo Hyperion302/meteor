@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import { addLog, log, db } from '../globals';
-import { videoFromFirestore } from '../converters';
+import { videoSchemaFromFirestore } from '../converters';
 
 export const event_muxWebhook = functions.https.onRequest(async (req, res) => {
     const eventType = req.body.type
@@ -20,7 +20,7 @@ export const event_muxWebhook = functions.https.onRequest(async (req, res) => {
         if(!data) {
             throw new functions.https.HttpsError('not-found', 'Video not found or could not be retrieved');
         }
-        const video = videoFromFirestore(data);
+        const video = videoSchemaFromFirestore(data);
         await admin.storage().bucket('meteor-247517.appspot.com').file(`masters/${video.author}/${video.id}`).makePrivate();
         await addLog(log, 'muxWebhook', {
             eventSource: 'video',

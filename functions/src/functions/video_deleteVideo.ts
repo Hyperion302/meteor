@@ -1,8 +1,7 @@
 import * as functions from 'firebase-functions';
 import * as axios from 'axios';
-import { IChannel, IVideo } from '../definitions';
 import { db, addLog, log, algoliaIndex } from '../globals';
-import { videoFromFirestore } from '../converters';
+import { videoSchemaFromFirestore, channelSchemaFromFirestore } from '../converters';
 
 export const video_deleteVideo = functions.https.onCall(async (data, context) => {
     if(!context.auth) {
@@ -20,11 +19,17 @@ export const video_deleteVideo = functions.https.onCall(async (data, context) =>
     if(!videoSnapshot.exists || !videoData) {
         throw new functions.https.HttpsError('not-found', 'Video not found or could not be retrieved');
     }
-    const video: IVideo =  videoFromFirestore(videoData);
-    const channel: IChannel = video.channel;
+    const video =  videoSchemaFromFirestore(videoData);
+    const channelDoc = db.doc(`channels/${video.channelID}`);
+    const channelSnap = await channelDoc.get();
+    const channelData = channelSnap.data();
+    if(!channelSnap.exists || !channelData) {
+        throw new functions.https.HttpsError('invalid-argument', 'Channel does not exist');
+    }
+    const channelSchema = channelSchemaFromFirestore(channelData);
 
     // Check owner
-    if(context.auth.uid != channel.owner && context.auth.uid != video.author) {
+    if(context.auth.uid != channelSchema.owner && context.auth.uid != video.author) {
         throw new functions.https.HttpsError('permission-denied', 'Only the video\'s uploader or it\'s channel owner can delete it');
     }
 

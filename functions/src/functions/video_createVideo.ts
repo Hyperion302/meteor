@@ -1,8 +1,8 @@
 import * as functions from 'firebase-functions';
-import { IVideo, IChannel, IMuxData } from '../definitions';
+import { ISchemaVideo, IMuxData } from '../definitions';
 import * as uuid from 'uuid/v4';
 import { db, addLog, log } from '../globals';
-import { channelFromFirestore } from '../converters';
+import { channelSchemaFromFirestore, resolveVideo } from '../converters';
 
 export const video_createVideo = functions.https.onCall(async (data, context) => {
     // Check auth
@@ -25,7 +25,7 @@ export const video_createVideo = functions.https.onCall(async (data, context) =>
     if(!channelSnap.exists || !channelData) {
         throw new functions.https.HttpsError('invalid-argument', 'Channel does not exist');
     }
-    const channel: IChannel = channelFromFirestore(channelData);
+    const channel = channelSchemaFromFirestore(channelData);
 
     // Check ownership
     if(context.auth.uid != channel.owner) {
@@ -40,13 +40,13 @@ export const video_createVideo = functions.https.onCall(async (data, context) =>
         assetID: null,
         playbackID: null,
     };
-    const video: IVideo = {
+    const video: ISchemaVideo = {
         id: id,
         author: userId,
-        channel: channel,
+        channelID: channel.id,
         title: title,
         muxData: mux,
-        uploadDate: parseInt((new Date().getTime() / 1000).toFixed(0)), // Now in unix timestamp
+        uploadDate: parseInt((new Date().getTime() / 1000).toFixed(0)), // right now in unix timestamp
     };
     const doc = db.doc(`videos/${id}`);
     await doc.set(video);
@@ -55,5 +55,6 @@ export const video_createVideo = functions.https.onCall(async (data, context) =>
         value: video,
         message: `Video ${id} : ${title} created in DB`
     });
-    return video;
+    const resolvedVideo = await resolveVideo(db, video);
+    return resolvedVideo;
 });

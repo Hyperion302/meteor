@@ -1,6 +1,9 @@
 import * as functions from 'firebase-functions';
 import { db } from '../globals';
-import { videoFromFirestore } from '../converters';
+import { videoSchemaFromFirestore, resolveVideo } from '../converters';
+
+// TODO: IMPLEMENT USING ALGOLIA
+
 
 export const channel_getVideos = functions.https.onCall(async (data, context) => {
     if(!context.auth) {
@@ -18,10 +21,11 @@ export const channel_getVideos = functions.https.onCall(async (data, context) =>
         throw new functions.https.HttpsError('invalid-argument', 'Channel does not exist');
     }
 
-    const query = db.collection('videos').where('channel.id', '==', channel); // TODO: Pagination
+    const query = db.collection('videos').where('channelID', '==', channel).limit(20); // TODO: Pagination
     const querySnapshot = await query.get();
-    const videos = querySnapshot.docs.map(docSnap => {
-        return videoFromFirestore(docSnap.data());
-    });
+    // \/ this is why I need algolia...
+    const videos = await Promise.all(querySnapshot.docs.map(docSnap => {
+        return resolveVideo(db, videoSchemaFromFirestore(docSnap.data()));
+    }));
     return videos;
 });

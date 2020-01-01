@@ -9,30 +9,45 @@ export interface IMuxData {
     playbackID: tMuxID | null,
 }
 
-export interface IVideo {
+export interface ISchemaVideo {
     id: tID,
     author: tUser,
-    channel: IChannel,
+    channelID: tID,
     title: string,
     muxData: IMuxData,
     uploadDate: tTimestamp,
 }
 
-export interface IAlgoliaVideoObject {
-    channel: IAlgoliaChannelObject,
+export interface IResolvedVideo {
+    id: tID,
+    author: tUser,
+    channel: IResolvedChannel,
+    title: string,
+    muxData: IMuxData,
+    uploadDate: tTimestamp,
+}
+
+export interface IAlgoliaVideo {
+    channelID: tID,
     title: string,
     id: tID,
     author: tUser,
     uploadDate: tTimestamp
 }
 
-export interface IAlgoliaChannelObject {
+export interface IAlgoliaChannel {
     name: string,
     id: tID,
     owner: tUser,
 }
 
-export interface IChannel {
+export interface ISchemaChannel {
+    id: tID,
+    name: string,
+    owner: tID,
+}
+
+export interface IResolvedChannel {
     id: tID,
     owner: tUser,
     name: string,

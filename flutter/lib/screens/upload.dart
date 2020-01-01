@@ -206,7 +206,7 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
           return Container();
         }
         else {
-          return Container();
+          return CircularProgressIndicator();
         }
       },
     );
