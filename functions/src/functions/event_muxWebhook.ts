@@ -3,7 +3,7 @@ import * as admin from 'firebase-admin';
 import { addLog, log, db } from '../globals';
 import { videoFromFirestore } from '../converters';
 
-export const muxWebhook = functions.https.onRequest(async (req, res) => {
+export const event_muxWebhook = functions.https.onRequest(async (req, res) => {
     const eventType = req.body.type
     await addLog(log, 'muxWebhook', {
         eventSource: 'video',

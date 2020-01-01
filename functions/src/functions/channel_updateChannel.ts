@@ -3,7 +3,7 @@ import { IChannel } from '../definitions';
 import { db, addLog, log } from '../globals';
 import { channelFromFirestore } from '../converters';
 
-export const updateChannel = functions.https.onCall(async (data, context) => {
+export const channel_updateChannel = functions.https.onCall(async (data, context) => {
     if(!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated to make this request');
     }

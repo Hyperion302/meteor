@@ -4,13 +4,19 @@ import * as admin from 'firebase-admin';
 // Call before imports
 admin.initializeApp(functions.config().firebase);
 
-export { createChannel } from './functions/createChannel';
-export { createVideo } from './functions/createVideo';
-export { getChannels } from './functions/getChannels';
-export { masterUploadComplete } from './functions/masterUploadComplete';
-export { muxWebhook } from './functions/muxWebhook';
-export { getVideos } from './functions/getVideos';
-export { getVideo } from './functions/getVideo';
-export { deleteChannel } from './functions/deleteChannel';
-export { deleteVideo } from './functions/deleteVideo';
-export { updateChannel } from './functions/updateChannel';
+export { channel_createChannel } from './functions/channel_createChannel';
+export { channel_getVideos } from './functions/channel_getVideos';
+export { channel_updateChannel } from './functions/channel_updateChannel';
+export { channel_deleteChannel } from './functions/channel_deleteChannel';
+
+export { video_createVideo } from './functions/video_createVideo';
+export { video_getVideo } from './functions/video_getVideo';
+export { video_deleteVideo } from './functions/video_deleteVideo';
+
+export { user_getChannels } from './functions/user_getChannels';
+
+export { event_masterUploadComplete } from './functions/event_masterUploadComplete';
+export { event_muxWebhook } from './functions/event_muxWebhook';
+
+
+

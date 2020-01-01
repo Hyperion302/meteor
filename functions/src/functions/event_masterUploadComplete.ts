@@ -42,7 +42,7 @@ async function addToAlgolia(video: IVideo) {
     return videoObj;
 }
 
-export const masterUploadComplete = functions.storage.bucket('meteor-247517.appspot.com').object().onFinalize(async object => {
+export const event_masterUploadComplete = functions.storage.bucket('meteor-247517.appspot.com').object().onFinalize(async object => {
     if(!object.name) { return; }
     await addLog(log, 'masterUploadComplete', {
         eventSource: 'video',

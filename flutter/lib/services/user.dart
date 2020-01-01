@@ -4,7 +4,7 @@ import 'package:meteor/models/channel.dart';
 
 Future< List< Channel > > getChannels(FirebaseUser user) async {
   final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
-    functionName: 'getChannels',
+    functionName: 'user_getChannels',
   );
   // Call
   dynamic resp = await callable.call(<String, dynamic>{

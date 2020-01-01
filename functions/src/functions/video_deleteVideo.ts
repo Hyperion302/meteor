@@ -4,7 +4,7 @@ import { IChannel, IVideo } from '../definitions';
 import { db, addLog, log, algoliaIndex } from '../globals';
 import { videoFromFirestore } from '../converters';
 
-export const deleteVideo = functions.https.onCall(async (data, context) => {
+export const video_deleteVideo = functions.https.onCall(async (data, context) => {
     if(!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated to make this request');
     }

@@ -3,7 +3,7 @@ import { IChannel } from '../definitions';
 import * as uuid from 'uuid/v4';
 import { db, addLog, log } from '../globals';
 
-export const createChannel = functions.https.onCall(async (data, context) => {
+export const channel_createChannel = functions.https.onCall(async (data, context) => {
     if(!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated to make this request');
     }

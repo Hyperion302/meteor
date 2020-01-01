@@ -4,7 +4,7 @@ import * as uuid from 'uuid/v4';
 import { db, addLog, log } from '../globals';
 import { channelFromFirestore } from '../converters';
 
-export const createVideo = functions.https.onCall(async (data, context) => {
+export const video_createVideo = functions.https.onCall(async (data, context) => {
     // Check auth
     if(!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated to make this request');

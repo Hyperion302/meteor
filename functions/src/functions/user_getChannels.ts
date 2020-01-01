@@ -3,7 +3,7 @@ import * as admin from 'firebase-admin';
 import { db } from '../globals';
 import { channelFromFirestore } from '../converters';
 
-export const getChannels = functions.https.onCall(async (data, context) => {
+export const user_getChannels = functions.https.onCall(async (data, context) => {
     if(!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated to make this request');
     }

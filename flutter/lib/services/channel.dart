@@ -4,7 +4,7 @@ import 'package:meteor/models/video.dart';
 
 Future< Channel > createChannel(String name) async {
   final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
-    functionName: 'createChannel',
+    functionName: 'channel_createChannel',
   );
   // Call
   dynamic resp = await callable.call(<String, dynamic>{
@@ -16,7 +16,7 @@ Future< Channel > createChannel(String name) async {
 
 Future< void > deleteChannel(Channel channel) async {
   final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
-    functionName: 'deleteChannel',
+    functionName: 'channel_deleteChannel',
   );
   // Call
   await callable.call(<String, dynamic>{
@@ -26,7 +26,7 @@ Future< void > deleteChannel(Channel channel) async {
 
 Future< void > updateChannel(Channel oldChannel, Channel newChannel) async {
   final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
-    functionName: 'updateChannel',
+    functionName: 'channel_updateChannel',
   );
 
   // Determine what fields changed
@@ -44,7 +44,7 @@ Future< void > updateChannel(Channel oldChannel, Channel newChannel) async {
 
 Future< List< Video > > getVideos(Channel channel) async {
   final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
-    functionName: 'getVideos',
+    functionName: 'channel_getVideos',
   );
   // Call
   dynamic resp = await callable.call(<String, dynamic>{

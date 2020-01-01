@@ -6,7 +6,7 @@ import 'package:meteor/models/video.dart';
 
 Future< StorageUploadTask > uploadVideo(VideoUpload video) async {
   final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
-    functionName: 'createVideo',
+    functionName: 'video_createVideo',
   );
   // Allocate ID
   dynamic resp = await callable.call(<String, dynamic>{
@@ -23,7 +23,7 @@ Future< StorageUploadTask > uploadVideo(VideoUpload video) async {
 
 Future< Video > getVideoById(String id) async {
   final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
-    functionName: 'getVideo',
+    functionName: 'video_getVideo',
   );
   // Allocate ID
   dynamic resp = await callable.call(<String, dynamic>{
@@ -34,7 +34,7 @@ Future< Video > getVideoById(String id) async {
 
 Future< void > deleteVideo(Video video) async {
   final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
-    functionName: 'deleteVideo',
+    functionName: 'video_deleteVideo',
   );
   // Call
   await callable.call(<String, dynamic>{

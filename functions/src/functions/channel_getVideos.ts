@@ -2,7 +2,7 @@ import * as functions from 'firebase-functions';
 import { db } from '../globals';
 import { videoFromFirestore } from '../converters';
 
-export const getVideos = functions.https.onCall(async (data, context) => {
+export const channel_getVideos = functions.https.onCall(async (data, context) => {
     if(!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated to make this request');
     }
