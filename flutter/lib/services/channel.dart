@@ -24,6 +24,24 @@ Future< void > deleteChannel(Channel channel) async {
   });
 }
 
+Future< void > updateChannel(Channel oldChannel, Channel newChannel) async {
+  final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
+    functionName: 'updateChannel',
+  );
+
+  // Determine what fields changed
+  Map< String, dynamic > args = {
+    'channel': oldChannel.id,
+  };
+  if(oldChannel.name != newChannel.name) {
+    args['name'] = newChannel.name;
+  }
+
+  // Call
+  await callable.call(args);
+
+}
+
 Future< List< Video > > getVideos(Channel channel) async {
   final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
     functionName: 'getVideos',

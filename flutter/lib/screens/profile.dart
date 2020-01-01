@@ -69,6 +69,9 @@ class _MeteorProfileScreenState extends State<MeteorProfileScreen> {
                           },
                           icon: Icon(Icons.delete_forever),
                         ),
+                        onTap: () {
+                          _navigateToChannel(channel);
+                        }
                       );
                     }).toList()];
                     return Column(
@@ -99,10 +102,19 @@ class _MeteorProfileScreenState extends State<MeteorProfileScreen> {
     );
   }
 
+  _navigateToChannel(Channel channel) async {
+    var shouldReload = await Navigator.pushNamed(context, channelRoute, arguments: channel);
+    if(shouldReload) {
+      setState(() {
+        _channels = _currentUser.then(getChannels);
+      });
+    }
+  }
+
   _navigateToChannelCreate() async {
     var shouldReload = await Navigator.pushNamed(context, createChannelRoute);
     if(shouldReload) {
-      await Future.delayed(Duration(seconds: 1));
+      await Future.delayed(Duration(seconds: 1)); // Wait a bit for long running channelCreate
       setState(() {
         _channels = _currentUser.then(getChannels);
       });

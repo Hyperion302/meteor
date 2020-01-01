@@ -13,3 +13,4 @@ export { getVideos } from './functions/getVideos';
 export { getVideo } from './functions/getVideo';
 export { deleteChannel } from './functions/deleteChannel';
 export { deleteVideo } from './functions/deleteVideo';
+export { updateChannel } from './functions/updateChannel';

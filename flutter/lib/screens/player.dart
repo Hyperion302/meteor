@@ -3,6 +3,8 @@ import 'package:meteor/atomic_widgets/channel_tile.dart';
 import 'package:meteor/models/video.dart';
 import 'package:video_player/video_player.dart';
 
+import '../routes.dart';
+
 class MeteorPlayerScreen extends StatefulWidget {
   final Video video;
   final double playerHeight = 200;
@@ -95,6 +97,9 @@ class _MeteorPlayerScreenState extends State<MeteorPlayerScreen>{
           MeteorChannelTile(
             channel: widget.video.channel,
             trailingAction: SizedBox(),
+            onTap: () {
+              Navigator.pushNamed(context, channelRoute, arguments: widget.video.channel);
+            }
           ),
         ],
       )

@@ -18,11 +18,16 @@ class MeteorChannelScreen extends StatefulWidget {
 class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
   Future< List< Video > > _videos;
   Future< FirebaseUser > _currentUser;
+  final _formKey = GlobalKey<FormState>();
+  TextEditingController _updateFormNameController;
 
   @override
   void initState() {
     _currentUser = FirebaseAuth.instance.currentUser();
     _videos = getVideos(widget.channel);
+    _updateFormNameController = TextEditingController(
+      text: widget.channel.name,
+    );
     super.initState();
   }
 
@@ -37,19 +42,31 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
           child: Column(
             children: <Widget>[
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  IconButton(
-                    icon: Icon(Icons.arrow_back_ios),
-                    tooltip: 'Go Back',
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
+                  Row(
+                    children: <Widget>[
+                      IconButton(
+                        icon: Icon(Icons.arrow_back_ios),
+                        tooltip: 'Go Back',
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      Text('${widget.channel.name}',
+                        style: TextStyle(
+                          fontSize: 32.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text('${widget.channel.name}',
-                    style: TextStyle(
-                      fontSize: 32.0,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  IconButton(
+                    icon: Icon(Icons.settings),
+                    tooltip: 'Edit channel settings',
+                    onPressed: () {
+                      _promptForUpdate(widget.channel);
+                    },
                   ),
                 ],
               ),
@@ -157,6 +174,68 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
           );
         },
       ),
+    );
+  }
+
+  _promptForUpdate(Channel channel) async {
+    // No reload since I can't reload a static channel argument, navigate back instead
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Channel Settings'),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextFormField(
+                  controller: _updateFormNameController,
+                  decoration: InputDecoration(
+                    labelText: 'Channel Name',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: Text('Cancel'),
+            ),
+            RaisedButton(
+              onPressed: () {
+                if(_formKey.currentState.validate()) {
+                  // Send update
+                  Channel newChannel = Channel(
+                    id: null,
+                    name: _updateFormNameController.value.text,
+                    owner: null
+                  );
+                  updateChannel(widget.channel, newChannel)
+                  .then((_) {
+                    // Double pop and trigger refresh
+                    Navigator.pop(context, false);
+                  })
+                  .then((_) {
+                    Navigator.pop(context, true);
+                  }); 
+                }
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              color: Theme.of(context).primaryColor,
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
     );
   }
 
