@@ -12,6 +12,7 @@ export { channel_deleteChannel } from './functions/channel_deleteChannel';
 export { video_createVideo } from './functions/video_createVideo';
 export { video_getVideo } from './functions/video_getVideo';
 export { video_deleteVideo } from './functions/video_deleteVideo';
+export { video_updateVideo } from './functions/video_updateVideo';
 
 export { user_getChannels } from './functions/user_getChannels';
 

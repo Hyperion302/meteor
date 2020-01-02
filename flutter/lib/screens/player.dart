@@ -1,6 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:meteor/atomic_widgets/channel_tile.dart';
 import 'package:meteor/models/video.dart';
+import 'package:meteor/services/video.dart';
 import 'package:video_player/video_player.dart';
 
 import '../routes.dart';
@@ -17,7 +19,10 @@ class MeteorPlayerScreen extends StatefulWidget {
 
 class _MeteorPlayerScreenState extends State<MeteorPlayerScreen>{
 
+  final _formKey = GlobalKey<FormState>();
+  TextEditingController _updateFormTitleController;
   VideoPlayerController _playerController;
+  Future< FirebaseUser > _currentUser;
   Stream< Duration > _playbackUpdateStream;
   double _position = 0.0;
   double _seekingBuffer = 0.0;
@@ -27,6 +32,8 @@ class _MeteorPlayerScreenState extends State<MeteorPlayerScreen>{
   
   @override
   void initState() {
+    _updateFormTitleController = TextEditingController(text: widget.video.title);
+    _currentUser = FirebaseAuth.instance.currentUser();
     _playerController = VideoPlayerController.network('https://stream.mux.com/${widget.video.muxData.playbackID}.m3u8');
     _playerController.initialize().then((_) {
       setState(() {
@@ -51,25 +58,43 @@ class _MeteorPlayerScreenState extends State<MeteorPlayerScreen>{
         child: Column(
           children: <Widget>[
             Row(
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(Icons.arrow_back_ios),
-                    tooltip: 'Go Back',
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  Flexible(
-                    child: Text(widget.video.title,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontSize: 32.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+              children: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.arrow_back_ios),
+                  tooltip: 'Go Back',
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                  },
+                ),
+                Flexible(
+                  child: Text(widget.video.title,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 32.0,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                ],
-              ),
+                ),
+                FutureBuilder(
+                  future: _currentUser,
+                  builder: (BuildContext context, snap) {
+                    if(snap.hasError) {
+                      return Container();
+                    }
+                    if(snap.hasData && (snap.data.uid == widget.video.author || snap.data.uid == widget.video.channel.owner)) {
+                      return IconButton(
+                        icon: Icon(Icons.edit),
+                        tooltip: 'Edit video',
+                        onPressed: () {
+                          _promptForUpdate();
+                        },
+                      );
+                    }
+                    return Container();
+                  },
+                ),
+              ],
+            ),
             buildPlayer(),
             buildVideoInfo(),
           ],
@@ -294,6 +319,69 @@ class _MeteorPlayerScreenState extends State<MeteorPlayerScreen>{
           ],
         ),
       ),
+    );
+  }
+  _promptForUpdate() async {
+    // No reload since I can't reload a static video argument, navigate back instead
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Video Settings'),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextFormField(
+                  controller: _updateFormTitleController,
+                  decoration: InputDecoration(
+                    labelText: 'Video Title',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: Text('Cancel'),
+            ),
+            RaisedButton(
+              onPressed: () {
+                if(_formKey.currentState.validate()) {
+                  // Send update
+                  Video newVideo = Video(
+                    id: null,
+                    title: _updateFormTitleController.value.text,
+                    author: null,
+                    muxData: null,
+                    uploadDate: null
+                  );
+                  updateVideo(widget.video, newVideo)
+                  .then((_) {
+                    // Double pop and trigger refresh
+                    Navigator.pop(context, false);
+                  })
+                  .then((_) {
+                    Navigator.pop(context, true);
+                  }); 
+                }
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              color: Theme.of(context).primaryColor,
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

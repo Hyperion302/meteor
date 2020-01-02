@@ -61,13 +61,25 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
                       ),
                     ],
                   ),
-                  IconButton(
-                    icon: Icon(Icons.settings),
-                    tooltip: 'Edit channel settings',
-                    onPressed: () {
-                      _promptForUpdate(widget.channel);
+                  FutureBuilder(
+                    future: _currentUser,
+                    builder: (BuildContext context, snap) {
+                      if(snap.hasError) {
+                        return Container();
+                      }
+                      if(snap.hasData && snap.data.uid == widget.channel.owner) {
+                        return IconButton(
+                          icon: Icon(Icons.settings),
+                          tooltip: 'Edit channel settings',
+                          onPressed: () {
+                            _promptForUpdate(widget.channel);
+                          },
+                        );
+                      }
+                      return Container();
                     },
-                  ),
+                  )
+                  
                 ],
               ),
               SizedBox(

@@ -41,3 +41,21 @@ Future< void > deleteVideo(Video video) async {
     'video': video.id,
   });
 }
+
+Future< void > updateVideo(Video oldVideo, Video newVideo) async {
+  final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
+    functionName: 'video_updateVideo',
+  );
+
+  // Determine what fields changed
+  Map< String, dynamic > args = {
+    'video': oldVideo.id,
+  };
+  if(oldVideo.title != newVideo.title) {
+    args['title'] = newVideo.title;
+  }
+
+  // Call
+  await callable.call(args);
+
+}
