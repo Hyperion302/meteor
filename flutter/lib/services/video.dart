@@ -11,7 +11,8 @@ Future< StorageUploadTask > uploadVideo(VideoUpload video) async {
   // Allocate ID
   dynamic resp = await callable.call(<String, dynamic>{
     'title': video.title,
-    'channel': video.channel,
+    'channel': video.channelID,
+    'description': video.description,
   });
   // Upload Video
   Video uploadedVideo = Video.fromFirestore(resp.data);
@@ -53,6 +54,9 @@ Future< void > updateVideo(Video oldVideo, Video newVideo) async {
   };
   if(oldVideo.title != newVideo.title) {
     args['title'] = newVideo.title;
+  }
+  if(oldVideo.description != newVideo.description) {
+    args['description'] = newVideo.description;
   }
 
   // Call

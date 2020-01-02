@@ -142,7 +142,7 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
                           ),
                         ),
                         onTap: () {
-                          Navigator.pushNamed(context, playerRoute, arguments: video);
+                          _navigateToPlayer(video);
                         }
                       );
                     })];
@@ -293,6 +293,15 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
 
   _navigateToCreateVideo() async {
     var shouldRefresh = await Navigator.pushNamed(context, uploadRoute, arguments: widget.channel);
+    if(shouldRefresh) {
+      setState(() {
+        _videos = getVideos(widget.channel);
+      });
+    }
+  }
+
+  _navigateToPlayer(Video video) async {
+    var shouldRefresh = await Navigator.pushNamed(context, playerRoute, arguments: video);
     if(shouldRefresh) {
       setState(() {
         _videos = getVideos(widget.channel);

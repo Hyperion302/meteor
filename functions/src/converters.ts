@@ -19,6 +19,7 @@ export function videoSchemaFromFirestore(data: FirebaseFirestore.DocumentData): 
     return {
         id: data['id'],
         title: data['title'],
+        description: data['description'],
         author: data['author'],
         channelID: data['channelID'],
         muxData: muxData,
@@ -51,6 +52,7 @@ export async function resolveVideo(db: FirebaseFirestore.Firestore, schema: ISch
     return {
         id: schema.id,
         title: schema.title,
+        description: schema.description,
         author: schema.author,
         channel: channel,
         muxData: schema.muxData,
@@ -64,6 +66,7 @@ export function videoSchemaFromResolved(video: IResolvedVideo): ISchemaVideo {
         id: video.id,
         title: video.title,
         author: video.author,
+        description: video.description,
         channelID: video.channel.id,
         muxData: video.muxData,
         uploadDate: video.uploadDate,
@@ -112,8 +115,9 @@ export function videoFromFirestore(data: FirebaseFirestore.DocumentData): IVideo
 */
 export function algoliaFromVideo(video: IResolvedVideo): IAlgoliaVideo {
     return {
-        id: video.id,
         title: video.title,
+        description: video.description,
+        id: video.id,
         author: video.author,
         channelID: video.channel.id,
         uploadDate: video.uploadDate

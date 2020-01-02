@@ -32,6 +32,7 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
   _UploadPhase _phase = _UploadPhase.select;
 
   final _titleInputController = TextEditingController();
+  final _descriptionInputController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   
   @override
@@ -121,7 +122,12 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
     setState(() {
       _phase = _UploadPhase.upload;
     });
-    VideoUpload upload = VideoUpload(title: _titleInputController.text, video: _video, channel: widget.videoChannel.id);
+    VideoUpload upload = VideoUpload(
+      title: _titleInputController.text,
+      description: _descriptionInputController.text,
+      video: _video,
+      channelID: widget.videoChannel.id
+    );
     StorageUploadTask uploadTask = await uploadVideo(upload);
     setState(() {
       _uploadEventStream = uploadTask.events;
@@ -138,6 +144,15 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
     }
     else {
       return 'Invalid title';
+    }
+  }
+
+  String descriptionValidator(String value) {
+    if(value.length > 0 && value.length < 5000) {
+      return null;
+    }
+    else {
+      return 'Invalid description';
     }
   }
 
@@ -237,14 +252,27 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
         ),
         Form(
           key: _formKey,
-          child: TextFormField(
-            enabled: _phase == _UploadPhase.details,
-            decoration: InputDecoration(
-              labelText: 'Title',
-              hintText: 'My Favorite Video',
-            ),
-            validator: titleValidator,
-            controller: _titleInputController,
+          child: Column(
+            children: <Widget>[
+              TextFormField(
+                enabled: _phase == _UploadPhase.details,
+                decoration: InputDecoration(
+                  labelText: 'Title',
+                  hintText: 'My Favorite Video',
+                ),
+                validator: titleValidator,
+                controller: _titleInputController,
+              ),
+              TextFormField(
+                enabled: _phase == _UploadPhase.details,
+                decoration: InputDecoration(
+                  labelText: 'Description',
+                  hintText: 'This video is my favorite kind of video',
+                ),
+                validator: descriptionValidator,
+                controller: _descriptionInputController,
+              ),
+            ],
           ),
         ),
         SizedBox(

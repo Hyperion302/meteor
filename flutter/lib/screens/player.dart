@@ -21,6 +21,7 @@ class _MeteorPlayerScreenState extends State<MeteorPlayerScreen>{
 
   final _formKey = GlobalKey<FormState>();
   TextEditingController _updateFormTitleController;
+  TextEditingController _updateFormDescriptionController;
   VideoPlayerController _playerController;
   Future< FirebaseUser > _currentUser;
   Stream< Duration > _playbackUpdateStream;
@@ -33,6 +34,7 @@ class _MeteorPlayerScreenState extends State<MeteorPlayerScreen>{
   @override
   void initState() {
     _updateFormTitleController = TextEditingController(text: widget.video.title);
+    _updateFormDescriptionController = TextEditingController(text: widget.video.description);
     _currentUser = FirebaseAuth.instance.currentUser();
     _playerController = VideoPlayerController.network('https://stream.mux.com/${widget.video.muxData.playbackID}.m3u8');
     _playerController.initialize().then((_) {
@@ -104,13 +106,33 @@ class _MeteorPlayerScreenState extends State<MeteorPlayerScreen>{
   }
 
   Widget buildVideoInfo() {
-    return Padding(
-      padding: EdgeInsets.symmetric(
+    return Container(
+      margin: EdgeInsets.symmetric(
         horizontal: 12.0,
-        vertical: 20.0
       ),
       child: Column(
         children: <Widget>[
+          Container(
+            margin: EdgeInsets.symmetric(
+              vertical: 20.0,
+            ),
+            child: Column(
+              children: <Widget>[
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Description',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(widget.video.description),
+                )
+              ],
+            ),
+          ),
           Align(
             alignment: Alignment.centerLeft,
             child: Text('Uploaded To',
@@ -339,6 +361,12 @@ class _MeteorPlayerScreenState extends State<MeteorPlayerScreen>{
                     labelText: 'Video Title',
                   ),
                 ),
+                TextFormField(
+                  controller: _updateFormDescriptionController,
+                  decoration: InputDecoration(
+                    labelText: 'Video Description',
+                  ),
+                ),
               ],
             ),
           ),
@@ -359,6 +387,7 @@ class _MeteorPlayerScreenState extends State<MeteorPlayerScreen>{
                   Video newVideo = Video(
                     id: null,
                     title: _updateFormTitleController.value.text,
+                    description: _updateFormDescriptionController.value.text,
                     author: null,
                     muxData: null,
                     uploadDate: null

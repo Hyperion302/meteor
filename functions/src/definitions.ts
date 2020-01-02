@@ -14,6 +14,7 @@ export interface ISchemaVideo {
     author: tUser,
     channelID: tID,
     title: string,
+    description: string,
     muxData: IMuxData,
     uploadDate: tTimestamp,
 }
@@ -23,6 +24,7 @@ export interface IResolvedVideo {
     author: tUser,
     channel: IResolvedChannel,
     title: string,
+    description: string,
     muxData: IMuxData,
     uploadDate: tTimestamp,
 }
@@ -30,6 +32,7 @@ export interface IResolvedVideo {
 export interface IAlgoliaVideo {
     channelID: tID,
     title: string,
+    description: string,
     id: tID,
     author: tUser,
     uploadDate: tTimestamp

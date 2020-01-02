@@ -14,6 +14,11 @@ export const video_createVideo = functions.https.onCall(async (data, context) =>
     if(!(typeof title === 'string') || title.length === 0) {
         throw new functions.https.HttpsError('invalid-argument', 'Invalid title');
     }
+    // Get description
+    const description = data.description;
+    if(!(typeof description === 'string') || description.length === 0 || description.length > 5000) {
+        throw new functions.https.HttpsError('invalid-argument', 'Invalid description');
+    }
     // Check channel existence
     const channelId = data.channel;
     if(!(typeof channelId === 'string') || channelId.length === 0) {
@@ -45,6 +50,7 @@ export const video_createVideo = functions.https.onCall(async (data, context) =>
         author: userId,
         channelID: channel.id,
         title: title,
+        description: description,
         muxData: mux,
         uploadDate: parseInt((new Date().getTime() / 1000).toFixed(0)), // right now in unix timestamp
     };
