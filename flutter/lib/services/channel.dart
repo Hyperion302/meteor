@@ -42,6 +42,17 @@ Future< void > updateChannel(Channel oldChannel, Channel newChannel) async {
 
 }
 
+Future< Channel > getChannelById(String id) async {
+  final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
+    functionName: 'channel_getChannel',
+  );
+  // Allocate ID
+  dynamic resp = await callable.call(<String, dynamic>{
+    'channel': id,
+  });
+  return Channel.fromFirestore(resp.data);
+}
+
 Future< List< Video > > getVideos(Channel channel) async {
   final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
     functionName: 'channel_getVideos',

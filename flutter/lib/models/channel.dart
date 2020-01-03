@@ -11,17 +11,3 @@ class Channel {
     name = data['name'];
   }
 }
-
-class AlgoliaChannel {
-  String id;
-  String name;
-  String owner;
-
-  AlgoliaChannel({this.id, this.name, this.owner});
-
-  AlgoliaChannel.fromAlgolia(Map<String, dynamic> data) {
-    id = data['id'];
-    name = data['name'];
-    owner = data['owner'];
-  }
-}

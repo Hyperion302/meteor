@@ -1,8 +1,8 @@
 import * as functions from 'firebase-functions';
 import { ISchemaChannel } from '../definitions';
 import * as uuid from 'uuid/v4';
-import { db, addLog, log } from '../globals';
-import { resolveChannel } from '../converters';
+import { db, addLog, log, algoliaIndex } from '../globals';
+import { resolveChannel, algoliaFromChannel } from '../converters';
 
 export const channel_createChannel = functions.https.onCall(async (data, context) => {
     if(!context.auth) {
@@ -29,5 +29,9 @@ export const channel_createChannel = functions.https.onCall(async (data, context
         message: `Channel ${channelId} : ${name}`
     });
     const resolvedChannel = await resolveChannel(db, schema);
+    // Put it in Algolia
+    const channelObj = algoliaFromChannel(resolvedChannel);
+    await algoliaIndex.addObject(channelObj, channelId);
+    
     return resolvedChannel;
 });

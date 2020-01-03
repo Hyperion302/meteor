@@ -31,7 +31,7 @@ export const channel_deleteChannel = functions.https.onCall(async (data, context
     });
 
     // Next, delete all videos of channel
-    const ref = db.collection('videos').where('channel.id', '==', channelSchema.id);
+    const ref = db.collection('videos').where('channelID', '==', channelSchema.id);
     const batch = db.batch();
     const docs = await ref.get();
     const muxPromises: Promise<axios.AxiosResponse>[] = [];

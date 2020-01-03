@@ -33,6 +33,7 @@ export interface IAlgoliaVideo {
     channelID: tID,
     title: string,
     description: string,
+    type: 'video',
     id: tID,
     author: tUser,
     uploadDate: tTimestamp
@@ -40,6 +41,7 @@ export interface IAlgoliaVideo {
 
 export interface IAlgoliaChannel {
     name: string,
+    type: 'channel',
     id: tID,
     owner: tUser,
 }

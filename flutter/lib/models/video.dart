@@ -39,26 +39,6 @@ class Video {
 
 }
 
-class AlgoliaVideo {
-  String id;
-  String title;
-  String author;
-  int uploadDate;
-  String channelID;
-  String description;
-
-  AlgoliaVideo({this.id, this.title, this.author, this.channelID});
-
-  AlgoliaVideo.fromAlgolia(Map<String, dynamic> data) {
-    id = data['id'];
-    title = data['title'];
-    author = data['author'];
-    channelID = data['channelID'];
-    uploadDate = data['uploadDate'];
-    description = data['description'];
-  }
-}
-
 class VideoUpload {
   final String title;
   final File video;

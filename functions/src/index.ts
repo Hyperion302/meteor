@@ -8,6 +8,7 @@ export { channel_createChannel } from './functions/channel_createChannel';
 export { channel_getVideos } from './functions/channel_getVideos';
 export { channel_updateChannel } from './functions/channel_updateChannel';
 export { channel_deleteChannel } from './functions/channel_deleteChannel';
+export { channel_getChannel } from './functions/channel_getChannel';
 
 export { video_createVideo } from './functions/video_createVideo';
 export { video_getVideo } from './functions/video_getVideo';
