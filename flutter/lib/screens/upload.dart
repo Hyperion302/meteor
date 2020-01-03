@@ -87,15 +87,34 @@ class _MeteorUploadScreenState extends State<MeteorUploadScreen> {
     }
     return Scaffold(
       body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              // If we're selecting, show the select button.  Else show the details widget
-              children: currentStack,
+        child: Column(
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(
+                left: 20.0,
+              ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  icon: Icon(Icons.cancel),
+                  tooltip: 'Go Back',
+                  onPressed: () {
+                    Navigator.pop(context, false);
+                  },
+                ),
+              ),
             ),
-          ),
+            Center(
+              child: Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  // If we're selecting, show the select button.  Else show the details widget
+                  children: currentStack,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
