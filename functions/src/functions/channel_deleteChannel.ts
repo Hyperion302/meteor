@@ -27,7 +27,7 @@ export const channel_deleteChannel = functions.https.onCall(async (data, context
 
     // First submit job to delete search indexes
     const algoliaPromise = algoliaIndex.deleteBy({
-        filters: `channelID:${channelSchema.id}`
+        filters: `channelID:${channelSchema.id} OR id:${channelSchema.id}`,
     });
 
     // Next, delete all videos of channel
