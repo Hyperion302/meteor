@@ -1,7 +1,6 @@
 import * as functions from 'firebase-functions';
-import { ISchemaVideo } from '../definitions';
-import { db, addLog, log } from '../globals';
-import { videoSchemaFromFirestore, resolveVideo } from '../converters';
+import { db, addLog, log, algoliaIndex } from '../globals';
+import { videoSchemaFromFirestore, resolveVideo, algoliaFromVideo } from '../converters';
 
 export const video_updateVideo = functions.https.onCall(async (data, context) => {
     if(!context.auth) {
@@ -31,7 +30,7 @@ export const video_updateVideo = functions.https.onCall(async (data, context) =>
     // Get fields to edit
     let willEditTitle = false;
     let willEditDescription = false;
-    const newVideo: ISchemaVideo = video;
+    const newVideo = video;
 
     if(data.title) {
         if(!(typeof data.title === 'string') || data.title.length === 0) {
@@ -49,12 +48,18 @@ export const video_updateVideo = functions.https.onCall(async (data, context) =>
         newVideo.description = data.description;
     }
 
+    // Update in DB
     await videoDoc.update(newVideo);
 
-    await addLog(log, 'deleteChannel', {
-        eventSource: 'channel',
+    // Update in Algolia
+    const resolvedVideo = await resolveVideo(db, newVideo);
+    const algoliaVideo = algoliaFromVideo(resolvedVideo);
+    await algoliaIndex.saveObject(algoliaVideo);
+
+    await addLog(log, 'updateVideo', {
+        eventSource: 'video',
         value: newVideo,
-        message: `Channel ${channel.id} : ${channel.name} updated ${willEditTitle ? 't' : ''}${willEditDescription ? 'd' : ''}`
+        message: `Video ${video.id} : ${video.title} updated ${willEditTitle ? 't' : ''}${willEditDescription ? 'd' : ''}`
     });
-    return channel;
+    return video;
 });

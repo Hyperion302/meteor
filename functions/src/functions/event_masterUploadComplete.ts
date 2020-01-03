@@ -39,7 +39,7 @@ async function addToMux(video: ISchemaVideo, bucketPath: string, docRef: Firebas
 async function addToAlgolia(video: ISchemaVideo) {
     const resolvedVideo = await resolveVideo(db, video);
     const videoObj = algoliaFromVideo(resolvedVideo);
-    await algoliaIndex.addObject(videoObj, video.id);
+    await algoliaIndex.addObject(videoObj, videoObj.objectID);
     return videoObj;
 }
 

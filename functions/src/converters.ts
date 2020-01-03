@@ -119,6 +119,7 @@ export function algoliaFromVideo(video: IResolvedVideo): IAlgoliaVideo {
         description: video.description,
         type: 'video',
         id: video.id,
+        objectID: video.id,
         author: video.author,
         channelID: video.channel.id,
         uploadDate: video.uploadDate
@@ -128,6 +129,7 @@ export function algoliaFromVideo(video: IResolvedVideo): IAlgoliaVideo {
 export function algoliaFromChannel(channel: IResolvedChannel): IAlgoliaChannel {
     return {
         id: channel.id,
+        objectID: channel.id,
         name: channel.name,
         type: 'channel',
         owner: channel.owner,

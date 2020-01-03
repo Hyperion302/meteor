@@ -1,7 +1,6 @@
 import * as functions from 'firebase-functions';
-import { ISchemaChannel } from '../definitions';
-import { db, addLog, log } from '../globals';
-import { channelSchemaFromFirestore } from '../converters';
+import { db, addLog, log, algoliaIndex } from '../globals';
+import { channelSchemaFromFirestore, resolveChannel, algoliaFromChannel } from '../converters';
 
 export const channel_updateChannel = functions.https.onCall(async (data, context) => {
     if(!context.auth) {
@@ -22,28 +21,30 @@ export const channel_updateChannel = functions.https.onCall(async (data, context
 
     // Check owner
     if(context.auth.uid != channel.owner) {
-        throw new functions.https.HttpsError('permission-denied', 'User must be owner of channel to delete it');
+        throw new functions.https.HttpsError('permission-denied', 'User must be owner of channel to update it');
     }
 
     // Get fields to edit
     let willEditName = false;
-    let newChannel: ISchemaChannel = channel;
+    let newChannel = channel;
 
     if(data.name) {
         if(!(typeof data.name === 'string') || data.name.length === 0) {
             throw new functions.https.HttpsError('invalid-argument', 'Invalid channel name');
         }
         willEditName = true;
+        channel.name = data.name;
     }
 
-    // Edit name if necessary
-    if(willEditName) {
-        newChannel.name = data.name
-    }
-
+    // Update in DB
     await channelDoc.update(newChannel);
 
-    await addLog(log, 'deleteChannel', {
+    // Update in Algolia
+    const resolvedChannel = await resolveChannel(db, newChannel);
+    const algoliaChannel = algoliaFromChannel(resolvedChannel);
+    await algoliaIndex.saveObject(algoliaChannel);
+
+    await addLog(log, 'updateChannel', {
         eventSource: 'channel',
         value: newChannel,
         message: `Channel ${channel.id} : ${channel.name} updated ${willEditName ? 'n' : ''}`

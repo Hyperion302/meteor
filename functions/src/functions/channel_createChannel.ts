@@ -31,7 +31,7 @@ export const channel_createChannel = functions.https.onCall(async (data, context
     const resolvedChannel = await resolveChannel(db, schema);
     // Put it in Algolia
     const channelObj = algoliaFromChannel(resolvedChannel);
-    await algoliaIndex.addObject(channelObj, channelId);
-    
+    await algoliaIndex.addObject(channelObj, channelObj.objectID);
+
     return resolvedChannel;
 });
