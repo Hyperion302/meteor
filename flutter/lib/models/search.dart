@@ -4,7 +4,6 @@ class AlgoliaObject {
   AlgoliaObject({this.type});
 
   AlgoliaObject.fromAlgolia(Map<String, dynamic> data) {
-    print('b');
     type = data['type'];
   }
 }
