@@ -32,14 +32,29 @@ class _MeteorProfileScreenState extends State<MeteorProfileScreen> {
           padding: EdgeInsets.all(20.0),
           child: Column(
             children: <Widget>[
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text('Profile',
-                  style: TextStyle(
-                    fontSize: 32.0,
-                    fontWeight: FontWeight.bold,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text('Profile',
+                      style: TextStyle(
+                        fontSize: 32.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
-                ),
+                  IconButton(
+                    onPressed: () {
+                      FirebaseAuth.instance.signOut()
+                      .then((_) {
+                        Navigator.pushNamedAndRemoveUntil(context, loginRoute, (Route<dynamic> route) => false);
+                      });
+                    },
+                    tooltip: 'Logout',
+                    icon: Icon(Icons.exit_to_app),
+                  )
+                ],
               ),
               SizedBox(
                 height: 20.0
