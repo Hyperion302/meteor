@@ -2,13 +2,14 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:meteor/models/channel.dart';
 import 'package:meteor/models/video.dart';
 
-Future< Channel > createChannel(String name) async {
+Future< Channel > createChannel(String name, bool icon) async {
   final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
     functionName: 'channel_createChannel',
   );
   // Call
   dynamic resp = await callable.call(<String, dynamic>{
     'name': name,
+    'iconStatus': icon ? 'expected' : 'none',
   });
   // return
   return Channel.fromFirestore(resp.data);
@@ -40,6 +41,17 @@ Future< void > updateChannel(Channel oldChannel, Channel newChannel) async {
   // Call
   await callable.call(args);
 
+}
+
+// Variation that calls channel_updateChannel with proper args
+Future< void > updateChannelIcon(Channel channel) async {
+  final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
+    functionName: 'channel_updateChannel',
+  );
+  await callable.call({
+    'channel': channel.id,
+    'icon': true,
+  });
 }
 
 Future< Channel > getChannelById(String id) async {

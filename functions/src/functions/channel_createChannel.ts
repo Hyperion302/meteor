@@ -8,11 +8,20 @@ export const channel_createChannel = functions.https.onCall(async (data, context
     if(!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated to make this request');
     }
+
     // Channel name
     const name = data.name;
     if(!(typeof name === 'string') || name.length === 0) {
         throw new functions.https.HttpsError('invalid-argument', 'Invalid channel name');
     }
+
+    // HasIcon?
+    const iconStatus = data.iconStatus;
+    if(!(typeof iconStatus === 'string') && (iconStatus != 'expected' && iconStatus != 'none' ) || iconStatus == 'uploaded') {
+        throw new functions.https.HttpsError('invalid-argument', 'Invalid argument for hasIcon');
+    }
+
+
     // Create channel
     const userId = context.auth.uid;
     const channelId = uuid();
@@ -20,6 +29,7 @@ export const channel_createChannel = functions.https.onCall(async (data, context
         id: channelId,
         owner: userId,
         name: name,
+        iconStatus: iconStatus,
     };
     const doc = db.doc(`channels/${channelId}`);
     await doc.set(schema);

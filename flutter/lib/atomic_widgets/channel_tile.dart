@@ -15,7 +15,10 @@ class MeteorChannelTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomCard(
       child: ListTile(
-        leading: FlutterLogo(),
+        leading: CircleAvatar(
+          radius: 30,
+          backgroundImage: NetworkImage('https://storage.googleapis.com/meteor-247517.appspot.com/channelAssets/${channel.id}/thumb128'),
+        ),
         trailing: trailingAction,
         title: Text(channel.name),
         subtitle: Text('Lorem Ipsum'),

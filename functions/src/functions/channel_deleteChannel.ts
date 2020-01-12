@@ -2,6 +2,7 @@ import * as functions from 'firebase-functions';
 import * as axios from 'axios';
 import { db, addLog, log, algoliaIndex } from '../globals';
 import { channelSchemaFromFirestore, videoSchemaFromFirestore } from '../converters';
+import admin = require('firebase-admin');
 
 export const channel_deleteChannel = functions.https.onCall(async (data, context) => {
     if(!context.auth) {
@@ -29,6 +30,12 @@ export const channel_deleteChannel = functions.https.onCall(async (data, context
     const algoliaPromise = algoliaIndex.deleteBy({
         filters: `channelID:${channelSchema.id} OR id:${channelSchema.id}`,
     });
+    
+    // Then delete channel art
+    const bucketPromise = admin.storage().bucket('meteor-247517.appspot.com').deleteFiles({
+        prefix: `channelAssets/${channelSchema.id}`,
+        force: true,
+    });
 
     // Next, delete all videos of channel
     const ref = db.collection('videos').where('channelID', '==', channelSchema.id);
@@ -51,7 +58,7 @@ export const channel_deleteChannel = functions.https.onCall(async (data, context
     // Also delete all mux assets 
     const muxPromise = Promise.all(muxPromises);
 
-    await Promise.all([algoliaPromise, firestorePromise, muxPromise]);
+    await Promise.all([algoliaPromise, firestorePromise, muxPromise, bucketPromise]);
 
     // Finally, delete channel doc
     await channelDoc.delete();

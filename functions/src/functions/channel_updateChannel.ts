@@ -26,7 +26,7 @@ export const channel_updateChannel = functions.https.onCall(async (data, context
 
     // Get fields to edit
     let willEditName = false;
-    let newChannel = channel;
+    let willEditIcon = false;
 
     if(data.name) {
         if(!(typeof data.name === 'string') || data.name.length === 0) {
@@ -36,18 +36,29 @@ export const channel_updateChannel = functions.https.onCall(async (data, context
         channel.name = data.name;
     }
 
-    // Update in DB
-    await channelDoc.update(newChannel);
+    if(data.icon) {
+        if(!(typeof data.icon === 'boolean')) {
+            throw new functions.https.HttpsError('invalid-argument', 'Invalid value for icon');
+        }
+        // Must be true at this point
+        channel.iconStatus = 'expected';
+    }
 
-    // Update in Algolia
-    const resolvedChannel = await resolveChannel(db, newChannel);
-    const algoliaChannel = algoliaFromChannel(resolvedChannel);
-    await algoliaIndex.saveObject(algoliaChannel);
+    // Update in DB
+    await channelDoc.update(channel);
+
+    // Update in Algolia if needed
+    if(willEditName) {
+        const resolvedChannel = await resolveChannel(db, channel);
+        const algoliaChannel = algoliaFromChannel(resolvedChannel);
+        await algoliaIndex.saveObject(algoliaChannel);
+    }
+    
 
     await addLog(log, 'updateChannel', {
         eventSource: 'channel',
-        value: newChannel,
-        message: `Channel ${channel.id} : ${channel.name} updated ${willEditName ? 'n' : ''}`
+        value: channel,
+        message: `Channel ${channel.id} : ${channel.name} updated ${willEditName ? 'n' : ''}${willEditIcon ? 'i' : ''}`,
     });
     return channel;
 });

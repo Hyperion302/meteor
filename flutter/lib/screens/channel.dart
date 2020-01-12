@@ -1,5 +1,10 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:meteor/models/channel.dart';
 import 'package:meteor/models/video.dart';
 import 'package:meteor/routes.dart';
@@ -18,6 +23,7 @@ class MeteorChannelScreen extends StatefulWidget {
 class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
   Future< List< Video > > _videos;
   Future< FirebaseUser > _currentUser;
+  File _newIcon;
   final _formKey = GlobalKey<FormState>();
   TextEditingController _updateFormNameController;
 
@@ -53,12 +59,7 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
                           Navigator.pop(context, false);
                         },
                       ),
-                      Text('${widget.channel.name}',
-                        style: TextStyle(
-                          fontSize: 32.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      
                     ],
                   ),
                   FutureBuilder(
@@ -80,6 +81,23 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
                     },
                   )
                   
+                ],
+              ),
+              SizedBox(
+                height: 20.0
+              ),
+              Row(
+                children: <Widget>[
+                  _buildIcon(),
+                  SizedBox(
+                    width: 20.0
+                  ),
+                  Text('${widget.channel.name}',
+                    style: TextStyle(
+                      fontSize: 32.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
               SizedBox(
@@ -186,6 +204,133 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildIcon() {
+    return FutureBuilder(
+      future: _currentUser,
+      builder: (BuildContext context, snap) {
+        if(snap.hasError) {
+          return CircleAvatar(
+            backgroundImage: NetworkImage('https://storage.googleapis.com/meteor-247517.appspot.com/channelAssets/${widget.channel.id}/thumb128'),
+            radius: 64
+          );
+        }
+        if(snap.hasData) {
+          if(snap.data.uid == widget.channel.owner) {
+            return GestureDetector(
+              onTap: () {
+                ImagePicker.pickImage(source: ImageSource.gallery).then((image) {
+                  if(image != null) {
+                    setState(() {
+                      _newIcon = image;
+                    });
+                    _promptForNewIcon(widget.channel);
+                  }
+                });
+              },
+              child: Stack(
+                alignment: Alignment.topRight,
+                children: <Widget>[
+                  CircleAvatar(
+                    backgroundImage: NetworkImage('https://storage.googleapis.com/meteor-247517.appspot.com/channelAssets/${widget.channel.id}/thumb128'),
+                    radius: 64
+                  ),
+                  ClipOval(
+                    child: Container(
+                      child: Icon(Icons.add_photo_alternate, 
+                        size: 32.0,
+                      ),
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+          return CircleAvatar(
+            backgroundImage: NetworkImage('https://storage.googleapis.com/meteor-247517.appspot.com/channelAssets/${widget.channel.id}/thumb128'),
+            radius: 64
+          );
+        }
+        return CircleAvatar(
+          backgroundImage: NetworkImage('https://storage.googleapis.com/meteor-247517.appspot.com/channelAssets/${widget.channel.id}/thumb128'),
+          radius: 64
+        );
+      },
+    );
+  }
+
+  _promptForNewIcon(Channel channel) async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Change Icon'),
+          content: Row(
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text('Old'),
+                  CircleAvatar(
+                    radius: 32,
+                    backgroundImage: NetworkImage('https://storage.googleapis.com/meteor-247517.appspot.com/channelAssets/${channel.id}/thumb128'),
+                  )
+                ],
+              ),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text('New'),
+                  CircleAvatar(
+                    radius: 32,
+                    backgroundImage: FileImage(_newIcon),
+                  )
+                ],
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            FlatButton(
+              onPressed: () {
+                Navigator.pop(context, false);
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: Text('Cancel'),
+            ),
+            RaisedButton(
+              onPressed: () {
+                updateChannelIcon(channel)
+                .then((_) {
+                  print('Started upload');
+                  StorageReference videoRef = FirebaseStorage.instance.ref().child('channelAssets/${channel.id}/icon');
+                  StorageUploadTask uploadTask = videoRef.putFile(_newIcon);
+                  return uploadTask.onComplete;
+                })
+                .then((_) {
+                  print('Upload finished');
+                  Navigator.pop(context, false);
+                })
+                .then((_) {
+                  Navigator.pop(context, true);
+                });
+              },
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20.0),
+              ),
+              color: Theme.of(context).primaryColor,
+              child: Text('Save'),
+            ),
+
+          ],
+        );
+      }
     );
   }
 

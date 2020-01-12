@@ -17,7 +17,7 @@ export { video_updateVideo } from './functions/video_updateVideo';
 
 export { user_getChannels } from './functions/user_getChannels';
 
-export { event_masterUploadComplete } from './functions/event_masterUploadComplete';
+export { event_objectFinalized } from './functions/event_objectFinalized';
 export { event_muxWebhook } from './functions/event_muxWebhook';
 
 

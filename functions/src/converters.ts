@@ -7,6 +7,7 @@ export function channelSchemaFromFirestore(data: FirebaseFirestore.DocumentData)
         id: data['id'],
         name: data['name'],
         owner: data['owner'],
+        iconStatus: data['iconStatus'],
     };
 }
 
@@ -34,6 +35,7 @@ export async function resolveChannel(db: FirebaseFirestore.Firestore, schema: IS
         id: schema.id,
         name: schema.name,
         owner: schema.owner,
+        iconStatus: schema.iconStatus,
     };
 }
 
@@ -78,6 +80,7 @@ export function channelSchemaFromResolved(channel: IResolvedChannel): ISchemaCha
         id: channel.id,
         name: channel.name,
         owner: channel.owner,
+        iconStatus: channel.iconStatus,
     };
 }
 

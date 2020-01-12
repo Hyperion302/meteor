@@ -2,6 +2,7 @@ export type tID = string;
 export type tMuxID = string;
 export type tUser = string;
 export type tTimestamp = number;
+export type tChannelIconStatus = 'none' | 'expected' | 'uploaded';
 
 export interface IMuxData {
     status: 'upload-ready' | 'upload-complete' | 'transcoded',
@@ -40,6 +41,14 @@ export interface IAlgoliaVideo {
     uploadDate: tTimestamp
 }
 
+
+export interface IResolvedChannel {
+    id: tID,
+    owner: tUser,
+    name: string,
+    iconStatus: tChannelIconStatus,
+}
+
 export interface IAlgoliaChannel {
     name: string,
     type: 'channel',
@@ -52,13 +61,9 @@ export interface ISchemaChannel {
     id: tID,
     name: string,
     owner: tID,
+    iconStatus: tChannelIconStatus,
 }
 
-export interface IResolvedChannel {
-    id: tID,
-    owner: tUser,
-    name: string,
-}
 
 export interface ILog {
     // TODO: Better log types with subtypes for video, error, etc.
