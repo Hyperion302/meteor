@@ -7,3 +7,4 @@ const String tabHostRoute = '/tabhost';
 const String createChannelRoute = '/createChannel';
 const String playerRoute = '/player';
 const String searchRoute = '/search';
+const String registerRoute = '/register';

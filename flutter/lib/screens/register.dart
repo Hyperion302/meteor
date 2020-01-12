@@ -3,14 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:meteor/routes.dart';
 
-class MeteorLoginScreen extends StatefulWidget {
-  MeteorLoginScreen({Key key}) : super(key: key);
+class MeteorRegisterScreen extends StatefulWidget {
+  MeteorRegisterScreen({Key key}) : super(key: key);
 
   @override
-  _MeteorLoginScreenState createState() => _MeteorLoginScreenState();
+  _MeteorRegisterScreenState createState() => _MeteorRegisterScreenState();
 }
 
-class _MeteorLoginScreenState extends State<MeteorLoginScreen> {
+class _MeteorRegisterScreenState extends State<MeteorRegisterScreen> {
 
   final emailInputController = TextEditingController();
   final pwdInputController = TextEditingController();
@@ -37,12 +37,12 @@ class _MeteorLoginScreenState extends State<MeteorLoginScreen> {
     }
   }
 
-  Future< void > login() async {
+  Future< void > register() async {
     if(!_formKey.currentState.validate()) {
       return null;
     }
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailInputController.text,
         password: pwdInputController.text,
       );
@@ -93,16 +93,10 @@ class _MeteorLoginScreenState extends State<MeteorLoginScreen> {
                   height: 30.0,
                 ),
                 RaisedButton(
-                  child: Text('Login'),
+                  child: Text('Register'),
                   color: Theme.of(context).primaryColor,
-                  onPressed: login,
+                  onPressed: register,
                 ),
-                FlatButton(
-                  child: Text('Create Account'),
-                  onPressed: () {
-                    Navigator.pushNamed(context, registerRoute);
-                  },
-                )
               ],
             ),
           )

@@ -5,6 +5,7 @@ import 'package:meteor/screens/channel.dart';
 import 'package:meteor/screens/create_channel.dart';
 import 'package:meteor/screens/login.dart';
 import 'package:meteor/screens/player.dart';
+import 'package:meteor/screens/register.dart';
 import 'package:meteor/screens/search.dart';
 import 'package:meteor/screens/splash.dart';
 import 'package:meteor/models/channel.dart';
@@ -32,6 +33,8 @@ Route< dynamic > generateRoute(RouteSettings settings) {
       return MaterialPageRoute(builder: (BuildContext context) => MeteorPlayerScreen(video: displayedVideo));
     case searchRoute:
       return MaterialPageRoute(builder: (BuildContext context) => MeteorSearchScreen());
+    case registerRoute:
+      return MaterialPageRoute(builder: (BuildContext context) => MeteorRegisterScreen());
     default:
       return MaterialPageRoute(builder: (context) => Container());
   }
