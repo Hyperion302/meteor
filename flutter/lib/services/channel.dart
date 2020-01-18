@@ -25,7 +25,7 @@ Future< void > deleteChannel(Channel channel) async {
   });
 }
 
-Future< void > updateChannel(Channel oldChannel, Channel newChannel) async {
+Future< void > updateChannel(Channel oldChannel, Channel newChannel, {bool newIcon = false}) async {
   final HttpsCallable callable = CloudFunctions.instance.getHttpsCallable(
     functionName: 'channel_updateChannel',
   );
@@ -33,6 +33,7 @@ Future< void > updateChannel(Channel oldChannel, Channel newChannel) async {
   // Determine what fields changed
   Map< String, dynamic > args = {
     'channel': oldChannel.id,
+    'icon': newIcon,
   };
   if(oldChannel.name != newChannel.name) {
     args['name'] = newChannel.name;
