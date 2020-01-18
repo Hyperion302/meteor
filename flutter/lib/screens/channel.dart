@@ -100,84 +100,82 @@ class _MeteorChannelScreenState extends State<MeteorChannelScreen> {
                     });
                     return videos;
                   },
-                  child: SingleChildScrollView(
+                  child: ListView(
                     physics: AlwaysScrollableScrollPhysics(),
-                    child: Column(
-                      children: <Widget>[
-                        _buildDetails(),
-                        SizedBox(
-                          height: 20.0
-                        ),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text('Videos',
-                            style: TextStyle(
-                              fontSize: 20.0,
-                            ),
+                    children: <Widget>[
+                      _buildDetails(),
+                      SizedBox(
+                        height: 20.0
+                      ),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text('Videos',
+                          style: TextStyle(
+                            fontSize: 20.0,
                           ),
                         ),
-                        FutureBuilder(
-                          future: _videos,
-                          builder: (context, snapshot) {
-                            if(snapshot.hasError) {
-                              print(snapshot.error);
-                              return Text('Error');
+                      ),
+                      FutureBuilder(
+                        future: _videos,
+                        builder: (context, snapshot) {
+                          if(snapshot.hasError) {
+                            print(snapshot.error);
+                            return Text('Error');
+                          }
+                          if(snapshot.hasData) {
+                            if(snapshot.data.length == 0) {
+                              return Text('This channel has no videos');
                             }
-                            if(snapshot.hasData) {
-                              if(snapshot.data.length == 0) {
-                                return Text('This channel has no videos');
-                              }
-                              List< Widget > mappedVideos = <Widget>[...snapshot.data.map((Video video) {
-                                return InkWell(
-                                  child: MeteorSmallVideoTile(
-                                    video: video, 
-                                    trailingAction: FutureBuilder(
-                                      future: _currentUser,
-                                      builder: (BuildContext context, snap) {
-                                        if(snap.hasError) {
-                                          return Container(
-                                            width: 0,
-                                            height: 0,
-                                          );
-                                        }
-                                        if(snap.hasData) {
-                                          if(snap.data.uid == widget.channel.owner) {
-                                            return IconButton(
-                                              onPressed: () {
-                                                _promptForDelete(video);
-                                              },
-                                              icon: Icon(
-                                                Icons.delete_forever,
-                                                color: Colors.black38,
-                                              ),
-                                            );
-                                          }
-                                          return Container(
-                                            width: 0,
-                                            height: 0,
+                            List< Widget > mappedVideos = <Widget>[...snapshot.data.map((Video video) {
+                              return InkWell(
+                                child: MeteorSmallVideoTile(
+                                  video: video, 
+                                  trailingAction: FutureBuilder(
+                                    future: _currentUser,
+                                    builder: (BuildContext context, snap) {
+                                      if(snap.hasError) {
+                                        return Container(
+                                          width: 0,
+                                          height: 0,
+                                        );
+                                      }
+                                      if(snap.hasData) {
+                                        if(snap.data.uid == widget.channel.owner) {
+                                          return IconButton(
+                                            onPressed: () {
+                                              _promptForDelete(video);
+                                            },
+                                            icon: Icon(
+                                              Icons.delete_forever,
+                                              color: Colors.black38,
+                                            ),
                                           );
                                         }
                                         return Container(
-                                            width: 0,
-                                            height: 0,
-                                          );
-                                      },
-                                    ),
+                                          width: 0,
+                                          height: 0,
+                                        );
+                                      }
+                                      return Container(
+                                          width: 0,
+                                          height: 0,
+                                        );
+                                    },
                                   ),
-                                  onTap: () {
-                                    _navigateToPlayer(video);
-                                  }
-                                );
-                              })];
-                              return Column(
-                                children: mappedVideos,
+                                ),
+                                onTap: () {
+                                  _navigateToPlayer(video);
+                                }
                               );
-                            }
-                            return CircularProgressIndicator();
+                            })];
+                            return Column(
+                              children: mappedVideos,
+                            );
                           }
-                        ),
-                      ],
-                    ),
+                          return CircularProgressIndicator();
+                        }
+                      ),
+                    ],
                   ),
                 ),
               ),

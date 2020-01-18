@@ -31,6 +31,7 @@ class _MeteorProfileScreenState extends State<MeteorProfileScreen> {
         child: Padding(
           padding: EdgeInsets.all(20.0),
           child: Column(
+            mainAxisSize: MainAxisSize.max,
             children: <Widget>[
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -69,63 +70,61 @@ class _MeteorProfileScreenState extends State<MeteorProfileScreen> {
                     });
                     return channels;
                   },
-                  child: SingleChildScrollView(
+                  child: ListView(
                     physics: AlwaysScrollableScrollPhysics(),
-                    child: Column(
-                      children: <Widget>[
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text('Channels',
-                            style: TextStyle(
-                              fontSize: 20.0,
-                            ),
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text('Channels',
+                          style: TextStyle(
+                            fontSize: 20.0,
                           ),
                         ),
-                        FutureBuilder(
-                          future: _channels,
-                          builder: (context, snapshot) {
-                            if(snapshot.hasError) {
-                              return Text(snapshot.error.toString());
-                            }
-                            if(snapshot.hasData) {
-                              // Weird but sound way to go from List< Channel > to List< Widget >
-                              List< Widget > mappedChannels = <Widget>[...snapshot.data.map((Channel channel) {
-                                return MeteorChannelTile(
-                                  channel: channel,
-                                  trailingAction: IconButton(
-                                    onPressed: () {
-                                      _promptForDelete(channel);
-                                    },
-                                    icon: Icon(Icons.delete_forever),
-                                  ),
-                                  onTap: () {
-                                    _navigateToChannel(channel);
-                                  }
-                                );
-                              }).toList()];
-                              return Column(
-                                children: [
-                                  Column(
-                                    children: mappedChannels,
-                                  ),
-                                  RaisedButton(
-                                    onPressed: () {
-                                      _navigateToChannelCreate();
-                                    },
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                    ),
-                                    color: Theme.of(context).primaryColor,
-                                    child: Text('New Channel'),
-                                  ),
-                                ]
+                      ),
+                      FutureBuilder(
+                        future: _channels,
+                        builder: (context, snapshot) {
+                          if(snapshot.hasError) {
+                            return Text(snapshot.error.toString());
+                          }
+                          if(snapshot.hasData) {
+                            // Weird but sound way to go from List< Channel > to List< Widget >
+                            List< Widget > mappedChannels = <Widget>[...snapshot.data.map((Channel channel) {
+                              return MeteorChannelTile(
+                                channel: channel,
+                                trailingAction: IconButton(
+                                  onPressed: () {
+                                    _promptForDelete(channel);
+                                  },
+                                  icon: Icon(Icons.delete_forever),
+                                ),
+                                onTap: () {
+                                  _navigateToChannel(channel);
+                                }
                               );
-                            }
-                            return CircularProgressIndicator();
-                          },
-                        ),
-                      ],
-                    ),
+                            }).toList()];
+                            return Column(
+                              children: [
+                                Column(
+                                  children: mappedChannels,
+                                ),
+                                RaisedButton(
+                                  onPressed: () {
+                                    _navigateToChannelCreate();
+                                  },
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20.0),
+                                  ),
+                                  color: Theme.of(context).primaryColor,
+                                  child: Text('New Channel'),
+                                ),
+                              ]
+                            );
+                          }
+                          return CircularProgressIndicator();
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
