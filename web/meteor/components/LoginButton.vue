@@ -1,7 +1,7 @@
 <template>
-    <a class="login-button" href="/login">
+    <n-link class="login-button" to="/login">
         Login
-    </a>
+    </n-link>
 </template>
 
 <script>

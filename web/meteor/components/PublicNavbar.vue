@@ -6,10 +6,10 @@
                 <img src="@/assets/menu.png" alt="" />
             </label>
             <div class="left-menu">
-                <a href="/about">About</a>
-                <a href="/contact">Contact</a>
+                <n-link to="/about">About</n-link>
+                <n-link to="/contact">Contact</n-link>
             </div>
-            <a href="/" class="logo">SWISH</a>
+            <n-link to="/" class="logo">METEOR</n-link>
             <div class="right-buttons">
                 <login-button />
                 <register-button />
