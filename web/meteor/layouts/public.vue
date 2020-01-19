@@ -5,7 +5,7 @@
     </div>
 </template>
 <script>
-import PublicNavbar from '@/components/public_navbar.vue'
+import PublicNavbar from '@/components/PublicNavbar.vue'
 export default {
     components: {
         PublicNavbar

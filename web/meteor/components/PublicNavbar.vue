@@ -18,8 +18,8 @@
     </div>
 </template>
 <script>
-import LoginButton from '@/components/login_button.vue'
-import RegisterButton from '@/components/register_button.vue'
+import LoginButton from '@/components/LoginButton.vue'
+import RegisterButton from '@/components/RegisterButton.vue'
 export default {
     name: 'PublicNavbar',
     components: {
