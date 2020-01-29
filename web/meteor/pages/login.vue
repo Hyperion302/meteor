@@ -18,14 +18,17 @@
             <button @click="login">
                 Login
             </button>
-            <a href="/signup">
+            <n-link to="/signup">
                 Sign Up
-            </a>
+            </n-link>
         </div>
     </div>
 </template>
 
 <script>
+import firebase from 'firebase/app'
+import 'firebase/auth'
+
 export default {
     data() {
         return {
@@ -35,7 +38,18 @@ export default {
     },
     methods: {
         login() {
-            console.log('Login started')
+            firebase
+                .auth()
+                .signInWithEmailAndPassword(this.email, this.password)
+                .then(() => {
+                    this.$router.push({
+                        path: '/home'
+                    })
+                })
+                .catch((e) => {
+                    console.log('Error during login')
+                    console.log(e)
+                })
         }
     }
 }

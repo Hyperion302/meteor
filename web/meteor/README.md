@@ -1,22 +1,10 @@
-# meteor
+# Notes
 
-> Meteor web app
+On page load, 2 different things can happen. If the page was loaded by direct link, it's SSR. If it was done by a transition, it is prerendered on the client, thus no SSR occurs.
 
-## Build Setup
+To handle auth:
+If running on the server, return SEO data, in mounted() check auth
 
-``` bash
-# install dependencies
-$ npm run install
+If running on client, do nothign and wait until mounted()
 
-# serve with hot reload at localhost:3000
-$ npm run dev
-
-# build for production and launch server
-$ npm run build
-$ npm run start
-
-# generate static project
-$ npm run generate
-```
-
-For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
+In both cases, mounted() should check auth and redirect if necessary.
