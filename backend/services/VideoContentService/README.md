@@ -7,7 +7,7 @@ Stores videos in the CDN and manages transcoding jobs
 Subsequent actions depend heavily on event received.
 
 - Transcoding complete
-- 1. Calls [SearchService](/backend/services/SearchService/README.md)/addVideo for search indexing
+- 1. Calls [SearchService](../SearchService/README.md)/addVideo for search indexing
 - 2. Updates video transcoding data in DB
 
 ## transcodeVideo
