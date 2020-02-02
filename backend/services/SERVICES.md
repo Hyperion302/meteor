@@ -2,39 +2,35 @@
 
 ## APIGatewayService
 
-Handles all API requests and authenticates user tokens
+Handles all user API requests
 
-## CDNService
+## ExternalGatewayService
 
-Handles all callbacks from the CDN provider ([Google Cloud Storage](https://cloud.google.com/storage))
+Receives events from external services (Algolia, Mux, GCS, etc.)
 
 ## VideoDataService
 
-Provides video data fields
+Provides video data fields and assembles related fields
 
-## VideoTranscodingService
+## VideoContentService
 
-Provides video transcoding endpoints (Handles MUX webhooks and submits transcoding jobs)
-
-## VideoUploadService
-
-Provides video data streaming endpoints and stores them to the CDN.
+Stores videos in the CDN and manages transcoding jobs
 
 ## ChannelDataService
 
-Provides channel data fields
+Provides channel data fields and assembles related fields
 
-## ChannelUploadService
+## ChannelContentService
 
-Provides channel art streaming endpoints and stores them to the CDN.
-
-## ChannelUGCService
-
-Preprocesses (resizes, transforms, formats, etc.) channel-related uploads.
+Uploads channel content to the CDN and preprocesses (resizes, transforms, formats, etc.) them.
 
 ## UserAuthService
 
-Authenticated user tokens
+Authenticates user tokens
+
+## SearchService
+
+Handles search index updating
 
 # Interesting or complicated (or both) Flows
 
@@ -42,18 +38,14 @@ Authenticated user tokens
 
 To create a video, the user first sends a request to "allocate" the video, which hits the /createVideo endpopint in [VideoDataService](/backend/services/VideoDataService/README.md). A nonuploaded, untranscoded video object is returned (empty schema with no mux fields).
 
-The user would then stream a multipart upload to [VideoUploadService](/backend/services/VideoUploadService/README.md)/uploadVideo that would stream their data to the CDN.
+The user then stream a multipart upload to [VideoContentService](/backend/services/VideoContentService/README.md)/uploadVideo that stream their data to the CDN.
 
-The [CDNService](/backend/services/CDNService/README.md) on upload completed, _if the completed upload is a video_, would trigger [VideoTranscodingService](/backend/services/VideoTranscodingService/README.md)/transcodeVideo to request a transcoding job.
+The [VideoContentService](/backend/services/VideoContentService/README.md) then requests a transcoding job.
 
-Once the transcoding job is complete, a call back to [VideoTranscodingService](/backend/services/VideoTranscodingService/README.md)/muxEndpoint would mark the video as transcoded and ready, and would attach video transcoding data to the DB object.
+Once the transcoding job is complete, [ExternalGatewayService](/backend/service/ExternalGatewayService/README.md)/muxEndpoint is called from outside the network. The ExternalGatewayService authenticates the event and calls back to [VideoContentService](/backend/services/VideoContentService/README.md)/muxEndpoint. VideoContentervice then marks the video as transcoded and ready, and attaches video transcoding data to the DB object.
 
 ## Uploading channel art
 
 This is similar, albeit less complicated without transcoding, to the video upload flow
 
-To upload channel art, the user first begins streaming their art to a streaming endpoint (/uploadIcon for channel icon) provided by [ChannelUploadService](/backend/services/ChannelUploadService), which would stream their art to the CDN.
-
-The [CDNService](/backend/services/CDNService/README.md) on upload completed, _if the completed upload is channel art_, would trigger an endpoint (/processIcon for channel icon) provided by [ChannelUGCService](/backend/services/ChannelUGCService/README.md) to process the UGC.
-
-The call to the [ChannelUGCService](/backend/services/ChannelUGCService/README.md) would compress and resize channel art, and stream reformatted art back to the CDN. Once the stream is complete, it would trigger the CDN to delete the old channel art.
+To upload channel art, the user first begins streaming their art to a streaming endpoint (/uploadIcon for channel icon) provided by [ChannelContentService](/backend/services/ChannelContentService/README.md), which compresses and resizes channel art, and streams reformatted art to the CDN. Once the stream is complete, it triggers the CDN to delete the old channel art.
