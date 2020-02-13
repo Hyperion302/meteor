@@ -6,6 +6,12 @@ Provides channel data fields and assembles related fields
 
 Retrieves data from DB
 
+## /queryChannel
+
+Query fields:
+
+-   owner - Filters channels based on owner
+
 ## /createChannel
 
 1. Creates DB entry

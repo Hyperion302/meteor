@@ -8,9 +8,13 @@ All of the endpoints below attach auth data to their request by first calling [U
 
 ## Video
 
-### GET /video
+### GET /video/:id
 
 Calls [VideoDataService](../VideoDataService/README.md)/getVideo
+
+### GET /video?<query>
+
+Calls [VideoDataService](../VideoDataService/README.md)/queryVideo
 
 ### POST /video
 

@@ -8,6 +8,19 @@ The VideoDataService serves basic fields for videos and assembles related fields
 2. Calls [VideoContentService](../VideoContentService)/getVideo for transcoding data
 3. Calls [ChannelDataService](../ChannelDataService)/getChannel for channel data
 
+## queryVideo
+
+Query fields:
+
+-   author - show videos by author
+-   channel - show videos by channel
+-   before - show videos before date
+-   after - show videos after date
+
+_If ID is specified, all others are ignored. If ID is not specified, one other parameter must be specified_
+
+_If before >= after, raises an error_
+
 ## createVideo
 
 1. Creates new untranscoded video in DB
