@@ -1,7 +1,7 @@
 import { tID, IError } from '../../../src/definitions';
 import * as uuid from 'uuid/v4';
 import { IChannel, IChannelQuery } from './definitions';
-import { addChannelIndex } from '../SearchService';
+import * as search from '../SearchService';
 import { firestoreInstance } from '../../../src/sharedInstances';
 
 async function getSingleChannelRecord(id: tID): Promise<IChannel> {
@@ -18,19 +18,17 @@ async function getSingleChannelRecord(id: tID): Promise<IChannel> {
     const channelData = channelDocSnap.data();
     // Build channel object
     return {
-        id: id,
+        id,
         owner: channelData.owner,
         name: channelData.name
     };
 }
 
-export async function getChannelData(id: tID): Promise<IChannel> {
+export async function getChannel(id: tID): Promise<IChannel> {
     return await getSingleChannelRecord(id);
 }
 
-export async function queryChannelData(
-    query: IChannelQuery
-): Promise<IChannel[]> {
+export async function queryChannel(query: IChannelQuery): Promise<IChannel[]> {
     if (!query.owner) {
         // No query
         const error: IError = {
@@ -40,7 +38,7 @@ export async function queryChannelData(
         throw error;
     }
     const collection = firestoreInstance.collection('channels');
-    let fsQuery = undefined;
+    let fsQuery;
     if (query.owner) {
         fsQuery = (fsQuery ? fsQuery : collection).where(
             'owner',
@@ -69,19 +67,19 @@ export async function queryChannelData(
     return channels;
 }
 
-export async function createChannelData(
+export async function createChannel(
     name: string,
     owner: string
 ): Promise<IChannel> {
     // Build channel object
     const channelData: IChannel = {
         id: uuid.default(),
-        owner: owner,
-        name: name
+        owner,
+        name
     };
 
     // Add to search index
-    await addChannelIndex(channelData);
+    await search.addChannel(channelData);
 
     // Write to DB
     const channelDoc = firestoreInstance.doc(`channels/${channelData.id}`);

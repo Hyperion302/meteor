@@ -2,9 +2,9 @@ import { IVideo } from '../VideoDataService/definitions';
 import { IChannel } from '../ChannelDataService/definitions';
 
 // #region Video
-export async function addVideoIndex(video: IVideo) {}
+export async function addVideo(video: IVideo) {}
 // #endregion
 
 // #region Channel
-export async function addChannelIndex(channel: IChannel) {}
+export async function addChannel(channel: IChannel) {}
 // #endregion

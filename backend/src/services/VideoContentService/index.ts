@@ -2,7 +2,7 @@ import { tID, IError } from '../../../src/definitions';
 import { firestoreInstance } from '../../../src/sharedInstances';
 import { IVideoContent } from './definitions';
 
-export async function getVideoContent(id: tID): Promise<IVideoContent> {
+export async function getVideo(id: tID): Promise<IVideoContent> {
     const contentDoc = firestoreInstance.doc(`content/${id}`);
     const contentDocSnap = await contentDoc.get();
     if (!contentDocSnap.exists) {
@@ -15,7 +15,7 @@ export async function getVideoContent(id: tID): Promise<IVideoContent> {
     const contentData = contentDocSnap.data();
 
     return {
-        id: id,
+        id,
         assetID: contentData.assetID,
         playbackID: contentData.playbackID
     };

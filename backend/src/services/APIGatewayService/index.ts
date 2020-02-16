@@ -1,14 +1,9 @@
+/**
+ *
+ */
 import express from 'express';
-import {
-    getVideoData,
-    queryVideoData,
-    createVideoData
-} from '../VideoDataService';
-import {
-    getChannelData,
-    createChannelData,
-    queryChannelData
-} from '../ChannelDataService';
+import * as videoDataService from '../VideoDataService';
+import * as channelDataService from '../ChannelDataService';
 import { IVideoQuery } from '../VideoDataService/definitions';
 import { IError } from '../../../src/definitions';
 import { IChannelQuery } from '../ChannelDataService/definitions';
@@ -28,7 +23,7 @@ app.get('/video', async (req, res) => {
             after: req.query.after,
             channel: req.query.channel
         };
-        const videos = await queryVideoData(query);
+        const videos = await videoDataService.queryVideo(query);
         res.status(200).send(videos);
     } catch (e) {
         console.log(e);
@@ -38,7 +33,7 @@ app.get('/video', async (req, res) => {
 app.get('/video/:id', async (req, res) => {
     // Service Request
     try {
-        const video = await getVideoData(req.params.id);
+        const video = await videoDataService.getVideo(req.params.id);
         res.status(200).send(video);
     } catch (e) {
         console.log(e);
@@ -71,7 +66,7 @@ app.post('/video', express.json(), async (req, res) => {
             };
         }
         const author = req.body.author; // TODO: REPLACE DURING AUTH BUILDUP
-        const video = await createVideoData(
+        const video = await videoDataService.createVideo(
             title,
             description,
             author,
@@ -109,7 +104,7 @@ app.get('/channel', async (req, res) => {
         const query: IChannelQuery = {
             owner: req.query.owner
         };
-        const videos = await queryChannelData(query);
+        const videos = await channelDataService.queryChannel(query);
         res.status(200).send(videos);
     } catch (e) {
         console.log(e);
@@ -119,7 +114,7 @@ app.get('/channel', async (req, res) => {
 app.get('/channel/:id', async (req, res) => {
     // Service Request
     try {
-        const channel = await getChannelData(req.params.id);
+        const channel = await channelDataService.getChannel(req.params.id);
         res.status(200).send(channel);
     } catch (e) {
         console.log(e);
@@ -138,7 +133,7 @@ app.post('/channel', express.json(), async (req, res) => {
             };
         }
         const owner = req.body.owner; // TODO: REPLACE DURING AUTH BUILDUP
-        const channel = await createChannelData(name, owner);
+        const channel = await channelDataService.createChannel(name, owner);
         res.status(201).send(channel);
     } catch (e) {
         console.log(e);

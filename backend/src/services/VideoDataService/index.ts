@@ -2,9 +2,9 @@ import { tID, IError } from '../../../src/definitions';
 import { IVideo, IVideoQuery, IVideoSchema } from './definitions';
 import * as uuid from 'uuid/v4';
 import { firestoreInstance } from '../../../src/sharedInstances';
-import { getChannelData } from '../ChannelDataService';
-import { getVideoContent } from '../VideoContentService';
-import { addVideoIndex } from '../SearchService';
+import * as channelDataService from '../ChannelDataService';
+import * as videoContentService from '../VideoContentService';
+import * as searchService from '../SearchService';
 
 async function getSingleVideoRecord(id: tID): Promise<IVideo> {
     // Get basic video data
@@ -20,15 +20,15 @@ async function getSingleVideoRecord(id: tID): Promise<IVideo> {
     const videoData = videoDocSnap.data();
 
     // Get channel data
-    const channelData = await getChannelData(videoData.channel);
+    const channelData = await channelDataService.getChannel(videoData.channel);
 
     // Get content data.  If there's no content data that means there's no uploaded video data for a video
     const contentData = videoData.content
-        ? await getVideoContent(videoData.content)
+        ? await videoContentService.getVideo(videoData.content)
         : null;
 
     return {
-        id: id,
+        id,
         author: videoData.author,
         title: videoData.title,
         description: videoData.description,
@@ -38,7 +38,7 @@ async function getSingleVideoRecord(id: tID): Promise<IVideo> {
     };
 }
 
-export async function queryVideoData(query: IVideoQuery): Promise<IVideo[]> {
+export async function queryVideo(query: IVideoQuery): Promise<IVideo[]> {
     if (!(query.after || query.before || query.author || query.channel)) {
         // No query
         const error: IError = {
@@ -57,7 +57,7 @@ export async function queryVideoData(query: IVideoQuery): Promise<IVideo[]> {
     }
     // Build FS query
     const collection = firestoreInstance.collection('videos');
-    let fsQuery = undefined;
+    let fsQuery;
     if (query.after) {
         fsQuery = (fsQuery ? fsQuery : collection).where(
             'uploadDate',
@@ -107,31 +107,31 @@ export async function queryVideoData(query: IVideoQuery): Promise<IVideo[]> {
     return videos;
 }
 
-export async function getVideoData(id: tID): Promise<IVideo> {
+export async function getVideo(id: tID): Promise<IVideo> {
     return await getSingleVideoRecord(id);
 }
 
-export async function createVideoData(
+export async function createVideo(
     title: string,
     description: string,
     author: string,
     channel: tID
 ): Promise<IVideo> {
     // Fetch channel that was referenced
-    const channelData = await getChannelData(channel);
+    const channelData = await channelDataService.getChannel(channel);
 
     const videoData: IVideo = {
         id: uuid.default(),
-        author: author,
+        author,
         channel: channelData,
-        title: title,
-        description: description,
+        title,
+        description,
         content: null,
         uploadDate: 0
     };
 
     // Add to search index
-    await addVideoIndex(videoData);
+    await searchService.addVideo(videoData);
 
     // Add to DB
     const videoDoc = firestoreInstance.doc(`videos/${videoData.id}`);
