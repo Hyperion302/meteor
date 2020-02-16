@@ -2,8 +2,10 @@
  *
  */
 import express from 'express';
+import busboy from 'busboy';
 import * as videoDataService from '../VideoDataService';
 import * as channelDataService from '../ChannelDataService';
+import * as videoContentService from '../VideoContentService';
 import { IVideoQuery } from '../VideoDataService/definitions';
 import { IError } from '../../../src/definitions';
 import { IChannelQuery } from '../ChannelDataService/definitions';
@@ -78,10 +80,27 @@ app.post('/video', express.json(), async (req, res) => {
         res.status(500).send(e);
     }
 });
-app.post('/uploadVideo', (req, res) => {
-    res.send({
-        message: 'POST /uploadVideo'
+app.post('/video/:id/upload', (req, res) => {
+    // Should be multipart
+    const busboyInstance = new busboy({
+        headers: req.headers,
+        limits: {
+            files: 1
+        }
     });
+    busboyInstance.on(
+        'file',
+        (fieldname, file, filename, encoding, mimetype) => {
+            // We can assume that this will only be called once since the file limit is 1
+            videoContentService
+                .uploadVideo(req.params.id, 'test', file, mimetype)
+                .then(() => {
+                    res.writeHead(200);
+                    res.end();
+                });
+        }
+    );
+    req.pipe(busboyInstance);
 });
 app.put('/video', (req, res) => {
     res.send({

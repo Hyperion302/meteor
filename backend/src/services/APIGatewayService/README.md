@@ -20,7 +20,7 @@ Calls [VideoDataService](../VideoDataService/README.md)/queryVideo
 
 Calls [VideoDataService](../VideoDataService/README.md)/createVideo
 
-### POST /uploadVideo
+### POST /video/:id/upload
 
 Calls (and streams) [VideoContentService](../VideoContentService/README.md)/uploadVideo
 
