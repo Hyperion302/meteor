@@ -6,6 +6,12 @@ import * as channelDataService from '../ChannelDataService';
 import * as videoContentService from '../VideoContentService';
 import * as searchService from '../SearchService';
 
+/**
+ * Get a single video record
+ * @param id Video record id
+ * @returns Promise that resolves to a found video record
+ * @ignore
+ */
 async function getSingleVideoRecord(id: tID): Promise<IVideo> {
     // Get basic video data
     const videoDoc = firestoreInstance.doc(`videos/${id}`);
@@ -38,6 +44,11 @@ async function getSingleVideoRecord(id: tID): Promise<IVideo> {
     };
 }
 
+/**
+ * Query for videos
+ * @param query Video query object
+ * @returns Promise that resolves to a list of found videos
+ */
 export async function queryVideo(query: IVideoQuery): Promise<IVideo[]> {
     if (!(query.after || query.before || query.author || query.channel)) {
         // No query
@@ -107,10 +118,23 @@ export async function queryVideo(query: IVideoQuery): Promise<IVideo[]> {
     return videos;
 }
 
+/**
+ * Get a single video
+ * @param id ID of video to retrieve
+ * @returns Promise that resolves to retrieved video
+ */
 export async function getVideo(id: tID): Promise<IVideo> {
     return await getSingleVideoRecord(id);
 }
 
+/**
+ * Create a video
+ * @param title Title of video
+ * @param description Description of video
+ * @param author TEMPORARY, will be removed with auth
+ * @param channel Channel to add the video to upon creation
+ * @returns Promise that resolves to created video
+ */
 export async function createVideo(
     title: string,
     description: string,

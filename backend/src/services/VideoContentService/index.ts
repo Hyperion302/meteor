@@ -2,6 +2,10 @@ import { tID, IError } from '../../../src/definitions';
 import { firestoreInstance } from '../../../src/sharedInstances';
 import { IVideoContent } from './definitions';
 
+/**
+ * Retrieves a content record
+ * @param id ID of content record
+ */
 export async function getVideo(id: tID): Promise<IVideoContent> {
     const contentDoc = firestoreInstance.doc(`content/${id}`);
     const contentDocSnap = await contentDoc.get();

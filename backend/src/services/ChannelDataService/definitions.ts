@@ -1,11 +1,17 @@
 import { tID } from '../../../src/definitions';
 
+/**
+ * Describes a fully rendered channel
+ */
 export interface IChannel {
     id: tID;
     owner: string;
     name: string;
 }
 
+/**
+ * Describes a channel query
+ */
 export interface IChannelQuery {
     owner?: string;
 }

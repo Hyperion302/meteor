@@ -4,6 +4,12 @@ import { IChannel, IChannelQuery } from './definitions';
 import * as search from '../SearchService';
 import { firestoreInstance } from '../../../src/sharedInstances';
 
+/**
+ * Retrieves a single channel record
+ * @param id ID of channel to retrieve
+ * @returns Promise that resolves to the requested channel
+ * @ignore
+ */
 async function getSingleChannelRecord(id: tID): Promise<IChannel> {
     // Get basic channel data
     const channelDoc = firestoreInstance.doc(`channels/${id}`);
@@ -24,10 +30,20 @@ async function getSingleChannelRecord(id: tID): Promise<IChannel> {
     };
 }
 
+/**
+ * Retrieves a single channel
+ * @param id ID of channel to return
+ * @returns Promise that resolves to requested channel
+ */
 export async function getChannel(id: tID): Promise<IChannel> {
     return await getSingleChannelRecord(id);
 }
 
+/**
+ * Queries channels
+ * @param query Query object to query against channels
+ * @returns Promise that resolves to a list of found channels
+ */
 export async function queryChannel(query: IChannelQuery): Promise<IChannel[]> {
     if (!query.owner) {
         // No query
@@ -67,6 +83,12 @@ export async function queryChannel(query: IChannelQuery): Promise<IChannel[]> {
     return channels;
 }
 
+/**
+ * Creates a channel
+ * @param name Name of channel
+ * @param owner TEMPORARY removed with auth
+ * @returns Promise resolves to created channel
+ */
 export async function createChannel(
     name: string,
     owner: string

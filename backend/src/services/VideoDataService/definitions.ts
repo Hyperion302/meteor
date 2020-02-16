@@ -2,6 +2,9 @@ import { IVideoContent } from '../VideoContentService/definitions';
 import { tID } from '../../../src/definitions';
 import { IChannel } from '../ChannelDataService/definitions';
 
+/**
+ * A fully retrieved video including the "joined" fields such as channel and content
+ */
 export interface IVideo {
     id: tID;
     author: string;
@@ -12,6 +15,9 @@ export interface IVideo {
     content: IVideoContent;
 }
 
+/**
+ * A "flat" video record with only ids for deep fields
+ */
 export interface IVideoSchema {
     id: tID;
     author: string;
@@ -22,6 +28,9 @@ export interface IVideoSchema {
     content?: tID;
 }
 
+/**
+ * Video query object
+ */
 export interface IVideoQuery {
     author?: string;
     channel?: tID;
