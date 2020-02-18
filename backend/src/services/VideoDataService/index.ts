@@ -4,7 +4,6 @@ import * as uuid from 'uuid/v4';
 import { firestoreInstance } from '../../../src/sharedInstances';
 import * as channelDataService from '../ChannelDataService';
 import * as videoContentService from '../VideoContentService';
-import * as searchService from '../SearchService';
 
 /**
  * Get a single video record
@@ -153,9 +152,6 @@ export async function createVideo(
         content: null,
         uploadDate: 0
     };
-
-    // Add to search index
-    await searchService.addVideo(videoData);
 
     // Add to DB
     const videoDoc = firestoreInstance.doc(`videos/${videoData.id}`);
