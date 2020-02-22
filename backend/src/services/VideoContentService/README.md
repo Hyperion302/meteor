@@ -2,7 +2,7 @@
 
 Stores videos in the CDN and manages transcoding jobs
 
-## muxEndpoint
+## muxWebhook
 
 Subsequent actions depend heavily on event received.
 

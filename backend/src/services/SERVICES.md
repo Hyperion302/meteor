@@ -2,11 +2,7 @@
 
 ## APIGatewayService
 
-Handles all user API requests
-
-## ExternalGatewayService
-
-Receives events from external services (Algolia, Mux, GCS, etc.)
+Handles all API requests
 
 ## VideoDataService
 
@@ -42,7 +38,7 @@ The user then stream a multipart upload to [VideoContentService](./VideoContentS
 
 The [VideoContentService](./VideoContentService/README.md) then requests a transcoding job.
 
-Once the transcoding job is complete, [ExternalGatewayService](./ExternalGatewayService/README.md)/muxEndpoint is called from outside the network. The ExternalGatewayService authenticates the event and calls back to [VideoContentService](./VideoContentService/README.md)/muxEndpoint. VideoContentervice then marks the video as transcoded and ready, and attaches video transcoding data to the DB object.
+Once the transcoding job is complete, the transcoding service calls an API endpoint that authenticates the event and calls back to [VideoContentService](./VideoContentService/README.md)/muxEndpoint. VideoContentervice then marks the video as transcoded and ready, and attaches video transcoding data to the DB object. It also calls [SearchService](./SearchService/README.md)/addVideo to add the video to the index.
 
 ## Uploading channel art
 

@@ -6,6 +6,12 @@ Handles all API requests and authenticates user tokens. Exposes _publicly facing
 
 All of the endpoints below attach auth data to their request by first calling [UserAuthService](../UserAuthService/README.md)/authenticate with the token provided by the request
 
+## External
+
+### POST /muxWebhook
+
+Authenticates the webhook and forwards directly to [VideoContentService](../VideoContentService/README.md)/muxWebhook
+
 ## Video
 
 ### GET /video/:id

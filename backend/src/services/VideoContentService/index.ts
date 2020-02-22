@@ -1,7 +1,9 @@
 import { tID, IError } from '../../../src/definitions';
 import {
     firestoreInstance,
-    storageInstance
+    storageInstance,
+    muxID,
+    muxSecret
 } from '../../../src/sharedInstances';
 import { IVideoContent } from './definitions';
 import axios from 'axios';
@@ -74,8 +76,7 @@ export async function uploadVideo(
     // Make public for axios
     await storageObject.makePublic();
     // Call transcoder
-    // TODO:
-    /*await axios.post(
+    await axios.post(
         'https://api.mux.com/video/v1/assets',
         {
             input: `https://storage.googleapis.com/meteor-videos/${path}`,
@@ -88,5 +89,6 @@ export async function uploadVideo(
                 password: muxSecret
             }
         }
-    );*/
+    );
+    // We're done here
 }

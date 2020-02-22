@@ -1,18 +1,45 @@
-/**
- *
- */
 import express from 'express';
 import busboy from 'busboy';
+import { muxWebhookSecret } from '../../sharedInstances';
 import * as videoDataService from '../VideoDataService';
 import * as channelDataService from '../ChannelDataService';
 import * as videoContentService from '../VideoContentService';
 import { IVideoQuery } from '../VideoDataService/definitions';
-import { IError } from '../../../src/definitions';
+import { IError } from '../../definitions';
 import { IChannelQuery } from '../ChannelDataService/definitions';
+import { createHmac } from 'crypto';
+import { isArray } from 'util';
 const app = express();
 
 // #region Middleware
 // #endregion Middleware
+
+// #region External
+app.post('/muxWebhook', async (req, res) => {
+    // Check security
+    if (!req.headers['Mux-Signature']) {
+        res.status(500).send('Invalid Header');
+    }
+    let muxSignature: string;
+    if (isArray(req.headers['Mux-Signature'])) {
+        muxSignature = req.headers['Mux-Signature'][0];
+    } else {
+        muxSignature = req.headers['Mux-Signature'];
+    }
+    const signatureTimestamp = muxSignature.split(',')[0].split('=')[1]; // Pulls the number after t=
+    const signature = muxSignature.split(',')[1].split('=')[1]; // Pulls the hash after the v1=
+    const payload = `${signatureTimestamp}.${req.body}`;
+    const hmac = createHmac('sha256', muxWebhookSecret);
+    hmac.update(payload);
+    const digest = hmac.digest('hex');
+    if (digest != signature) {
+        res.status(500).send('Invalid Signature');
+    }
+    // TODO: Check timestamp for tolerance
+
+    // TODO: Develop after having a deployed version (so I can properly test URLs)
+});
+// #endregion External
 
 // #region Video Routes
 app.get('/video', async (req, res) => {
