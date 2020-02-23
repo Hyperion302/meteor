@@ -10,9 +10,7 @@
         "start": "cross-env node --require dotenv/config .",
         "doc": "typedoc --out docs",
         "dev": "cross-env NODE_ENV=dev ts-node-dev --require dotenv/config src/main.ts",
-        "test": "jest --setupFiles dotenv/config",
-        "start:background": "nohup npm run start > /dev/null &",
-        "stop:background": "killall node"
+        "test": "cross-env NODE_ENV=test jest --setupFiles dotenv/config"
     },
     "author": "",
     "license": "ISC",
