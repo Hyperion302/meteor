@@ -7,6 +7,11 @@ import { IChannel } from '../ChannelDataService/definitions';
  * @param video Video to add
  */
 export async function addVideo(video: IVideo) {}
+/**
+ * Updates a video in the search index
+ * @param video
+ */
+export async function updateVideo(video: IVideo) {}
 // #endregion
 
 // #region Channel

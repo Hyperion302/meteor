@@ -3,7 +3,7 @@ import busboy from 'busboy';
 import * as videoDataService from '../VideoDataService';
 import * as channelDataService from '../ChannelDataService';
 import * as videoContentService from '../VideoContentService';
-import { IVideoQuery } from '../VideoDataService/definitions';
+import { IVideoQuery, IVideoUpdate } from '../VideoDataService/definitions';
 import { IError } from '../../definitions';
 import { IChannelQuery } from '../ChannelDataService/definitions';
 import { createHmac } from 'crypto';
@@ -78,6 +78,7 @@ app.post('/video', express.json(), async (req, res) => {
                 resource: title,
                 message: 'Invalid video title',
             };
+            throw error;
         }
         const description = req.body.description;
         if (!(typeof description === 'string') || description.length > 1024) {
@@ -85,6 +86,7 @@ app.post('/video', express.json(), async (req, res) => {
                 resource: description,
                 message: 'Invalid video description',
             };
+            throw error;
         }
         const channel = req.body.channel;
         if (!(typeof title === 'string')) {
@@ -92,6 +94,7 @@ app.post('/video', express.json(), async (req, res) => {
                 resource: title,
                 message: 'Invalid channel ID',
             };
+            throw error;
         }
         const author = req.body.author; // TODO: REPLACE DURING AUTH BUILDUP
         const video = await videoDataService.createVideo(
@@ -128,10 +131,45 @@ app.post('/video/:id/upload', (req, res) => {
     );
     req.pipe(busboyInstance);
 });
-app.put('/video', (req, res) => {
-    res.send({
-        message: 'PUT /video',
-    });
+app.put('/video/:id', express.json(), async (req, res) => {
+    // Service request
+    try {
+        // Build update object
+        const update: IVideoUpdate = {};
+        const title = req.body.title;
+        if (title) {
+            if (!(typeof title === 'string') || title.length > 32) {
+                const error: IError = {
+                    resource: title,
+                    message: 'Invalid video title',
+                };
+                throw error;
+            }
+            update.title = title;
+        }
+        const description = req.body.description;
+        if (description) {
+            if (
+                !(typeof description === 'string') ||
+                description.length > 1024
+            ) {
+                const error: IError = {
+                    resource: description,
+                    message: 'Invalid video description',
+                };
+                throw error;
+            }
+            update.description = description;
+        }
+        const newVideo = await videoDataService.updateVideo(
+            req.params.id,
+            update,
+        );
+        res.status(200).send(newVideo);
+    } catch (e) {
+        console.log(e);
+        res.status(500).send(e);
+    }
 });
 app.delete('/video', (req, res) => {
     res.send({

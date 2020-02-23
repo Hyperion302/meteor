@@ -37,3 +37,11 @@ export interface IVideoQuery {
     before?: number;
     after?: number;
 }
+
+/**
+ * Video update object
+ */
+export interface IVideoUpdate {
+    title?: string;
+    description?: string;
+}

@@ -1,9 +1,10 @@
 import { tID, IError } from '../../definitions';
-import { IVideo, IVideoQuery, IVideoSchema } from './definitions';
+import { IVideo, IVideoQuery, IVideoSchema, IVideoUpdate } from './definitions';
 import * as uuid from 'uuid/v4';
 import { firestoreInstance } from '../../sharedInstances';
 import * as channelDataService from '../ChannelDataService';
 import * as videoContentService from '../VideoContentService';
+import * as searchService from '../SearchService';
 
 /**
  * Get a single video record
@@ -166,3 +167,31 @@ export async function createVideo(
     }); // Uses a schema form of IVideo
     return videoData;
 }
+
+/**
+ * Update a video's information
+ * @param id ID of video to update
+ * @param update Update object
+ */
+export async function updateVideo(id: tID, update: IVideoUpdate) {
+    // Fetch video to make sure it exists
+    const videoDoc = firestoreInstance.doc(`videos/${id}`);
+    const videoDocSnap = await videoDoc.get();
+    if (!videoDocSnap.exists) {
+        const error: IError = {
+            resource: id,
+            message: `Could not find video ${id}`,
+        };
+        throw error;
+    }
+    // Update doc in DB and fetch it again
+    await videoDoc.update(update);
+    const newVideo = await getSingleVideoRecord(id);
+
+    // Update doc in search index
+    await searchService.updateVideo(newVideo);
+
+    return newVideo;
+}
+
+export async function deleteVideo() {}
