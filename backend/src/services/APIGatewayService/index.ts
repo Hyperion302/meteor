@@ -31,7 +31,7 @@ app.post('/muxWebhook', async (req, res) => {
     const hmac = createHmac('sha256', process.env.MUXWEBHOOKSECRET);
     hmac.update(payload);
     const digest = hmac.digest('hex');
-    if (digest != signature) {
+    if (digest !== signature) {
         res.status(500).send('Invalid Signature');
     }
     // TODO: Check timestamp for tolerance
@@ -73,21 +73,21 @@ app.post('/video', express.json(), async (req, res) => {
     try {
         // Cleanse inputs
         const title = req.body.title;
-        if (!(typeof title == 'string') || title.length > 32) {
+        if (!(typeof title === 'string') || title.length > 32) {
             const error: IError = {
                 resource: title,
                 message: 'Invalid video title',
             };
         }
         const description = req.body.description;
-        if (!(typeof description == 'string') || description.length > 1024) {
+        if (!(typeof description === 'string') || description.length > 1024) {
             const error: IError = {
                 resource: description,
                 message: 'Invalid video description',
             };
         }
         const channel = req.body.channel;
-        if (!(typeof title == 'string')) {
+        if (!(typeof title === 'string')) {
             const error: IError = {
                 resource: title,
                 message: 'Invalid channel ID',
@@ -171,7 +171,7 @@ app.post('/channel', express.json(), async (req, res) => {
     try {
         // Cleanse inputs (just name for now)
         const name = req.body.name;
-        if (!(typeof name == 'string') || name.length > 32) {
+        if (!(typeof name === 'string') || name.length > 32) {
             const error: IError = {
                 resource: name,
                 message: 'Invalid channel name',

@@ -1,8 +1,8 @@
-import { tID, IError } from '../../../src/definitions';
+import { tID, IError } from '../../definitions';
 import * as uuid from 'uuid/v4';
 import { IChannel, IChannelQuery } from './definitions';
 import * as search from '../SearchService';
-import { firestoreInstance } from '../../../src/sharedInstances';
+import { firestoreInstance } from '../../sharedInstances';
 
 /**
  * Retrieves a single channel record
@@ -17,7 +17,7 @@ async function getSingleChannelRecord(id: tID): Promise<IChannel> {
     if (!channelDocSnap.exists) {
         const error: IError = {
             resource: id,
-            message: `Could not find channel ${id}`
+            message: `Could not find channel ${id}`,
         };
         throw error;
     }
@@ -26,7 +26,7 @@ async function getSingleChannelRecord(id: tID): Promise<IChannel> {
     return {
         id,
         owner: channelData.owner,
-        name: channelData.name
+        name: channelData.name,
     };
 }
 
@@ -49,7 +49,7 @@ export async function queryChannel(query: IChannelQuery): Promise<IChannel[]> {
         // No query
         const error: IError = {
             resource: query,
-            message: `No query provided`
+            message: `No query provided`,
         };
         throw error;
     }
@@ -59,7 +59,7 @@ export async function queryChannel(query: IChannelQuery): Promise<IChannel[]> {
         fsQuery = (fsQuery ? fsQuery : collection).where(
             'owner',
             '==',
-            query.owner
+            query.owner,
         );
     }
     if (!fsQuery) {
@@ -67,7 +67,7 @@ export async function queryChannel(query: IChannelQuery): Promise<IChannel[]> {
             resource: query,
             message: 'An unexpected error occured',
             longMessage:
-                'fsQuery was undefined when it should have been overwritten at *some* point'
+                'fsQuery was undefined when it should have been overwritten at *some* point',
         };
         throw error;
     }
@@ -91,13 +91,13 @@ export async function queryChannel(query: IChannelQuery): Promise<IChannel[]> {
  */
 export async function createChannel(
     name: string,
-    owner: string
+    owner: string,
 ): Promise<IChannel> {
     // Build channel object
     const channelData: IChannel = {
         id: uuid.default(),
         owner,
-        name
+        name,
     };
 
     // Add to search index

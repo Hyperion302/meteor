@@ -2,7 +2,7 @@ import { Firestore } from '@google-cloud/firestore';
 import { Storage, StorageOptions } from '@google-cloud/storage';
 import { readFileSync } from 'fs';
 
-const production: boolean = process.env.NODE_ENV == 'prod';
+const production: boolean = process.env.NODE_ENV === 'prod';
 
 console.log(`Running in production: ${production}`);
 

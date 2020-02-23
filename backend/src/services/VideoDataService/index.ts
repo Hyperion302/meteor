@@ -1,7 +1,7 @@
-import { tID, IError } from '../../../src/definitions';
+import { tID, IError } from '../../definitions';
 import { IVideo, IVideoQuery, IVideoSchema } from './definitions';
 import * as uuid from 'uuid/v4';
-import { firestoreInstance } from '../../../src/sharedInstances';
+import { firestoreInstance } from '../../sharedInstances';
 import * as channelDataService from '../ChannelDataService';
 import * as videoContentService from '../VideoContentService';
 

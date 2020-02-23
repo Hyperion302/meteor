@@ -1,5 +1,5 @@
 import { IVideoContent } from '../VideoContentService/definitions';
-import { tID } from '../../../src/definitions';
+import { tID } from '../../definitions';
 import { IChannel } from '../ChannelDataService/definitions';
 
 /**

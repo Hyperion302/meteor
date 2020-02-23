@@ -1,4 +1,4 @@
-import { tID } from '../../../src/definitions';
+import { tID } from '../../definitions';
 
 /**
  * Describes a fully rendered channel

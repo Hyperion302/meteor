@@ -1,8 +1,5 @@
-import { tID, IError } from '../../../src/definitions';
-import {
-    firestoreInstance,
-    storageInstance,
-} from '../../../src/sharedInstances';
+import { tID, IError } from '../../definitions';
+import { firestoreInstance, storageInstance } from '../../sharedInstances';
 import { IVideoContent } from './definitions';
 import axios from 'axios';
 
