@@ -1,6 +1,5 @@
 import express from 'express';
 import busboy from 'busboy';
-import { muxWebhookSecret } from '../../sharedInstances';
 import * as videoDataService from '../VideoDataService';
 import * as channelDataService from '../ChannelDataService';
 import * as videoContentService from '../VideoContentService';
@@ -29,7 +28,7 @@ app.post('/muxWebhook', async (req, res) => {
     const signatureTimestamp = muxSignature.split(',')[0].split('=')[1]; // Pulls the number after t=
     const signature = muxSignature.split(',')[1].split('=')[1]; // Pulls the hash after the v1=
     const payload = `${signatureTimestamp}.${req.body}`;
-    const hmac = createHmac('sha256', muxWebhookSecret);
+    const hmac = createHmac('sha256', process.env.MUXWEBHOOKSECRET);
     hmac.update(payload);
     const digest = hmac.digest('hex');
     if (digest != signature) {
@@ -50,7 +49,7 @@ app.get('/video', async (req, res) => {
             author: req.query.author,
             before: req.query.before,
             after: req.query.after,
-            channel: req.query.channel
+            channel: req.query.channel,
         };
         const videos = await videoDataService.queryVideo(query);
         res.status(200).send(videos);
@@ -77,21 +76,21 @@ app.post('/video', express.json(), async (req, res) => {
         if (!(typeof title == 'string') || title.length > 32) {
             const error: IError = {
                 resource: title,
-                message: 'Invalid video title'
+                message: 'Invalid video title',
             };
         }
         const description = req.body.description;
         if (!(typeof description == 'string') || description.length > 1024) {
             const error: IError = {
                 resource: description,
-                message: 'Invalid video description'
+                message: 'Invalid video description',
             };
         }
         const channel = req.body.channel;
         if (!(typeof title == 'string')) {
             const error: IError = {
                 resource: title,
-                message: 'Invalid channel ID'
+                message: 'Invalid channel ID',
             };
         }
         const author = req.body.author; // TODO: REPLACE DURING AUTH BUILDUP
@@ -99,7 +98,7 @@ app.post('/video', express.json(), async (req, res) => {
             title,
             description,
             author,
-            channel
+            channel,
         );
         res.status(201).send(video);
     } catch (e) {
@@ -112,8 +111,8 @@ app.post('/video/:id/upload', (req, res) => {
     const busboyInstance = new busboy({
         headers: req.headers,
         limits: {
-            files: 1
-        }
+            files: 1,
+        },
     });
     busboyInstance.on(
         'file',
@@ -125,18 +124,18 @@ app.post('/video/:id/upload', (req, res) => {
                     res.writeHead(200);
                     res.end();
                 });
-        }
+        },
     );
     req.pipe(busboyInstance);
 });
 app.put('/video', (req, res) => {
     res.send({
-        message: 'PUT /video'
+        message: 'PUT /video',
     });
 });
 app.delete('/video', (req, res) => {
     res.send({
-        message: 'DELETE /video'
+        message: 'DELETE /video',
     });
 });
 
@@ -148,7 +147,7 @@ app.get('/channel', async (req, res) => {
     try {
         // Build query
         const query: IChannelQuery = {
-            owner: req.query.owner
+            owner: req.query.owner,
         };
         const videos = await channelDataService.queryChannel(query);
         res.status(200).send(videos);
@@ -175,7 +174,7 @@ app.post('/channel', express.json(), async (req, res) => {
         if (!(typeof name == 'string') || name.length > 32) {
             const error: IError = {
                 resource: name,
-                message: 'Invalid channel name'
+                message: 'Invalid channel name',
             };
         }
         const owner = req.body.owner; // TODO: REPLACE DURING AUTH BUILDUP
@@ -188,17 +187,17 @@ app.post('/channel', express.json(), async (req, res) => {
 });
 app.post('/uploadIcon', (req, res) => {
     res.send({
-        message: 'POST /uploadIcon'
+        message: 'POST /uploadIcon',
     });
 });
 app.put('/channel', (req, res) => {
     res.send({
-        message: 'PUT /channel'
+        message: 'PUT /channel',
     });
 });
 app.delete('/channel', (req, res) => {
     res.send({
-        message: 'DELETE /channel'
+        message: 'DELETE /channel',
     });
 });
 // #endregion Channel Routes

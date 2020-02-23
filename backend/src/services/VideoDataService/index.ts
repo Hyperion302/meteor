@@ -18,7 +18,7 @@ async function getSingleVideoRecord(id: tID): Promise<IVideo> {
     if (!videoDocSnap.exists) {
         const error: IError = {
             resource: id,
-            message: `Could not find video ${id}`
+            message: `Could not find video ${id}`,
         };
         throw error;
     }
@@ -39,7 +39,7 @@ async function getSingleVideoRecord(id: tID): Promise<IVideo> {
         description: videoData.description,
         uploadDate: videoData.uploadDate,
         channel: channelData,
-        content: contentData
+        content: contentData,
     };
 }
 
@@ -53,7 +53,7 @@ export async function queryVideo(query: IVideoQuery): Promise<IVideo[]> {
         // No query
         const error: IError = {
             resource: query,
-            message: `No query provided`
+            message: `No query provided`,
         };
         throw error;
     }
@@ -61,7 +61,7 @@ export async function queryVideo(query: IVideoQuery): Promise<IVideo[]> {
         // Invalid dates
         const error: IError = {
             resource: query,
-            message: `Invalid dates provided in video query`
+            message: `Invalid dates provided in video query`,
         };
         throw error;
     }
@@ -72,28 +72,28 @@ export async function queryVideo(query: IVideoQuery): Promise<IVideo[]> {
         fsQuery = (fsQuery ? fsQuery : collection).where(
             'uploadDate',
             '>',
-            query.after
+            query.after,
         );
     }
     if (query.before) {
         fsQuery = (fsQuery ? fsQuery : collection).where(
             'uploadDate',
             '<',
-            query.before
+            query.before,
         );
     }
     if (query.author) {
         fsQuery = (fsQuery ? fsQuery : collection).where(
             'author',
             '==',
-            query.author
+            query.author,
         );
     }
     if (query.channel) {
         fsQuery = (fsQuery ? fsQuery : collection).where(
             'channel',
             '==',
-            query.channel
+            query.channel,
         );
     }
     if (!fsQuery) {
@@ -101,7 +101,7 @@ export async function queryVideo(query: IVideoQuery): Promise<IVideo[]> {
             resource: query,
             message: 'An unexpected error occured',
             longMessage:
-                'fsQuery was undefined when it should have been overwritten at *some* point'
+                'fsQuery was undefined when it should have been overwritten at *some* point',
         };
         throw error;
     }
@@ -138,7 +138,7 @@ export async function createVideo(
     title: string,
     description: string,
     author: string,
-    channel: tID
+    channel: tID,
 ): Promise<IVideo> {
     // Fetch channel that was referenced
     const channelData = await channelDataService.getChannel(channel);
@@ -150,7 +150,7 @@ export async function createVideo(
         title,
         description,
         content: null,
-        uploadDate: 0
+        uploadDate: 0,
     };
 
     // Add to DB
@@ -162,7 +162,7 @@ export async function createVideo(
         title: videoData.title,
         description: videoData.description,
         content: null,
-        uploadDate: 0
+        uploadDate: 0,
     }); // Uses a schema form of IVideo
     return videoData;
 }

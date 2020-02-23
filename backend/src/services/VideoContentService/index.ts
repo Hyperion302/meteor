@@ -2,8 +2,6 @@ import { tID, IError } from '../../../src/definitions';
 import {
     firestoreInstance,
     storageInstance,
-    muxID,
-    muxSecret
 } from '../../../src/sharedInstances';
 import { IVideoContent } from './definitions';
 import axios from 'axios';
@@ -18,7 +16,7 @@ export async function getVideo(id: tID): Promise<IVideoContent> {
     if (!contentDocSnap.exists) {
         const error: IError = {
             resource: id,
-            message: `Could not find content record ${id}`
+            message: `Could not find content record ${id}`,
         };
         throw error;
     }
@@ -27,7 +25,7 @@ export async function getVideo(id: tID): Promise<IVideoContent> {
     return {
         id,
         assetID: contentData.assetID,
-        playbackID: contentData.playbackID
+        playbackID: contentData.playbackID,
     };
 }
 
@@ -38,7 +36,7 @@ export async function getVideo(id: tID): Promise<IVideoContent> {
  */
 function promisePiper(
     readStream: NodeJS.ReadableStream,
-    writeStream: NodeJS.WritableStream
+    writeStream: NodeJS.WritableStream,
 ): Promise<void> {
     return new Promise((resolve, reject) => {
         readStream.pipe(writeStream);
@@ -59,7 +57,7 @@ export async function uploadVideo(
     id: tID,
     uploader: tID,
     fileStream: NodeJS.ReadableStream,
-    mime: string
+    mime: string,
 ): Promise<void> {
     // In the future I'll check if this "uploader" can upload to the channel and if the video is even available for upload
     // Build our storage path
@@ -68,8 +66,8 @@ export async function uploadVideo(
     // Create the storage writestream
     const storageWritestream = storageObject.createWriteStream({
         metadata: {
-            contentType: mime
-        }
+            contentType: mime,
+        },
     });
     // Upload
     await promisePiper(fileStream, storageWritestream);
@@ -81,14 +79,14 @@ export async function uploadVideo(
         {
             input: `https://storage.googleapis.com/meteor-videos/${path}`,
             playback_policy: ['public'],
-            passthrough: id
+            passthrough: id,
         },
         {
             auth: {
-                username: muxID,
-                password: muxSecret
-            }
-        }
+                username: process.env.MUXID,
+                password: process.env.MUXSECRET,
+            },
+        },
     );
     // We're done here
 }
