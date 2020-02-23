@@ -7,10 +7,12 @@
         "prebuild": "tslint -c tslint.json -p tsconfig.json --fix",
         "build": "tsc",
         "prestart": "npm run build",
-        "start": "cross-env NODE_ENV=prod node --require dotenv/config .",
+        "start": "cross-env node --require dotenv/config .",
         "doc": "typedoc --out docs",
         "dev": "cross-env NODE_ENV=dev ts-node-dev --require dotenv/config src/main.ts",
-        "test": "cross-env NODE_ENV=test jest --env=node --setupFiles dotenv/config"
+        "test": "jest --setupFiles dotenv/config",
+        "start:background": "nohup npm run start > /dev/null &",
+        "stop:background": "killall node"
     },
     "author": "",
     "license": "ISC",
