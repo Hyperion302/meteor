@@ -5,12 +5,18 @@ export const mockGet = jest.fn();
 export const mockSet = jest.fn();
 export const mockWhere = jest.fn();
 export const mockUpdate = jest.fn();
+export const mockDelete = jest.fn();
 // Optionally overriden
 export const mockExists = jest.fn(() => true);
 // mockData should have it's implementation overriden by the unit test
 export const mockData = jest.fn();
 
 export class MockedFirestore {
+    get exists() {
+        return mockExists();
+    }
+    public data = mockData;
+    public delete = mockDelete;
     doc() {
         mockDoc(...arguments);
         return this;
@@ -27,10 +33,6 @@ export class MockedFirestore {
             });
         });
     }
-    get exists() {
-        return mockExists();
-    }
-    public data = mockData;
     set() {
         mockSet(...arguments);
         return new Promise((resolve) => {

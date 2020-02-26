@@ -1,5 +1,6 @@
 import { IVideo } from '../VideoDataService/definitions';
 import { IChannel } from '../ChannelDataService/definitions';
+import { tID } from '../../definitions';
 
 // #region Video
 /**
@@ -12,6 +13,11 @@ export async function addVideo(video: IVideo) {}
  * @param video
  */
 export async function updateVideo(video: IVideo) {}
+/**
+ * Removes a video from the search index
+ * @param id ID of index to delete
+ */
+export async function removeVideo(id: tID) {}
 // #endregion
 
 // #region Channel

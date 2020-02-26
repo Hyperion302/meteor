@@ -14,6 +14,10 @@ Subsequent actions depend heavily on event received.
 
 Returns transcoding information from DB
 
+## deleteVideo
+
+Deletes a videos master video, transcoding assets, and content record
+
 ## uploadVideo
 
 Streams video data to CDN

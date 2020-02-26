@@ -87,3 +87,9 @@ export async function uploadVideo(
     );
     // We're done here
 }
+
+/**
+ * Delete a video from the CDN
+ * @param id ID of video to delete
+ */
+export async function deleteVideo(id: tID) {}

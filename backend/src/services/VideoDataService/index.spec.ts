@@ -1,10 +1,13 @@
 import * as videoDataService from './';
+import 'jest-extended';
 const sharedInstances = require('../../sharedInstances');
 const channelDataService = require('../ChannelDataService');
 const videoContentService = require('../VideoContentService');
+const searchService = require('../SearchService');
 jest.mock('../../sharedInstances');
 jest.mock('../ChannelDataService');
 jest.mock('../VideoContentService');
+jest.mock('../SearchService');
 
 function mockImplementations() {
     // Mock firestore document
@@ -108,6 +111,105 @@ describe('Video Data Service', () => {
                   "uploadDate": 1578009691,
                 }
             `);
+        });
+    });
+
+    describe('createVideo', () => {});
+
+    describe('queryVideos', () => {});
+
+    describe('updateVideo', () => {});
+
+    describe('deleteVideo', () => {
+        it('Checks to see if the video exists first', async () => {
+            await videoDataService.deleteVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+            );
+
+            expect(sharedInstances.mockDoc).toBeCalledWith(
+                'videos/3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+            );
+
+            expect(sharedInstances.mockExists).toBeCalled();
+        });
+
+        it('Deletes everything in the right order', async () => {
+            await videoDataService.deleteVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+            );
+
+            expect(searchService.removeVideo).toHaveBeenCalledBefore(
+                videoContentService.deleteVideo,
+            ); // Search before content
+            expect(videoContentService.deleteVideo).toHaveBeenCalledBefore(
+                sharedInstances.mockDelete,
+            ); // Content before delete
+        });
+
+        it('Deletes the search index', async () => {
+            await videoDataService.deleteVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+            );
+            expect(searchService.removeVideo).toHaveBeenCalled();
+        });
+
+        it('Deletes the correct search index', async () => {
+            await videoDataService.deleteVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+            );
+            expect(searchService.removeVideo).toHaveBeenCalledWith(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+            );
+        });
+
+        it('Deletes the video content', async () => {
+            await videoDataService.deleteVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+            );
+            expect(videoContentService.deleteVideo).toHaveBeenCalled();
+        });
+
+        it('Deletes the correct video content', async () => {
+            await videoDataService.deleteVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+            );
+            expect(videoContentService.deleteVideo).toHaveBeenCalledWith(
+                'b5263a52-1c05-4ab7-813d-65b8866bacfd',
+            );
+        });
+
+        it("Doesn't try to delete video content if it does't exist", async () => {
+            sharedInstances.mockData.mockImplementation(() => {
+                const retVal: {
+                    id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a';
+                    author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2';
+                    channel: '716886dd-c107-4bd7-9060-a47b50f81689';
+                    content: null;
+                    description: 'Test Video Description';
+                    title: 'Test Video Name';
+                    uploadDate: 1578009691;
+                } = {
+                    id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+                    author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
+                    channel: '716886dd-c107-4bd7-9060-a47b50f81689',
+                    content: null,
+                    description: 'Test Video Description',
+                    title: 'Test Video Name',
+                    uploadDate: 1578009691,
+                }; // Work around for TS
+                return retVal;
+            });
+            await videoDataService.deleteVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+            );
+            expect(videoContentService.deleteVideo).not.toHaveBeenCalled();
+        });
+
+        it('Deletes the video record', async () => {
+            await videoDataService.deleteVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+            );
+            expect(sharedInstances.mockDelete).toHaveBeenCalled();
         });
     });
 });

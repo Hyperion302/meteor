@@ -194,4 +194,27 @@ export async function updateVideo(id: tID, update: IVideoUpdate) {
     return newVideo;
 }
 
-export async function deleteVideo() {}
+export async function deleteVideo(id: tID) {
+    // Fetch video to make sure it exists
+    const videoDoc = firestoreInstance.doc(`videos/${id}`);
+    const videoDocSnap = await videoDoc.get();
+    if (!videoDocSnap.exists) {
+        const error: IError = {
+            resource: id,
+            message: `Could not find video ${id}`,
+        };
+        throw error;
+    }
+    const videoData = videoDocSnap.data();
+
+    // Delete from search index
+    await searchService.removeVideo(id);
+
+    // Delete content if it exists
+    if (videoData.content) {
+        await videoContentService.deleteVideo(videoData.content);
+    }
+
+    // Delete from firestore
+    await videoDoc.delete();
+}
