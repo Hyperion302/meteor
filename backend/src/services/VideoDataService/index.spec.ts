@@ -1,5 +1,8 @@
 import * as videoDataService from './';
 import 'jest-extended';
+import { IVideoUpdate, IVideo, IVideoSchema } from './definitions';
+import { IChannel } from '../ChannelDataService/definitions';
+import { IVideoContent } from '../VideoContentService/definitions';
 const sharedInstances = require('../../sharedInstances');
 const channelDataService = require('../ChannelDataService');
 const videoContentService = require('../VideoContentService');
@@ -9,28 +12,38 @@ jest.mock('../ChannelDataService');
 jest.mock('../VideoContentService');
 jest.mock('../SearchService');
 
+const testVideo: IVideoSchema = {
+    id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+    author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
+    channel: '716886dd-c107-4bd7-9060-a47b50f81689',
+    content: 'b5263a52-1c05-4ab7-813d-65b8866bacfd',
+    description: 'Test Video Description',
+    title: 'Test Video Name',
+    uploadDate: 1578009691,
+};
+
+const testChannel: IChannel = {
+    id: '716886dd-c107-4bd7-9060-a47b50f81689',
+    name: 'Test Channel',
+    owner: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
+};
+
+const testContent: IVideoContent = {
+    id: 'b5263a52-1c05-4ab7-813d-65b8866bacfd',
+    assetID: 'SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo',
+    playbackID: '1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG',
+};
+
 function mockImplementations() {
     // Mock firestore document
     sharedInstances.mockData.mockImplementation(() => {
-        return {
-            id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-            author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
-            channel: '716886dd-c107-4bd7-9060-a47b50f81689',
-            content: 'b5263a52-1c05-4ab7-813d-65b8866bacfd',
-            description: 'Test Video Description',
-            title: 'Test Video Name',
-            uploadDate: 1578009691,
-        };
+        return testVideo;
     });
     // Mock Channel
     channelDataService.getChannel.mockImplementation((id: string) => {
         return new Promise((resolve) => {
             process.nextTick(() => {
-                resolve({
-                    id: '716886dd-c107-4bd7-9060-a47b50f81689',
-                    name: 'Test Channel',
-                    owner: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
-                });
+                resolve(testChannel);
             });
         });
     });
@@ -38,11 +51,7 @@ function mockImplementations() {
     videoContentService.getVideo.mockImplementation((id: string) => {
         return new Promise((resolve) => {
             process.nextTick(() => {
-                resolve({
-                    id: 'b5263a52-1c05-4ab7-813d-65b8866bacfd',
-                    assetID: 'SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo',
-                    playbackID: '1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG',
-                });
+                resolve(testContent);
             });
         });
     });
@@ -118,7 +127,128 @@ describe('Video Data Service', () => {
 
     describe('queryVideos', () => {});
 
-    describe('updateVideo', () => {});
+    describe('updateVideo', () => {
+        const testFullUpdate: IVideoUpdate = {
+            title: 'New title',
+            description: 'New description',
+        };
+        const testTitleUpdate: IVideoUpdate = {
+            title: 'New title',
+        };
+        const testDescriptionUpdate: IVideoUpdate = {
+            description: 'New description',
+        };
+        const updatedVideoSchema: IVideoSchema = {
+            author: testVideo.author,
+            channel: testVideo.channel,
+            content: testVideo.content,
+            description: testFullUpdate.description,
+            id: testVideo.id,
+            title: testFullUpdate.title,
+            uploadDate: testVideo.uploadDate,
+        };
+        const expectedUpdatedVideo: IVideo = {
+            author: testVideo.author,
+            channel: testChannel,
+            content: testContent,
+            description: testFullUpdate.description,
+            id: testVideo.id,
+            title: testFullUpdate.title,
+            uploadDate: testVideo.uploadDate,
+        };
+        const testBlankUpdate: IVideoUpdate = {};
+        it('Checks to see if the video exists first', async () => {
+            await videoDataService.updateVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+                testFullUpdate,
+            );
+            expect(sharedInstances.mockExists).toBeCalled();
+        });
+        it('Updates the video record', async () => {
+            await videoDataService.updateVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+                testFullUpdate,
+            );
+            expect(sharedInstances.mockUpdate).toBeCalled();
+        });
+        it('Updates the correct video record', async () => {
+            await videoDataService.updateVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+                testFullUpdate,
+            );
+            expect(sharedInstances.mockUpdate).toBeCalledWith(testFullUpdate);
+        });
+        it('Only updates title if given only a title', async () => {
+            await videoDataService.updateVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+                testTitleUpdate,
+            );
+            expect(sharedInstances.mockUpdate).toBeCalledWith(testTitleUpdate);
+        });
+        it('Only updates description if given only a description', async () => {
+            await videoDataService.updateVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+                testDescriptionUpdate,
+            );
+            expect(sharedInstances.mockUpdate).toBeCalledWith(
+                testDescriptionUpdate,
+            );
+        });
+        it('Silently performs no update if given no changes', async () => {
+            await videoDataService.updateVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+                testBlankUpdate,
+            );
+            expect(sharedInstances.mockUpdate).toBeCalledWith(testBlankUpdate);
+        });
+        it('Requests a new video record after updating', async () => {
+            await videoDataService.updateVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+                testFullUpdate,
+            );
+            expect(sharedInstances.mockDoc).toBeCalled();
+        });
+        it('Requests the correct new video record', async () => {
+            await videoDataService.updateVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+                testFullUpdate,
+            );
+            expect(sharedInstances.mockDoc).toHaveBeenLastCalledWith(
+                'videos/3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+            );
+        });
+        it('Updates the search index', async () => {
+            await videoDataService.updateVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+                testFullUpdate,
+            );
+            expect(searchService.updateVideo).toBeCalled();
+        });
+        it('Updates the correct video in the search index', async () => {
+            // Mock re-request
+            sharedInstances.mockData.mockImplementationOnce(() => {
+                return updatedVideoSchema; // Updated test video schema.  Updated with test update data
+            });
+            await videoDataService.updateVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+                testFullUpdate,
+            );
+            expect(searchService.updateVideo).toBeCalledWith(
+                expectedUpdatedVideo,
+            );
+        });
+        it('Returns the updated video', async () => {
+            // Mock re-request
+            sharedInstances.mockData.mockImplementationOnce(() => {
+                return updatedVideoSchema; // Updated test video schema.  Updated with test update data
+            });
+            const res = await videoDataService.updateVideo(
+                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+                testFullUpdate,
+            );
+            expect(res).toMatchObject(expectedUpdatedVideo);
+        });
+    });
 
     describe('deleteVideo', () => {
         it('Checks to see if the video exists first', async () => {
