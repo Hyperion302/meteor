@@ -1,6 +1,6 @@
 import { tID, IError } from '../../definitions';
 import { IVideo, IVideoQuery, IVideoSchema, IVideoUpdate } from './definitions';
-import * as uuid from 'uuid/v4';
+import uuid from 'uuid/v4';
 import { firestoreInstance } from '../../sharedInstances';
 import * as channelDataService from '../ChannelDataService';
 import * as videoContentService from '../VideoContentService';
@@ -145,7 +145,7 @@ export async function createVideo(
     const channelData = await channelDataService.getChannel(channel);
 
     const videoData: IVideo = {
-        id: uuid.default(),
+        id: uuid(),
         author,
         channel: channelData,
         title,
