@@ -7,10 +7,13 @@ const sharedInstances = require('../../sharedInstances');
 const channelDataService = require('../ChannelDataService');
 const videoContentService = require('../VideoContentService');
 const searchService = require('../SearchService');
+const uuid = require('uuid/v4');
+
 jest.mock('../../sharedInstances');
 jest.mock('../ChannelDataService');
 jest.mock('../VideoContentService');
 jest.mock('../SearchService');
+jest.mock('uuid/v4');
 
 const testVideo: IVideoSchema = {
     id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
@@ -54,6 +57,10 @@ function mockImplementations() {
                 resolve(testContent);
             });
         });
+    });
+    // Mock UUID
+    uuid.mockImplementation(() => {
+        return '3d1afd2a-04a2-47f9-9c65-e34b6465b83a';
     });
 }
 
@@ -123,7 +130,89 @@ describe('Video Data Service', () => {
         });
     });
 
-    describe('createVideo', () => {});
+    describe('createVideo', () => {
+        const testTitle = 'Cool vid';
+        const testDescription = 'Cool video description';
+        const testAuthor = 'FDJIVPG1xgXfXmm67ETETSn9MSe2';
+        const testChannel = '716886dd-c107-4bd7-9060-a47b50f81689';
+
+        it('Fetches the videos future channel', async () => {
+            await videoDataService.createVideo(
+                testTitle,
+                testDescription,
+                testAuthor,
+                testChannel,
+            );
+
+            expect(channelDataService.getChannel).toHaveBeenCalledWith(
+                testChannel,
+            );
+        });
+        it('Generates a UUID for the video', async () => {
+            await videoDataService.createVideo(
+                testTitle,
+                testDescription,
+                testAuthor,
+                testChannel,
+            );
+
+            expect(uuid).toHaveBeenCalled();
+        });
+        it('References a correct path', async () => {
+            await videoDataService.createVideo(
+                testTitle,
+                testDescription,
+                testAuthor,
+                testChannel,
+            );
+
+            expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
+                'videos/3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+            );
+        });
+        it('Sets the correct video data', async () => {
+            await videoDataService.createVideo(
+                testTitle,
+                testDescription,
+                testAuthor,
+                testChannel,
+            );
+
+            expect(sharedInstances.mockSet).toHaveBeenCalledWith({
+                id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+                author: testAuthor,
+                channel: testChannel,
+                title: testTitle,
+                description: testDescription,
+                content: null,
+                uploadDate: 0,
+            });
+        });
+        it('Returns the correct video', async () => {
+            const res = await videoDataService.createVideo(
+                testTitle,
+                testDescription,
+                testAuthor,
+                testChannel,
+            );
+
+            expect(res).toMatchInlineSnapshot(`
+                Object {
+                  "author": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
+                  "channel": Object {
+                    "id": "716886dd-c107-4bd7-9060-a47b50f81689",
+                    "name": "Test Channel",
+                    "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
+                  },
+                  "content": null,
+                  "description": "Cool video description",
+                  "id": "3d1afd2a-04a2-47f9-9c65-e34b6465b83a",
+                  "title": "Cool vid",
+                  "uploadDate": 0,
+                }
+            `);
+        });
+    });
 
     describe('queryVideos', () => {});
 

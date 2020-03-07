@@ -10,7 +10,7 @@
         "start": "cross-env node --require dotenv/config .",
         "doc": "typedoc --out docs",
         "dev": "cross-env NODE_ENV=dev ts-node-dev --require dotenv/config src/main.ts",
-        "test": "cross-env NODE_ENV=test jest --setupFiles dotenv/config"
+        "test": "cross-env NODE_ENV=test jest --setupFiles dotenv/config --verbose"
     },
     "author": "",
     "license": "ISC",
