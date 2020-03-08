@@ -1,6 +1,6 @@
 import * as videoDataService from './';
 import 'jest-extended';
-import { IVideoUpdate, IVideo, IVideoSchema } from './definitions';
+import { IVideoUpdate, IVideo, IVideoSchema, IVideoQuery } from './definitions';
 import { IChannel } from '../ChannelDataService/definitions';
 import { IVideoContent } from '../VideoContentService/definitions';
 const sharedInstances = require('../../sharedInstances');
@@ -214,7 +214,78 @@ describe('Video Data Service', () => {
         });
     });
 
-    describe('queryVideos', () => {});
+    describe('queryVideo', () => {
+        const sampleQuery: IVideoQuery = {
+            channel: '716886dd-c107-4bd7-9060-a47b50f81689',
+            before: 30,
+            after: 50,
+            author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
+        };
+        it('Fails with empty query', async () => {
+            const promise = videoDataService.queryVideo({});
+
+            expect(promise).rejects.toThrow();
+        });
+        it('Fails with invalid query dates', async () => {
+            const promise = videoDataService.queryVideo({
+                before: 10,
+                after: 5,
+            });
+
+            expect(promise).rejects.toThrow();
+        });
+        it('References correct collection', async () => {
+            await videoDataService.queryVideo(sampleQuery);
+
+            expect(sharedInstances.mockCollection).toBeCalledWith('videos');
+        });
+        it("Constructs the correct query for 'after'", async () => {
+            await videoDataService.queryVideo(sampleQuery);
+
+            expect(sharedInstances.mockWhere).toHaveBeenCalledWith(
+                'uploadDate',
+                '>',
+                sampleQuery.after,
+            );
+        });
+        it("Constructs the correct query for 'before'", async () => {
+            await videoDataService.queryVideo(sampleQuery);
+
+            expect(sharedInstances.mockWhere).toHaveBeenCalledWith(
+                'uploadDate',
+                '<',
+                sampleQuery.before,
+            );
+        });
+        it("Constructs the correct query for 'channel'", async () => {
+            await videoDataService.queryVideo(sampleQuery);
+
+            expect(sharedInstances.mockWhere).toHaveBeenCalledWith(
+                'channel',
+                '==',
+                sampleQuery.channel,
+            );
+        });
+        it("Constructs the correct query for 'author'", async () => {
+            await videoDataService.queryVideo(sampleQuery);
+
+            expect(sharedInstances.mockWhere).toHaveBeenCalledWith(
+                'author',
+                '==',
+                sampleQuery.author,
+            );
+        });
+        it('Properly maps query responses', async () => {
+            await videoDataService.queryVideo(sampleQuery);
+
+            expect(sharedInstances.mockMap).toHaveBeenCalled();
+        });
+        it('Returns the correct data', async () => {
+            const res = await videoDataService.queryVideo(sampleQuery);
+
+            expect(res).toBeArray(); // Probably should test return value
+        });
+    });
 
     describe('updateVideo', () => {
         const testFullUpdate: IVideoUpdate = {
