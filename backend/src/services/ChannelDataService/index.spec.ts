@@ -1,5 +1,5 @@
 import * as ChannelDataService from './';
-import { IChannel } from './definitions';
+import { IChannel, IChannelQuery } from './definitions';
 
 const sharedInstances = require('../../sharedInstances');
 
@@ -47,6 +47,41 @@ describe('Channel Data Sevice', () => {
                   "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
                 }
             `);
+        });
+    });
+
+    describe('queryChannel', () => {
+        const sampleQuery: IChannelQuery = {
+            owner: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
+        };
+        it('Fails with empty query', async () => {
+            const promise = ChannelDataService.queryChannel({});
+
+            expect(promise).rejects.toThrow();
+        });
+        it('References correct collection', async () => {
+            await ChannelDataService.queryChannel(sampleQuery);
+
+            expect(sharedInstances.mockCollection).toBeCalledWith('channels');
+        });
+        it("Constructs the correct query for 'owner'", async () => {
+            await ChannelDataService.queryChannel(sampleQuery);
+
+            expect(sharedInstances.mockWhere).toHaveBeenCalledWith(
+                'owner',
+                '==',
+                sampleQuery.owner,
+            );
+        });
+        it('Properly maps query responses', async () => {
+            await ChannelDataService.queryChannel(sampleQuery);
+
+            expect(sharedInstances.mockMap).toHaveBeenCalled();
+        });
+        it('Returns the correct data', async () => {
+            const res = await ChannelDataService.queryChannel(sampleQuery);
+
+            expect(res).toBeArray(); // Probably should test return value
         });
     });
 });
