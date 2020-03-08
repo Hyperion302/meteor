@@ -1,6 +1,6 @@
 import { tID, IError } from '../../definitions';
 import uuid from 'uuid/v4';
-import { IChannel, IChannelQuery } from './definitions';
+import { IChannel, IChannelQuery, IChannelUpdate } from './definitions';
 import * as search from '../SearchService';
 import { firestoreInstance } from '../../sharedInstances';
 
@@ -107,4 +107,33 @@ export async function createChannel(
     const channelDoc = firestoreInstance.doc(`channels/${channelData.id}`);
     await channelDoc.set(channelData);
     return channelData;
+}
+
+/**
+ * Updates a channel
+ * @param id ID of channel
+ * @param update Update to perform
+ */
+export async function updateChannel(
+    id: tID,
+    update: IChannelUpdate,
+): Promise<IChannel> {
+    // Fetch channel to make sure it exists
+    const channelDoc = firestoreInstance.doc(`channels/${id}`);
+    const channelDocSnap = await channelDoc.get();
+    if (!channelDocSnap.exists) {
+        const error: IError = {
+            resource: id,
+            message: `Could not find channel ${id}`,
+        };
+    }
+
+    // Update doc in DB and fetch again
+    await channelDoc.update(update);
+    const newChannel = await getSingleChannelRecord(id);
+
+    // Update search index
+    await search.updateChannel(newChannel);
+
+    return newChannel;
 }

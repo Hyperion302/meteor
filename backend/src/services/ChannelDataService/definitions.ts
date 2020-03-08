@@ -10,6 +10,13 @@ export interface IChannel {
 }
 
 /**
+ * Describes a channel update
+ */
+export interface IChannelUpdate {
+    name?: string;
+}
+
+/**
  * Describes a channel query
  */
 export interface IChannelQuery {
