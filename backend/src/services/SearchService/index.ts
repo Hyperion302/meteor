@@ -35,5 +35,5 @@ export async function updateChannel(channel: IChannel) {}
  * Removes a channel from the search index
  * @param id ID of channel to remove
  */
-export async function removeChannel(channel: IChannel) {}
+export async function removeChannel(id: tID) {}
 // #endregion

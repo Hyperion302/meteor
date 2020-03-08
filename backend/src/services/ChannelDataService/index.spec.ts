@@ -229,5 +229,33 @@ describe('Channel Data Sevice', () => {
         });
     });
 
-    describe('deleteChannel', () => {});
+    describe('deleteChannel', () => {
+        it('Checks to see if the channel exists first', async () => {
+            await ChannelDataService.deleteChannel(testChannel.id);
+
+            expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
+                `channels/${testChannel.id}`,
+            );
+            expect(sharedInstances.mockExists).toHaveBeenCalled();
+        });
+        it('Deletes everything in the right order', async () => {
+            await ChannelDataService.deleteChannel(testChannel.id);
+
+            expect(searchService.removeChannel).toHaveBeenCalledBefore(
+                sharedInstances.mockDelete,
+            );
+        });
+        it('Deletes the correct search index', async () => {
+            await ChannelDataService.deleteChannel(testChannel.id);
+
+            expect(searchService.removeChannel).toHaveBeenCalledWith(
+                testChannel.id,
+            );
+        });
+        it('Deletes the channel record', async () => {
+            await ChannelDataService.deleteChannel(testChannel.id);
+
+            expect(sharedInstances.mockDelete).toHaveBeenCalled();
+        });
+    });
 });

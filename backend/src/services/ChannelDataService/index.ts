@@ -126,6 +126,8 @@ export async function updateChannel(
             resource: id,
             message: `Could not find channel ${id}`,
         };
+
+        throw error;
     }
 
     // Update doc in DB and fetch again
@@ -136,4 +138,28 @@ export async function updateChannel(
     await search.updateChannel(newChannel);
 
     return newChannel;
+}
+
+/**
+ * Deletes a channel
+ * @param id ID of channel to delete
+ */
+export async function deleteChannel(id: tID): Promise<void> {
+    // Fetch channel to make sure it exists
+    const channelDoc = firestoreInstance.doc(`channels/${id}`);
+    const channelDocSnap = await channelDoc.get();
+    if (!channelDocSnap.exists) {
+        const error: IError = {
+            resource: id,
+            message: `Could not find channel ${id}`,
+        };
+
+        throw error;
+    }
+
+    // Remove from search index
+    await search.removeChannel(id);
+
+    // Remove from DB
+    await channelDoc.delete();
 }
