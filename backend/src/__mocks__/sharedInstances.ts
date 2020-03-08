@@ -1,3 +1,5 @@
+import { ObjectWritableMock } from 'stream-mock';
+
 // Mock Firestore
 export const mockDoc = jest.fn();
 export const mockCollection = jest.fn();
@@ -59,3 +61,36 @@ export class MockedFirestore {
 }
 
 export const firestoreInstance = new MockedFirestore();
+
+// Mock Storage
+export const mockBucket = jest.fn();
+export const mockFile = jest.fn();
+export const mockCreateWriteStream = jest.fn();
+export const mockStreamWritten = jest.fn();
+export const mockMakePublic = jest.fn();
+export const mockedWriteStream = new ObjectWritableMock();
+
+export class MockedStorage {
+    bucket() {
+        mockBucket(...arguments);
+        return this;
+    }
+    file() {
+        mockFile(...arguments);
+        return this;
+    }
+    createWriteStream() {
+        mockCreateWriteStream(...arguments);
+        return mockedWriteStream;
+    }
+    makePublic() {
+        mockMakePublic(...arguments);
+        return new Promise((resolve) => {
+            process.nextTick(() => {
+                resolve(this);
+            });
+        });
+    }
+}
+
+export const storageInstance = new MockedStorage();
