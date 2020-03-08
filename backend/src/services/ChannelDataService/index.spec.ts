@@ -2,8 +2,12 @@ import * as ChannelDataService from './';
 import { IChannel, IChannelQuery } from './definitions';
 
 const sharedInstances = require('../../sharedInstances');
+const searchService = require('../SearchService');
+const uuid = require('uuid/v4');
 
 jest.mock('../../sharedInstances');
+jest.mock('../SearchService');
+jest.mock('uuid/v4');
 
 const testChannel: IChannel = {
     id: '8c352a70-ee3b-4691-83e7-20c48cbc799e',
@@ -15,6 +19,10 @@ function mockImplementations() {
     // Mock firestore document
     sharedInstances.mockData.mockImplementation(() => {
         return testChannel;
+    });
+    // Mock UUID
+    uuid.mockImplementation(() => {
+        return '3d1afd2a-04a2-47f9-9c65-e34b6465b83a';
     });
 }
 
@@ -82,6 +90,51 @@ describe('Channel Data Sevice', () => {
             const res = await ChannelDataService.queryChannel(sampleQuery);
 
             expect(res).toBeArray(); // Probably should test return value
+        });
+    });
+
+    describe('createChannel', () => {
+        const testName = 'New channel';
+        const testOwner = 'FDJIVPG1xgXfXmm67ETETSn9MSe2';
+
+        it('Adds the channel to the search index', async () => {
+            await ChannelDataService.createChannel(testName, testOwner);
+
+            expect(searchService.addChannel).toHaveBeenCalledWith({
+                id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+                owner: testOwner,
+                name: testName,
+            });
+        });
+        it('References the correct new document', async () => {
+            await ChannelDataService.createChannel(testName, testOwner);
+
+            expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
+                'channels/3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+            );
+        });
+        it('Sets the correct data', async () => {
+            await ChannelDataService.createChannel(testName, testOwner);
+
+            expect(sharedInstances.mockSet).toHaveBeenCalledWith({
+                id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+                owner: testOwner,
+                name: testName,
+            });
+        });
+        it('Returns the new channel', async () => {
+            const res = await ChannelDataService.createChannel(
+                testName,
+                testOwner,
+            );
+
+            expect(res).toMatchInlineSnapshot(`
+                Object {
+                  "id": "3d1afd2a-04a2-47f9-9c65-e34b6465b83a",
+                  "name": "New channel",
+                  "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
+                }
+            `);
         });
     });
 });
