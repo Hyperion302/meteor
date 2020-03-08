@@ -1,5 +1,5 @@
 import { tID, IError } from '../../definitions';
-import * as uuid from 'uuid/v4';
+import uuid from 'uuid/v4';
 import { IChannel, IChannelQuery } from './definitions';
 import * as search from '../SearchService';
 import { firestoreInstance } from '../../sharedInstances';
@@ -95,7 +95,7 @@ export async function createChannel(
 ): Promise<IChannel> {
     // Build channel object
     const channelData: IChannel = {
-        id: uuid.default(),
+        id: uuid(),
         owner,
         name,
     };
