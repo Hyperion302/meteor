@@ -90,6 +90,22 @@ export async function uploadVideo(
 
 /**
  * Delete a video from the CDN
- * @param id ID of video to delete
+ * @param id ID of a videos content record to delete
  */
-export async function deleteVideo(id: tID) {}
+export async function deleteVideo(id: tID) {
+    // Retrieve content record
+    const contentRecord = await getVideo(id);
+    // Delete from mux
+    await axios.delete(
+        `https://api.mux.com/video/v1/assets/${contentRecord.assetID}`,
+        {
+            auth: {
+                username: process.env.MUXID,
+                password: process.env.MUXSECRET,
+            },
+        },
+    );
+    // Delete content record
+    const contentDoc = firestoreInstance.doc(`content/id`);
+    await contentDoc.delete();
+}

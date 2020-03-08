@@ -146,4 +146,47 @@ describe('Video Content Service', () => {
                 });
         });
     });
+    describe('deleteVideo', () => {
+        beforeEach(() => {
+            // Setup Moxios
+            moxios.install();
+            moxios.stubRequest(
+                /https\:\/\/api\.mux\.com\/video\/v1\/assets\/.*/,
+                {
+                    status: 204,
+                },
+            );
+        });
+
+        afterEach(() => {
+            // Teardown Moxios
+            moxios.uninstall();
+        });
+        it('Checks if the content record exists', async () => {
+            await videoContentService.deleteVideo(testContent.id);
+
+            expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
+                `content/${testContent.id}`,
+            );
+            expect(sharedInstances.mockExists).toHaveBeenCalled();
+        });
+        it('Deletes the Mux asset', (done) => {
+            videoContentService.deleteVideo(testContent.id).then(() => {
+                moxios.wait(() => {
+                    let request = moxios.requests.mostRecent();
+                    expect(request.url).toEqual(
+                        `https://api.mux.com/video/v1/assets/${testContent.assetID}`,
+                    );
+                    expect(request.config.auth.password).not.toBeUndefined;
+                    expect(request.config.auth.username).not.toBeUndefined;
+                    done();
+                });
+            });
+        });
+        it('Deletes the content record', async () => {
+            await videoContentService.deleteVideo(testContent.id);
+
+            expect(sharedInstances.mockDelete).toHaveBeenCalled();
+        });
+    });
 });
