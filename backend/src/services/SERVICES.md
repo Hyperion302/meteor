@@ -20,10 +20,6 @@ Provides channel data fields and assembles related fields
 
 Uploads channel content to the CDN and preprocesses (resizes, transforms, formats, etc.) them.
 
-## SSRService
-
-Runs nuxt as a service and statelessly generates webpages
-
 ## SearchService
 
 Handles search index updating
