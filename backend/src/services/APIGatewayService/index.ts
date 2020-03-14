@@ -12,6 +12,8 @@ import {
 } from '../ChannelDataService/definitions';
 import { createHmac } from 'crypto';
 import { isArray } from 'util';
+import authMiddleware from './auth';
+
 const app = express();
 
 // #region Middleware
@@ -45,7 +47,7 @@ app.post('/muxWebhook', async (req, res) => {
 // #endregion External
 
 // #region Video Routes
-app.get('/video', async (req, res) => {
+app.get('/video', authMiddleware, async (req, res) => {
     // Service Request
     try {
         // Build query
@@ -62,7 +64,7 @@ app.get('/video', async (req, res) => {
         res.status(500).send(e);
     }
 });
-app.get('/video/:id', async (req, res) => {
+app.get('/video/:id', authMiddleware, async (req, res) => {
     // Service Request
     try {
         const video = await videoDataService.getVideo(req.params.id);
@@ -72,7 +74,7 @@ app.get('/video/:id', async (req, res) => {
         res.status(500).send(e);
     }
 });
-app.post('/video', express.json(), async (req, res) => {
+app.post('/video', authMiddleware, express.json(), async (req, res) => {
     // Service Request
     try {
         // Cleanse inputs
@@ -113,7 +115,7 @@ app.post('/video', express.json(), async (req, res) => {
         res.status(500).send(e);
     }
 });
-app.post('/video/:id/upload', (req, res) => {
+app.post('/video/:id/upload', authMiddleware, (req, res) => {
     // Should be multipart
     const busboyInstance = new busboy({
         headers: req.headers,
@@ -135,7 +137,7 @@ app.post('/video/:id/upload', (req, res) => {
     );
     req.pipe(busboyInstance);
 });
-app.put('/video/:id', express.json(), async (req, res) => {
+app.put('/video/:id', authMiddleware, express.json(), async (req, res) => {
     // Service request
     try {
         // Build update object
@@ -175,7 +177,7 @@ app.put('/video/:id', express.json(), async (req, res) => {
         res.status(500).send(e);
     }
 });
-app.delete('/video/:id', async (req, res) => {
+app.delete('/video/:id', authMiddleware, async (req, res) => {
     // Service Request
     try {
         await videoDataService.deleteVideo(req.params.id);
@@ -189,7 +191,7 @@ app.delete('/video/:id', async (req, res) => {
 //#endregion Video Routes
 
 // #region Channel Routes
-app.get('/channel', async (req, res) => {
+app.get('/channel', authMiddleware, async (req, res) => {
     // Service Request
     try {
         // Build query
@@ -203,7 +205,7 @@ app.get('/channel', async (req, res) => {
         res.status(500).send(e);
     }
 });
-app.get('/channel/:id', async (req, res) => {
+app.get('/channel/:id', authMiddleware, async (req, res) => {
     // Service Request
     try {
         const channel = await channelDataService.getChannel(req.params.id);
@@ -213,7 +215,7 @@ app.get('/channel/:id', async (req, res) => {
         res.status(500).send(e);
     }
 });
-app.post('/channel', express.json(), async (req, res) => {
+app.post('/channel', authMiddleware, express.json(), async (req, res) => {
     // Service Request
     try {
         // Cleanse inputs (just name for now)
@@ -232,7 +234,7 @@ app.post('/channel', express.json(), async (req, res) => {
         res.status(500).send(e);
     }
 });
-app.post('/channel/:id/uploadIcon', (req, res) => {
+app.post('/channel/:id/uploadIcon', authMiddleware, (req, res) => {
     // Should be multipart
     const busboyInstance = new busboy({
         headers: req.headers,
@@ -253,7 +255,7 @@ app.post('/channel/:id/uploadIcon', (req, res) => {
     );
     req.pipe(busboyInstance);
 });
-app.put('/channel/:id', express.json(), async (req, res) => {
+app.put('/channel/:id', authMiddleware, express.json(), async (req, res) => {
     // Service Request
     try {
         // Build update object
@@ -279,7 +281,7 @@ app.put('/channel/:id', express.json(), async (req, res) => {
         res.status(500).send(e);
     }
 });
-app.delete('/channel/:id', async (req, res) => {
+app.delete('/channel/:id', authMiddleware, async (req, res) => {
     // Service Request
     try {
         await channelDataService.deleteChannel(req.params.id);
