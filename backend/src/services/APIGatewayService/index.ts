@@ -5,7 +5,10 @@ import * as channelDataService from '../ChannelDataService';
 import * as videoContentService from '../VideoContentService';
 import { IVideoQuery, IVideoUpdate } from '../VideoDataService/definitions';
 import { IError } from '../../definitions';
-import { IChannelQuery } from '../ChannelDataService/definitions';
+import {
+    IChannelQuery,
+    IChannelUpdate,
+} from '../ChannelDataService/definitions';
 import { createHmac } from 'crypto';
 import { isArray } from 'util';
 const app = express();
@@ -171,10 +174,15 @@ app.put('/video/:id', express.json(), async (req, res) => {
         res.status(500).send(e);
     }
 });
-app.delete('/video', (req, res) => {
-    res.send({
-        message: 'DELETE /video',
-    });
+app.delete('/video/:id', async (req, res) => {
+    // Service Request
+    try {
+        await videoDataService.deleteVideo(req.params.id);
+        res.sendStatus(204);
+    } catch (e) {
+        console.log(e);
+        res.status(500).send(e);
+    }
 });
 
 //#endregion Video Routes
@@ -228,15 +236,41 @@ app.post('/uploadIcon', (req, res) => {
         message: 'POST /uploadIcon',
     });
 });
-app.put('/channel', (req, res) => {
-    res.send({
-        message: 'PUT /channel',
-    });
+app.put('/channel/:id', express.json(), async (req, res) => {
+    // Service Request
+    try {
+        // Build update object
+        const update: IChannelUpdate = {};
+        const name = req.body.name;
+        if (name) {
+            if (!(typeof name === 'string') || name.length > 32) {
+                const error: IError = {
+                    resource: name,
+                    message: 'Invalid channel name',
+                };
+                throw error;
+            }
+            update.name = name;
+        }
+        const newChannel = await channelDataService.updateChannel(
+            req.params.id,
+            update,
+        );
+        res.status(200).send(newChannel);
+    } catch (e) {
+        console.log(e);
+        res.status(500).send(e);
+    }
 });
-app.delete('/channel', (req, res) => {
-    res.send({
-        message: 'DELETE /channel',
-    });
+app.delete('/channel/:id', async (req, res) => {
+    // Service Request
+    try {
+        await channelDataService.deleteChannel(req.params.id);
+        res.sendStatus(204);
+    } catch (e) {
+        console.log(e);
+        res.status(500).send(e);
+    }
 });
 // #endregion Channel Routes
 
