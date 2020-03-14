@@ -3,6 +3,7 @@ import busboy from 'busboy';
 import * as videoDataService from '../VideoDataService';
 import * as channelDataService from '../ChannelDataService';
 import * as videoContentService from '../VideoContentService';
+import * as channelContentService from '../ChannelContentService';
 import { IVideoQuery, IVideoUpdate } from '../VideoDataService/definitions';
 import { IError } from '../../definitions';
 import {
@@ -231,10 +232,26 @@ app.post('/channel', express.json(), async (req, res) => {
         res.status(500).send(e);
     }
 });
-app.post('/uploadIcon', (req, res) => {
-    res.send({
-        message: 'POST /uploadIcon',
+app.post('/channel/:id/uploadIcon', (req, res) => {
+    // Should be multipart
+    const busboyInstance = new busboy({
+        headers: req.headers,
+        limits: {
+            files: 1,
+        },
     });
+    busboyInstance.on(
+        'file',
+        (fieldname, file, filename, encoding, mimetype) => {
+            console.log(`Got ${fieldname}`);
+            channelContentService.uploadIcon(req.params.id, file).then(() => {
+                res.writeHead(200);
+                res.end();
+            });
+            // We can assume that this will only be called once since the file limit is 1
+        },
+    );
+    req.pipe(busboyInstance);
 });
 app.put('/channel/:id', express.json(), async (req, res) => {
     // Service Request
