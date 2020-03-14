@@ -1,6 +1,6 @@
 import { Firestore } from '@google-cloud/firestore';
 import { Storage, StorageOptions } from '@google-cloud/storage';
-import { readFileSync } from 'fs';
+import algoliasearch from 'algoliasearch';
 
 const production: boolean = process.env.NODE_ENV === 'prod';
 
@@ -32,6 +32,12 @@ if (production) {
 export const storageInstance = new Storage(storageOptions);
 // #endregion Storage
 
-// #region Mux Secrets
-
-// #endregion Mux Secrets
+// #region Algolia
+export const algoliaClientInstance = algoliasearch(
+    process.env.ALGOLIAID,
+    process.env.ALGOLIASECRET,
+);
+export const algoliaIndexInstance = algoliaClientInstance.initIndex(
+    'dev_videos',
+);
+// #endregion Algolia

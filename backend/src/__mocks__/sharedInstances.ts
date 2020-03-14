@@ -94,3 +94,30 @@ export class MockedStorage {
 }
 
 export const storageInstance = new MockedStorage();
+
+// Mock Algolia
+export const mockSaveObject = jest.fn();
+export const mockDeleteObject = jest.fn();
+
+export class MockedAlgolia {
+    saveObject() {
+        mockSaveObject(...arguments);
+        return new Promise((resolve) => {
+            process.nextTick(() => {
+                resolve();
+            });
+        });
+    }
+
+    deleteObject() {
+        mockDeleteObject(...arguments);
+        return new Promise((resolve) => {
+            process.nextTick(() => {
+                resolve();
+            });
+        });
+    }
+}
+
+export const algoliaClientInstance = {};
+export const algoliaIndexInstance = new MockedAlgolia();

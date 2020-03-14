@@ -10,7 +10,8 @@
         "start": "cross-env node --require dotenv/config .",
         "doc": "typedoc --out docs",
         "dev": "cross-env NODE_ENV=dev ts-node-dev --require dotenv/config src/main.ts",
-        "test": "cross-env NODE_ENV=test jest --setupFiles dotenv/config --verbose"
+        "test": "cross-env NODE_ENV=test jest --setupFiles dotenv/config --verbose",
+        "test:coverage": "cross-env NODE_ENV=test jest --setupFiles dotenv/config --verbose --collectCoverage"
     },
     "author": "",
     "license": "ISC",
@@ -38,6 +39,7 @@
     "dependencies": {
         "@google-cloud/firestore": "^3.5.0",
         "@google-cloud/storage": "^4.3.1",
+        "algoliasearch": "^4.0.3",
         "axios": "^0.19.2",
         "busboy": "^0.3.1",
         "dotenv": "^8.2.0",
