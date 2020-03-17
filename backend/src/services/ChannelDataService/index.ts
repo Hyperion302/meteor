@@ -138,6 +138,7 @@ export async function updateChannel(
             resource: id,
             message: 'Unauthorized to update channel',
         };
+        throw error;
     }
 
     // Update doc in DB and fetch again
@@ -170,6 +171,7 @@ export async function deleteChannel(
             resource: id,
             message: 'Unauthorized to delete channel',
         };
+        throw error;
     }
 
     // Remove from search index

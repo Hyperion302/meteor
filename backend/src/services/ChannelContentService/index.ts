@@ -1,7 +1,8 @@
 import sharp from 'sharp';
 import { firestoreInstance, storageInstance } from '../../sharedInstances';
-import { tID, IServiceInvocationContext } from '../../definitions';
+import { tID, IServiceInvocationContext, IError } from '../../definitions';
 import { CreateWriteStreamOptions } from '@google-cloud/storage';
+import { getChannel } from '../ChannelDataService';
 
 const sharpPipeline = sharp().png();
 const pipeline_128 = sharpPipeline.clone().resize(128, 128);
@@ -10,6 +11,7 @@ const pipeline_32 = sharpPipeline.clone().resize(32, 32);
 
 /**
  * Formats and saves a channel icon
+ * @param context Invocation Context
  * @param id ID of channel the icon is for
  * @param imageStream Raw upload stream from the user
  */
@@ -18,7 +20,17 @@ export async function uploadIcon(
     id: tID,
     imageStream: NodeJS.ReadableStream,
 ): Promise<void> {
-    //TODO: Check auth here
+    // Authorization Check
+    const channel = await getChannel(context, id);
+    // Channel icons can only be uploaded by the owner
+    if (context.auth.userID != channel.owner) {
+        const error: IError = {
+            resource: id,
+            message: 'Unauthorized to upload icon to channel',
+        };
+        throw error;
+    }
+
     // Setup storage writestreams
     const path_128 = `channelIcons/${id}_128.png`;
     const path_64 = `channelIcons/${id}_64.png`;
