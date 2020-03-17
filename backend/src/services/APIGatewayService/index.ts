@@ -70,7 +70,7 @@ app.get('/video', async (req, res) => {
             after: req.query.after,
             channel: req.query.channel,
         };
-        const videos = await videoDataService.queryVideo(query);
+        const videos = await videoDataService.queryVideo(req.context, query);
         res.status(200).send(videos);
     } catch (e) {
         console.log(e);
@@ -80,7 +80,10 @@ app.get('/video', async (req, res) => {
 app.get('/video/:id', async (req, res) => {
     // Service Request
     try {
-        const video = await videoDataService.getVideo(req.params.id);
+        const video = await videoDataService.getVideo(
+            req.context,
+            req.params.id,
+        );
         res.status(200).send(video);
     } catch (e) {
         console.log(e);
@@ -115,11 +118,10 @@ app.post('/video', express.json(), async (req, res) => {
             };
             throw error;
         }
-        const author = req.body.author; // TODO: REPLACE DURING AUTH BUILDUP
         const video = await videoDataService.createVideo(
+            req.context,
             title,
             description,
-            author,
             channel,
         );
         res.status(201).send(video);
@@ -141,7 +143,7 @@ app.post('/video/:id/upload', (req, res) => {
         (fieldname, file, filename, encoding, mimetype) => {
             // We can assume that this will only be called once since the file limit is 1
             videoContentService
-                .uploadVideo(req.params.id, 'test', file, mimetype)
+                .uploadVideo(req.context, req.params.id, file, mimetype)
                 .then(() => {
                     res.writeHead(200);
                     res.end();
@@ -181,6 +183,7 @@ app.put('/video/:id', express.json(), async (req, res) => {
             update.description = description;
         }
         const newVideo = await videoDataService.updateVideo(
+            req.context,
             req.params.id,
             update,
         );
@@ -193,7 +196,7 @@ app.put('/video/:id', express.json(), async (req, res) => {
 app.delete('/video/:id', async (req, res) => {
     // Service Request
     try {
-        await videoDataService.deleteVideo(req.params.id);
+        await videoDataService.deleteVideo(req.context, req.params.id);
         res.sendStatus(204);
     } catch (e) {
         console.log(e);
@@ -211,7 +214,10 @@ app.get('/channel', async (req, res) => {
         const query: IChannelQuery = {
             owner: req.query.owner,
         };
-        const videos = await channelDataService.queryChannel(query);
+        const videos = await channelDataService.queryChannel(
+            req.context,
+            query,
+        );
         res.status(200).send(videos);
     } catch (e) {
         console.log(e);
@@ -221,7 +227,10 @@ app.get('/channel', async (req, res) => {
 app.get('/channel/:id', async (req, res) => {
     // Service Request
     try {
-        const channel = await channelDataService.getChannel(req.params.id);
+        const channel = await channelDataService.getChannel(
+            req.context,
+            req.params.id,
+        );
         res.status(200).send(channel);
     } catch (e) {
         console.log(e);
@@ -239,8 +248,10 @@ app.post('/channel', express.json(), async (req, res) => {
                 message: 'Invalid channel name',
             };
         }
-        const owner = req.body.owner; // TODO: REPLACE DURING AUTH BUILDUP
-        const channel = await channelDataService.createChannel(name, owner);
+        const channel = await channelDataService.createChannel(
+            req.context,
+            name,
+        );
         res.status(201).send(channel);
     } catch (e) {
         console.log(e);
@@ -259,10 +270,12 @@ app.post('/channel/:id/uploadIcon', (req, res) => {
         'file',
         (fieldname, file, filename, encoding, mimetype) => {
             console.log(`Got ${fieldname}`);
-            channelContentService.uploadIcon(req.params.id, file).then(() => {
-                res.writeHead(200);
-                res.end();
-            });
+            channelContentService
+                .uploadIcon(req.context, req.params.id, file)
+                .then(() => {
+                    res.writeHead(200);
+                    res.end();
+                });
             // We can assume that this will only be called once since the file limit is 1
         },
     );
@@ -285,6 +298,7 @@ app.put('/channel/:id', express.json(), async (req, res) => {
             update.name = name;
         }
         const newChannel = await channelDataService.updateChannel(
+            req.context,
             req.params.id,
             update,
         );
@@ -297,7 +311,7 @@ app.put('/channel/:id', express.json(), async (req, res) => {
 app.delete('/channel/:id', async (req, res) => {
     // Service Request
     try {
-        await channelDataService.deleteChannel(req.params.id);
+        await channelDataService.deleteChannel(req.context, req.params.id);
         res.sendStatus(204);
     } catch (e) {
         console.log(e);
