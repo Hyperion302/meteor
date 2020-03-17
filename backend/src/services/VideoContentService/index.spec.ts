@@ -3,10 +3,13 @@ import { IVideoContent } from './definitions';
 import { ObjectReadableMock, ObjectWritableMock } from 'stream-mock';
 import { IServiceInvocationContext } from '../../definitions';
 import moxios from 'moxios';
+import { IVideo } from '../VideoDataService/definitions';
 
 const sharedInstances = require('../../sharedInstances');
+const VideoDataService = require('../VideoDataService');
 
 jest.mock('../../sharedInstances');
+jest.mock('../VideoDataService');
 
 const mockContext: IServiceInvocationContext = {
     auth: {
@@ -21,11 +24,26 @@ const testContent: IVideoContent = {
     playbackID: '1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG',
 };
 
+const testVideo: IVideo = {
+    id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+    author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
+    channel: {
+        id: '716886dd-c107-4bd7-9060-a47b50f81689',
+        name: 'Test Channel',
+        owner: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
+    },
+    content: testContent,
+    description: 'Test Video Description',
+    title: 'Test Video Name',
+    uploadDate: 1578009691,
+};
+
 function mockImplementations() {
     // Mock firestore document
-    sharedInstances.mockData.mockImplementation(() => {
-        return testContent;
-    });
+    sharedInstances.mockData.mockImplementation(() => testContent);
+
+    // Mock video
+    VideoDataService.getVideo.mockImplementation(() => testVideo);
 }
 
 beforeAll(() => {
@@ -67,7 +85,6 @@ describe('Video Content Service', () => {
     });
     describe('uploadVideo', () => {
         const testID = '3d1afd2a-04a2-47f9-9c65-e34b6465b83a';
-        const testUploader = 'FDJIVPG1xgXfXmm67ETETSn9MSe2';
         const testMime = 'video/mp4';
 
         beforeEach(() => {
@@ -90,7 +107,6 @@ describe('Video Content Service', () => {
             await videoContentService.uploadVideo(
                 mockContext,
                 testID,
-                testUploader,
                 testInput,
                 testMime,
             );
@@ -102,13 +118,12 @@ describe('Video Content Service', () => {
             await videoContentService.uploadVideo(
                 mockContext,
                 testID,
-                testUploader,
                 testInput,
                 testMime,
             );
 
             expect(sharedInstances.mockFile).toBeCalledWith(
-                `masters/${testUploader}/${testID}`,
+                `masters/${mockContext.auth.userID}/${testID}`,
             );
         });
         it('Creates a writestream with the correct parameters', async () => {
@@ -116,7 +131,6 @@ describe('Video Content Service', () => {
             await videoContentService.uploadVideo(
                 mockContext,
                 testID,
-                testUploader,
                 testInput,
                 testMime,
             );
@@ -132,7 +146,6 @@ describe('Video Content Service', () => {
             await videoContentService.uploadVideo(
                 mockContext,
                 testID,
-                testUploader,
                 testInput,
                 testMime,
             );
@@ -142,13 +155,7 @@ describe('Video Content Service', () => {
         it('Sends transcoding request to Mux', (done) => {
             const testInput = new ObjectReadableMock([0, 1, 2, 3, 4]);
             videoContentService
-                .uploadVideo(
-                    mockContext,
-                    testID,
-                    testUploader,
-                    testInput,
-                    testMime,
-                )
+                .uploadVideo(mockContext, testID, testInput, testMime)
                 .then(() => {
                     moxios.wait(() => {
                         let request = moxios.requests.mostRecent();

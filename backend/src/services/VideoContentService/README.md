@@ -20,4 +20,6 @@ Deletes a videos master video, transcoding assets, and content record
 
 ## uploadVideo
 
+_Video can only be uploaded by author_
+
 Streams video data to CDN

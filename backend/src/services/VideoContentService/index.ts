@@ -1,6 +1,7 @@
 import { tID, IError, IServiceInvocationContext } from '../../definitions';
 import { firestoreInstance, storageInstance } from '../../sharedInstances';
 import { IVideoContent } from './definitions';
+import * as VideoDataService from '../VideoDataService';
 import axios from 'axios';
 
 /**
@@ -51,20 +52,28 @@ function promisePiper(
  * Upload a video to the CDN and call the transcoder on complete
  * @param context Invocation context
  * @param id ID of video to upload
- * @param uploader Uploader of video file
  * @param fileStream Filestream of video data
  * @param mime Mimetype of video
  */
 export async function uploadVideo(
     context: IServiceInvocationContext,
     id: tID,
-    uploader: tID,
     fileStream: NodeJS.ReadableStream,
     mime: string,
 ): Promise<void> {
-    // In the future I'll check if this "uploader" can upload to the channel and if the video is even available for upload
+    const video = await VideoDataService.getVideo(context, id);
+    // Authorization Check
+    // Video can only be uploaded by author
+    if (context.auth.userID != video.author) {
+        const error: IError = {
+            resource: id,
+            message: 'Unauthorized upload',
+        };
+        throw error;
+    }
+
     // Build our storage path
-    const path = `masters/${uploader}/${id}`;
+    const path = `masters/${context.auth.userID}/${id}`;
     const storageObject = storageInstance.bucket('meteor-videos').file(path);
     // Create the storage writestream
     const storageWritestream = storageObject.createWriteStream({
