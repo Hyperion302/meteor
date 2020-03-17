@@ -283,10 +283,14 @@ describe('Channel Data Sevice', () => {
         it('Deletes the correct search index', async () => {
             await ChannelDataService.deleteChannel(mockContext, testChannel.id);
 
-            expect(searchService.removeChannel).toHaveBeenCalledWith(
-                mockContext,
-                testChannel.id,
-            );
+            expect(searchService.removeChannel.mock.calls[0][1])
+                .toMatchInlineSnapshot(`
+                    Object {
+                      "id": "8c352a70-ee3b-4691-83e7-20c48cbc799e",
+                      "name": "New Good Channel :)",
+                      "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
+                    }
+                `);
         });
         it('Deletes the channel record', async () => {
             await ChannelDataService.deleteChannel(mockContext, testChannel.id);

@@ -118,6 +118,7 @@ export async function createChannel(
 
 /**
  * Updates a channel
+ * @param context Invocation context
  * @param id ID of channel
  * @param update Update to perform
  */
@@ -128,14 +129,15 @@ export async function updateChannel(
 ): Promise<IChannel> {
     // Fetch channel to make sure it exists
     const channelDoc = firestoreInstance.doc(`channels/${id}`);
-    const channelDocSnap = await channelDoc.get();
-    if (!channelDocSnap.exists) {
+    const oldChannel = await getSingleChannelRecord(id);
+
+    // Authorization Check
+    // Channels can only be updated by the owner
+    if (context.auth.userID != oldChannel.owner) {
         const error: IError = {
             resource: id,
-            message: `Could not find channel ${id}`,
+            message: 'Unauthorized to update channel',
         };
-
-        throw error;
     }
 
     // Update doc in DB and fetch again
@@ -150,6 +152,7 @@ export async function updateChannel(
 
 /**
  * Deletes a channel
+ * @param context Invocation context
  * @param id ID of channel to delete
  */
 export async function deleteChannel(
@@ -158,18 +161,19 @@ export async function deleteChannel(
 ): Promise<void> {
     // Fetch channel to make sure it exists
     const channelDoc = firestoreInstance.doc(`channels/${id}`);
-    const channelDocSnap = await channelDoc.get();
-    if (!channelDocSnap.exists) {
+    const channelData = await getSingleChannelRecord(id);
+
+    // Authorization Check
+    // Channels can only be deleted by the owner
+    if (context.auth.userID != channelData.owner) {
         const error: IError = {
             resource: id,
-            message: `Could not find channel ${id}`,
+            message: 'Unauthorized to delete channel',
         };
-
-        throw error;
     }
 
     // Remove from search index
-    await search.removeChannel(context, id);
+    await search.removeChannel(context, channelData);
 
     // Remove from DB
     await channelDoc.delete();
