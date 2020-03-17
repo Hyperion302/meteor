@@ -1,6 +1,7 @@
 import sharp from 'sharp';
 import { firestoreInstance, storageInstance } from '../../sharedInstances';
-import { tID, IServiceInvocationContext, IError } from '../../definitions';
+import { tID, IServiceInvocationContext } from '../../definitions';
+import { AuthorizationError } from '../../errors';
 import { CreateWriteStreamOptions } from '@google-cloud/storage';
 import { getChannel } from '../ChannelDataService';
 
@@ -24,11 +25,10 @@ export async function uploadIcon(
     const channel = await getChannel(context, id);
     // Channel icons can only be uploaded by the owner
     if (context.auth.userID != channel.owner) {
-        const error: IError = {
-            resource: id,
-            message: 'Unauthorized to upload icon to channel',
-        };
-        throw error;
+        throw new AuthorizationError(
+            'ChannelContent',
+            'upload icon to channel',
+        );
     }
 
     // Setup storage writestreams

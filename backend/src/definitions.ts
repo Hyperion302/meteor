@@ -22,7 +22,14 @@ export interface IJWTToken {
  * Generic error interface
  */
 export interface IError {
-    resource: any;
+    statusCode: number;
+    service:
+        | 'Gateway'
+        | 'ChannelContent'
+        | 'ChannelData'
+        | 'Search'
+        | 'VideoContent'
+        | 'VideoData';
     message: string;
     longMessage?: string;
 }

@@ -3,6 +3,7 @@ import { firestoreInstance, storageInstance } from '../../sharedInstances';
 import { IVideoContent } from './definitions';
 import * as VideoDataService from '../VideoDataService';
 import axios from 'axios';
+import { ResourceNotFoundError, AuthorizationError } from '../../errors';
 
 /**
  * Retrieves a content record
@@ -16,11 +17,7 @@ export async function getVideo(
     const contentDoc = firestoreInstance.doc(`content/${id}`);
     const contentDocSnap = await contentDoc.get();
     if (!contentDocSnap.exists) {
-        const error: IError = {
-            resource: id,
-            message: `Could not find content record ${id}`,
-        };
-        throw error;
+        throw new ResourceNotFoundError('VideoContent', 'videoContent', id);
     }
     const contentData = contentDocSnap.data();
 
@@ -65,11 +62,7 @@ export async function uploadVideo(
     // Authorization Check
     // Video can only be uploaded by author
     if (context.auth.userID != video.author) {
-        const error: IError = {
-            resource: id,
-            message: 'Unauthorized upload',
-        };
-        throw error;
+        throw new AuthorizationError('VideoContent', 'upload video data');
     }
 
     // Build our storage path

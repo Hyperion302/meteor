@@ -3,6 +3,7 @@ import { IChannel } from '../ChannelDataService/definitions';
 import { tID, IServiceInvocationContext, IError } from '../../definitions';
 import { algoliaIndexInstance } from '../../sharedInstances';
 import { IVideoSearchObject, IChannelSearchObject } from './definitions';
+import { AuthorizationError } from '../../errors';
 
 function algoliaFromVideo(video: IVideo): IVideoSearchObject {
     return {
@@ -36,11 +37,7 @@ export async function addVideo(
     // Videos can only be created on channels owned by the author
     // (Author in this case can be assumed to be the caller, since the video is being added to the index)
     if (context.auth.userID != video.channel.owner) {
-        const error: IError = {
-            resource: video,
-            message: 'Unauthorized to add video to chanenl',
-        };
-        throw error;
+        throw new AuthorizationError('Search', 'add video to search index');
     }
     await algoliaIndexInstance.saveObject(algoliaFromVideo(video));
 }
@@ -59,11 +56,7 @@ export async function updateVideo(
         context.auth.userID != video.channel.owner &&
         context.auth.userID != video.author
     ) {
-        const error: IError = {
-            resource: video,
-            message: 'Unauthorized to update video',
-        };
-        throw error;
+        throw new AuthorizationError('Search', 'update video in search index');
     }
     await algoliaIndexInstance.saveObject(algoliaFromVideo(video));
 }
@@ -82,11 +75,10 @@ export async function removeVideo(
         context.auth.userID != video.channel.owner &&
         context.auth.userID != video.author
     ) {
-        const error: IError = {
-            resource: video,
-            message: 'Unauthorized to remove video',
-        };
-        throw error;
+        throw new AuthorizationError(
+            'Search',
+            'remove video from search index',
+        );
     }
 
     await algoliaIndexInstance.deleteObject(video.id);
@@ -117,11 +109,10 @@ export async function updateChannel(
     // Authorization check
     // Channels can only be updated by the owner
     if (context.auth.userID != channel.owner) {
-        const error: IError = {
-            resource: channel,
-            message: 'Unauthorized to update channel',
-        };
-        throw error;
+        throw new AuthorizationError(
+            'Search',
+            'update channel in search index',
+        );
     }
     await algoliaIndexInstance.saveObject(algoliaFromChannel(channel));
 }
@@ -137,11 +128,10 @@ export async function removeChannel(
     // Authorization check
     // Channels can only be removed by the owner
     if (context.auth.userID != channel.owner) {
-        const error: IError = {
-            resource: channel,
-            message: 'Unauthorized to update channel',
-        };
-        throw error;
+        throw new AuthorizationError(
+            'Search',
+            'remove channel from search index',
+        );
     }
     await algoliaIndexInstance.deleteObject(channel.id);
 }

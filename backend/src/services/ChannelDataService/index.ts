@@ -1,4 +1,10 @@
-import { tID, IError, IServiceInvocationContext } from '../../definitions';
+import { tID, IServiceInvocationContext } from '../../definitions';
+import {
+    ResourceNotFoundError,
+    InvalidQueryError,
+    InternalError,
+    AuthorizationError,
+} from '../../errors';
 import uuid from 'uuid/v4';
 import { IChannel, IChannelQuery, IChannelUpdate } from './definitions';
 import * as search from '../SearchService';
@@ -15,11 +21,7 @@ async function getSingleChannelRecord(id: tID): Promise<IChannel> {
     const channelDoc = firestoreInstance.doc(`channels/${id}`);
     const channelDocSnap = await channelDoc.get();
     if (!channelDocSnap.exists) {
-        const error: IError = {
-            resource: id,
-            message: `Could not find channel ${id}`,
-        };
-        throw error;
+        throw new ResourceNotFoundError('ChannelData', 'channel', id);
     }
     const channelData = channelDocSnap.data();
     // Build channel object
@@ -53,11 +55,7 @@ export async function queryChannel(
 ): Promise<IChannel[]> {
     if (!query.owner) {
         // No query
-        const error: IError = {
-            resource: query,
-            message: `No query provided`,
-        };
-        throw error;
+        throw new InvalidQueryError('ChannelData', query);
     }
     const collection = firestoreInstance.collection('channels');
     let fsQuery;
@@ -69,13 +67,10 @@ export async function queryChannel(
         );
     }
     if (!fsQuery) {
-        const error: IError = {
-            resource: query,
-            message: 'An unexpected error occured',
-            longMessage:
-                'fsQuery was undefined when it should have been overwritten at *some* point',
-        };
-        throw error;
+        throw new InternalError(
+            'ChannelData',
+            'fsQuery was not supposed to be undefined',
+        );
     }
 
     // Query FS
@@ -133,11 +128,7 @@ export async function updateChannel(
     // Authorization Check
     // Channels can only be updated by the owner
     if (context.auth.userID != oldChannel.owner) {
-        const error: IError = {
-            resource: id,
-            message: 'Unauthorized to update channel',
-        };
-        throw error;
+        throw new AuthorizationError('ChannelData', 'update channel');
     }
 
     // Update doc in DB and fetch again
@@ -166,11 +157,7 @@ export async function deleteChannel(
     // Authorization Check
     // Channels can only be deleted by the owner
     if (context.auth.userID != channelData.owner) {
-        const error: IError = {
-            resource: id,
-            message: 'Unauthorized to delete channel',
-        };
-        throw error;
+        throw new AuthorizationError('ChannelData', 'delete channel');
     }
 
     // Remove from search index

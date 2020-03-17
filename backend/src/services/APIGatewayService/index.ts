@@ -10,6 +10,7 @@ import {
     IChannelQuery,
     IChannelUpdate,
 } from '../ChannelDataService/definitions';
+import { GenericError, InvalidFieldError } from '../../errors';
 import { createHmac } from 'crypto';
 import { isArray } from 'util';
 import authMiddleware from './auth';
@@ -17,9 +18,11 @@ import authMiddleware from './auth';
 const app = express();
 
 // #region Middleware
+// Auth
 app.use('/video*', authMiddleware);
 app.use('/channel*', authMiddleware);
 
+// Context
 app.use(['/video*', '/channel*'], (req, res, next) => {
     // Generate invocation context
     req.context = {
@@ -30,6 +33,7 @@ app.use(['/video*', '/channel*'], (req, res, next) => {
     };
     next();
 });
+
 // #endregion Middleware
 
 // #region External
@@ -60,7 +64,7 @@ app.post('/muxWebhook', async (req, res) => {
 // #endregion External
 
 // #region Video Routes
-app.get('/video', async (req, res) => {
+app.get('/video', async (req, res, next) => {
     // Service Request
     try {
         // Build query
@@ -73,11 +77,10 @@ app.get('/video', async (req, res) => {
         const videos = await videoDataService.queryVideo(req.context, query);
         res.status(200).send(videos);
     } catch (e) {
-        console.log(e);
-        res.status(500).send(e);
+        next(e);
     }
 });
-app.get('/video/:id', async (req, res) => {
+app.get('/video/:id', async (req, res, next) => {
     // Service Request
     try {
         const video = await videoDataService.getVideo(
@@ -86,37 +89,24 @@ app.get('/video/:id', async (req, res) => {
         );
         res.status(200).send(video);
     } catch (e) {
-        console.log(e);
-        res.status(500).send(e);
+        next(e);
     }
 });
-app.post('/video', express.json(), async (req, res) => {
+app.post('/video', express.json(), async (req, res, next) => {
     // Service Request
     try {
         // Cleanse inputs
         const title = req.body.title;
         if (!(typeof title === 'string') || title.length > 32) {
-            const error: IError = {
-                resource: title,
-                message: 'Invalid video title',
-            };
-            throw error;
+            throw new InvalidFieldError('Gateway', 'title');
         }
         const description = req.body.description;
         if (!(typeof description === 'string') || description.length > 1024) {
-            const error: IError = {
-                resource: description,
-                message: 'Invalid video description',
-            };
-            throw error;
+            throw new InvalidFieldError('Gateway', 'description');
         }
         const channel = req.body.channel;
         if (!(typeof title === 'string')) {
-            const error: IError = {
-                resource: title,
-                message: 'Invalid channel ID',
-            };
-            throw error;
+            throw new InvalidFieldError('Gateway', 'channel');
         }
         const video = await videoDataService.createVideo(
             req.context,
@@ -126,11 +116,10 @@ app.post('/video', express.json(), async (req, res) => {
         );
         res.status(201).send(video);
     } catch (e) {
-        console.log(e);
-        res.status(500).send(e);
+        next(e);
     }
 });
-app.post('/video/:id/upload', (req, res) => {
+app.post('/video/:id/upload', (req, res, next) => {
     // Should be multipart
     const busboyInstance = new busboy({
         headers: req.headers,
@@ -147,12 +136,15 @@ app.post('/video/:id/upload', (req, res) => {
                 .then(() => {
                     res.writeHead(200);
                     res.end();
+                })
+                .catch((e) => {
+                    next(e);
                 });
         },
     );
     req.pipe(busboyInstance);
 });
-app.put('/video/:id', express.json(), async (req, res) => {
+app.put('/video/:id', express.json(), async (req, res, next) => {
     // Service request
     try {
         // Build update object
@@ -160,11 +152,7 @@ app.put('/video/:id', express.json(), async (req, res) => {
         const title = req.body.title;
         if (title) {
             if (!(typeof title === 'string') || title.length > 32) {
-                const error: IError = {
-                    resource: title,
-                    message: 'Invalid video title',
-                };
-                throw error;
+                throw new InvalidFieldError('Gateway', 'title');
             }
             update.title = title;
         }
@@ -174,11 +162,7 @@ app.put('/video/:id', express.json(), async (req, res) => {
                 !(typeof description === 'string') ||
                 description.length > 1024
             ) {
-                const error: IError = {
-                    resource: description,
-                    message: 'Invalid video description',
-                };
-                throw error;
+                throw new InvalidFieldError('Gateway', 'description');
             }
             update.description = description;
         }
@@ -189,25 +173,23 @@ app.put('/video/:id', express.json(), async (req, res) => {
         );
         res.status(200).send(newVideo);
     } catch (e) {
-        console.log(e);
-        res.status(500).send(e);
+        next(e);
     }
 });
-app.delete('/video/:id', async (req, res) => {
+app.delete('/video/:id', async (req, res, next) => {
     // Service Request
     try {
         await videoDataService.deleteVideo(req.context, req.params.id);
         res.sendStatus(204);
     } catch (e) {
-        console.log(e);
-        res.status(500).send(e);
+        next(e);
     }
 });
 
 //#endregion Video Routes
 
 // #region Channel Routes
-app.get('/channel', async (req, res) => {
+app.get('/channel', async (req, res, next) => {
     // Service Request
     try {
         // Build query
@@ -220,11 +202,10 @@ app.get('/channel', async (req, res) => {
         );
         res.status(200).send(videos);
     } catch (e) {
-        console.log(e);
-        res.status(500).send(e);
+        next(e);
     }
 });
-app.get('/channel/:id', async (req, res) => {
+app.get('/channel/:id', async (req, res, next) => {
     // Service Request
     try {
         const channel = await channelDataService.getChannel(
@@ -233,20 +214,16 @@ app.get('/channel/:id', async (req, res) => {
         );
         res.status(200).send(channel);
     } catch (e) {
-        console.log(e);
-        res.status(500).send(e);
+        next(e);
     }
 });
-app.post('/channel', express.json(), async (req, res) => {
+app.post('/channel', express.json(), async (req, res, next) => {
     // Service Request
     try {
         // Cleanse inputs (just name for now)
         const name = req.body.name;
         if (!(typeof name === 'string') || name.length > 32) {
-            const error: IError = {
-                resource: name,
-                message: 'Invalid channel name',
-            };
+            throw new InvalidFieldError('Gateway', 'name');
         }
         const channel = await channelDataService.createChannel(
             req.context,
@@ -254,11 +231,10 @@ app.post('/channel', express.json(), async (req, res) => {
         );
         res.status(201).send(channel);
     } catch (e) {
-        console.log(e);
-        res.status(500).send(e);
+        next(e);
     }
 });
-app.post('/channel/:id/uploadIcon', (req, res) => {
+app.post('/channel/:id/uploadIcon', (req, res, next) => {
     // Should be multipart
     const busboyInstance = new busboy({
         headers: req.headers,
@@ -275,13 +251,16 @@ app.post('/channel/:id/uploadIcon', (req, res) => {
                 .then(() => {
                     res.writeHead(200);
                     res.end();
+                })
+                .catch((e) => {
+                    next(e);
                 });
             // We can assume that this will only be called once since the file limit is 1
         },
     );
     req.pipe(busboyInstance);
 });
-app.put('/channel/:id', express.json(), async (req, res) => {
+app.put('/channel/:id', express.json(), async (req, res, next) => {
     // Service Request
     try {
         // Build update object
@@ -289,11 +268,7 @@ app.put('/channel/:id', express.json(), async (req, res) => {
         const name = req.body.name;
         if (name) {
             if (!(typeof name === 'string') || name.length > 32) {
-                const error: IError = {
-                    resource: name,
-                    message: 'Invalid channel name',
-                };
-                throw error;
+                throw new InvalidFieldError('Gateway', 'name');
             }
             update.name = name;
         }
@@ -304,20 +279,23 @@ app.put('/channel/:id', express.json(), async (req, res) => {
         );
         res.status(200).send(newChannel);
     } catch (e) {
-        console.log(e);
-        res.status(500).send(e);
+        next(e);
     }
 });
-app.delete('/channel/:id', async (req, res) => {
+app.delete('/channel/:id', async (req, res, next) => {
     // Service Request
     try {
         await channelDataService.deleteChannel(req.context, req.params.id);
         res.sendStatus(204);
     } catch (e) {
-        console.log(e);
-        res.status(500).send(e);
+        next(e);
     }
 });
 // #endregion Channel Routes
+
+// any in this case because TS *refuses* to acknowledge the override
+app.use((err: GenericError, req: any, res: any, next: any) => {
+    res.status(err.status).send(err.toAPIError());
+});
 
 export default app;

@@ -5,6 +5,12 @@ import { firestoreInstance } from '../../sharedInstances';
 import * as channelDataService from '../ChannelDataService';
 import * as videoContentService from '../VideoContentService';
 import * as searchService from '../SearchService';
+import {
+    AuthorizationError,
+    ResourceNotFoundError,
+    InvalidQueryError,
+    InternalError,
+} from '../../errors';
 
 /**
  * Get a single video record
@@ -21,11 +27,7 @@ async function getSingleVideoRecord(
     const videoDoc = firestoreInstance.doc(`videos/${id}`);
     const videoDocSnap = await videoDoc.get();
     if (!videoDocSnap.exists) {
-        const error: IError = {
-            resource: id,
-            message: `Could not find video ${id}`,
-        };
-        throw error;
+        throw new ResourceNotFoundError('VideoData', 'video', id);
     }
     const videoData = videoDocSnap.data();
 
@@ -63,19 +65,11 @@ export async function queryVideo(
 ): Promise<IVideo[]> {
     if (!(query.after || query.before || query.author || query.channel)) {
         // No query
-        const error: IError = {
-            resource: query,
-            message: `No query provided`,
-        };
-        throw error;
+        throw new InvalidQueryError('VideoData', query);
     }
     if (query.after && query.before && query.after <= query.before) {
         // Invalid dates
-        const error: IError = {
-            resource: query,
-            message: `Invalid dates provided in video query`,
-        };
-        throw error;
+        throw new InvalidQueryError('VideoData', query);
     }
     // Build FS query
     const collection = firestoreInstance.collection('videos');
@@ -109,13 +103,10 @@ export async function queryVideo(
         );
     }
     if (!fsQuery) {
-        const error: IError = {
-            resource: query,
-            message: 'An unexpected error occured',
-            longMessage:
-                'fsQuery was undefined when it should have been overwritten at *some* point',
-        };
-        throw error;
+        throw new InternalError(
+            'VideoData',
+            'fsQuery was not supposed to be undefined',
+        );
     }
 
     // Query FS
@@ -164,11 +155,10 @@ export async function createVideo(
 
     // Videos can only be created on channels owned by the author
     if (channelData.owner != context.auth.userID) {
-        const error: IError = {
-            resource: null,
-            message: 'Unauthorized to create video',
-        };
-        throw error;
+        throw new AuthorizationError(
+            'VideoData',
+            'create video in requested channel',
+        );
     }
 
     const videoData: IVideo = {
@@ -217,10 +207,7 @@ export async function updateVideo(
         oldVideo.author != context.auth.userID &&
         oldVideo.channel.owner != context.auth.userID
     ) {
-        const error: IError = {
-            resource: id,
-            message: 'Unathorized to update video',
-        };
+        throw new AuthorizationError('VideoData', 'update video');
     }
 
     // Update doc in DB and fetch it again
@@ -250,10 +237,7 @@ export async function deleteVideo(context: IServiceInvocationContext, id: tID) {
         videoData.author != context.auth.userID &&
         videoData.channel.owner != context.auth.userID
     ) {
-        const error: IError = {
-            resource: id,
-            message: 'Unauthorized to delete video',
-        };
+        throw new AuthorizationError('VideoData', 'delete video');
     }
 
     // Delete from search index
