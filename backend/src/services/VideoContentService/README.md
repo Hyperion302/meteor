@@ -16,8 +16,12 @@ Returns transcoding information from DB
 
 ## deleteVideo
 
+_Videos can only be deleted by the video author or the channel owner_
+
 Deletes a videos master video, transcoding assets, and content record
 
 ## uploadVideo
+
+_Videos can only be uploaded by the author_
 
 Streams video data to CDN

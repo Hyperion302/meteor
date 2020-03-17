@@ -23,14 +23,20 @@ _If before >= after, raises an error_
 
 ## createVideo
 
+_Videos can only be created on channels owned by the author_
+
 1. Creates new untranscoded video in DB
 
 ## updateVideo
+
+_Videos can only be updated by their author or the channel owner_
 
 1. Updates video in DB with provided fields
 2. Calls [SearchService](../SearchService/README.md)/updateVideo to update fields
 
 ## deleteVideo
+
+_Videos can only be deleted by their author or the channel owner_
 
 1. Calls [SearchService](../SearchService/README.md)/deleteVideo to delete from search index
 2. Calls [VideoContentService](../VideoContentService)/deleteVideo to delete transcoding entry

@@ -4,7 +4,7 @@ Handles all API requests and authenticates user tokens. Exposes _publicly facing
 
 ## Authentication
 
-All of the endpoints below attach auth data to their request by first calling [UserAuthService](../UserAuthService/README.md)/authenticate with the token provided by the request
+The APIGatewayService _authenticates_ user requests, and expects downstream services to properlly check permission bounds and react accordingly.
 
 ## External
 
@@ -40,7 +40,7 @@ Calls [VideoDataService](../VideoDataService/README.md)/deleteVideo
 
 ## Channel
 
-### GET /channel
+### GET /channel/:id
 
 Calls [ChannelDataService](../ChannelDataService/README.md)/getChannel
 
@@ -48,14 +48,14 @@ Calls [ChannelDataService](../ChannelDataService/README.md)/getChannel
 
 Calls [ChannelDataService](../ChannelDataService/README.md)/createChannel
 
-### POST /uploadIcon
+### POST /channel/:id/uploadIcon
 
 Calls [ChanenlContentService](/backend/service/ChannelContentService/README.md)/uploadIcon
 
-### PUT /channel
+### PUT /channel/:id
 
 Calls [ChannelDataService](../ChannelDataService/README.md)/updateChannel
 
-### DELETE /channel
+### DELETE /channel/:id
 
 Calls [ChannelDataService](../ChannelDataService/README.md)/deleteChannel

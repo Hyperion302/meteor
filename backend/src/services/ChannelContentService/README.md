@@ -4,4 +4,6 @@ Streams and preprocesses (resizes, transforms, formats, etc.) channel-related up
 
 ## /uploadIcon
 
+_Channel icons can only be uploaded by the owner_
+
 Streams icon to thbe CDN and preprocesses it.
