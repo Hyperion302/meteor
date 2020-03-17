@@ -8,6 +8,7 @@ import * as searchService from '../SearchService';
 
 /**
  * Get a single video record
+ * @param context Invocation context
  * @param id Video record id
  * @returns Promise that resolves to a found video record
  * @ignore
@@ -52,6 +53,7 @@ async function getSingleVideoRecord(
 
 /**
  * Query for videos
+ * @param context Invocation context
  * @param query Video query object
  * @returns Promise that resolves to a list of found videos
  */
@@ -129,6 +131,7 @@ export async function queryVideo(
 
 /**
  * Get a single video
+ * @param context Invocation context
  * @param id ID of video to retrieve
  * @returns Promise that resolves to retrieved video
  */
@@ -141,6 +144,7 @@ export async function getVideo(
 
 /**
  * Create a video
+ * @param context Invocation context
  * @param title Title of video
  * @param description Description of video
  * @param author TEMPORARY, will be removed with auth
@@ -156,6 +160,17 @@ export async function createVideo(
 ): Promise<IVideo> {
     // Fetch channel that was referenced
     const channelData = await channelDataService.getChannel(context, channel);
+
+    // Authorization check
+
+    // Videos can only be created on channels owned by the author
+    if (channelData.owner != context.auth.userID) {
+        const error: IError = {
+            resource: null,
+            message: 'Unauthorized to create video',
+        };
+        throw error;
+    }
 
     const videoData: IVideo = {
         id: uuid(),
@@ -183,6 +198,7 @@ export async function createVideo(
 
 /**
  * Update a video's information
+ * @param context Invocation context
  * @param id ID of video to update
  * @param update Update object
  */
@@ -193,14 +209,21 @@ export async function updateVideo(
 ) {
     // Fetch video to make sure it exists
     const videoDoc = firestoreInstance.doc(`videos/${id}`);
-    const videoDocSnap = await videoDoc.get();
-    if (!videoDocSnap.exists) {
+    const oldVideo = await getSingleVideoRecord(context, id);
+
+    // Authorization check
+
+    // Videos can only be updated by their author or the channel owner
+    if (
+        oldVideo.author != context.auth.userID &&
+        oldVideo.channel.owner != context.auth.userID
+    ) {
         const error: IError = {
             resource: id,
-            message: `Could not find video ${id}`,
+            message: 'Unathorized to update video',
         };
-        throw error;
     }
+
     // Update doc in DB and fetch it again
     await videoDoc.update(update);
     const newVideo = await getSingleVideoRecord(context, id);
@@ -211,25 +234,35 @@ export async function updateVideo(
     return newVideo;
 }
 
+/**
+ * Deletes a video record and it's associated resources
+ * @param context Invocation Context
+ * @param id ID of video to delete
+ */
 export async function deleteVideo(context: IServiceInvocationContext, id: tID) {
     // Fetch video to make sure it exists
     const videoDoc = firestoreInstance.doc(`videos/${id}`);
-    const videoDocSnap = await videoDoc.get();
-    if (!videoDocSnap.exists) {
+    const videoData = await getSingleVideoRecord(context, id);
+
+    // Authorization check
+
+    // Videos can only be deleted by their author or the channel owner
+    if (
+        videoData.author != context.auth.userID &&
+        videoData.channel.owner != context.auth.userID
+    ) {
         const error: IError = {
             resource: id,
-            message: `Could not find video ${id}`,
+            message: 'Unauthorized to delete video',
         };
-        throw error;
     }
-    const videoData = videoDocSnap.data();
 
     // Delete from search index
     await searchService.removeVideo(context, id);
 
     // Delete content if it exists
     if (videoData.content) {
-        await videoContentService.deleteVideo(context, videoData.content);
+        await videoContentService.deleteVideo(context, videoData.content.id);
     }
 
     // Delete from firestore

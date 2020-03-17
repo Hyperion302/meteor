@@ -422,6 +422,9 @@ describe('Video Data Service', () => {
             sharedInstances.mockData.mockImplementationOnce(() => {
                 return updatedVideoSchema; // Updated test video schema.  Updated with test update data
             });
+            sharedInstances.mockData.mockImplementationOnce(() => {
+                return updatedVideoSchema; // Updated test video schema.  Updated with test update data
+            });
             await videoDataService.updateVideo(
                 mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
@@ -437,6 +440,10 @@ describe('Video Data Service', () => {
             sharedInstances.mockData.mockImplementationOnce(() => {
                 return updatedVideoSchema; // Updated test video schema.  Updated with test update data
             });
+            sharedInstances.mockData.mockImplementationOnce(() => {
+                return updatedVideoSchema; // Updated test video schema.  Updated with test update data
+            });
+
             const res = await videoDataService.updateVideo(
                 mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
