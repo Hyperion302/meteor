@@ -6,8 +6,10 @@ import {
 } from 'stream-mock';
 import { SharpInstance } from '../../../__mocks__/sharp';
 import { IServiceInvocationContext } from '../../definitions';
+import { IChannel } from '../ChannelDataService/definitions';
 
 const sharedInstances = require('../../sharedInstances');
+const ChannelDataService = require('../ChannelDataService');
 const sharp = require('sharp');
 
 const mockContext: IServiceInvocationContext = {
@@ -17,10 +19,18 @@ const mockContext: IServiceInvocationContext = {
     },
 };
 
+const testChannel: IChannel = {
+    id: '716886dd-c107-4bd7-9060-a47b50f81689',
+    name: 'Test Channel',
+    owner: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
+};
+
 jest.mock('../../sharedInstances');
+jest.mock('../ChannelDataService');
 
 function mockImplementations() {
-    // No mocking required
+    // Mock channel
+    ChannelDataService.getChannel.mockImplementation(() => testChannel);
 }
 
 beforeAll(() => {
@@ -33,7 +43,6 @@ beforeEach(() => {
 
 describe('Channel Content Service', () => {
     describe('uploadIcon', () => {
-        const testID = '3d1afd2a-04a2-47f9-9c65-e34b6465b83a';
         const storageMetadata = {
             metadata: {
                 contentType: 'image/png',
@@ -43,7 +52,7 @@ describe('Channel Content Service', () => {
             const testInput = new ObjectReadableMock(['a', 'b', 'c', 'd', 'e']);
             await ChannelContentService.uploadIcon(
                 mockContext,
-                testID,
+                testChannel.id,
                 testInput,
             );
 
@@ -67,15 +76,15 @@ describe('Channel Content Service', () => {
 
             expect(sharedInstances.mockFile).toHaveBeenNthCalledWith(
                 1,
-                `channelIcons/${testID}_128.png`,
+                `channelIcons/${testChannel.id}_128.png`,
             );
             expect(sharedInstances.mockFile).toHaveBeenNthCalledWith(
                 2,
-                `channelIcons/${testID}_64.png`,
+                `channelIcons/${testChannel.id}_64.png`,
             );
             expect(sharedInstances.mockFile).toHaveBeenNthCalledWith(
                 3,
-                `channelIcons/${testID}_32.png`,
+                `channelIcons/${testChannel.id}_32.png`,
             );
 
             // Creates proper write streams
