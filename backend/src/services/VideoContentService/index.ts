@@ -5,6 +5,7 @@ import axios from 'axios';
 
 /**
  * Retrieves a content record
+ * @param context Invocation context
  * @param id ID of content record
  */
 export async function getVideo(
@@ -48,6 +49,7 @@ function promisePiper(
 
 /**
  * Upload a video to the CDN and call the transcoder on complete
+ * @param context Invocation context
  * @param id ID of video to upload
  * @param uploader Uploader of video file
  * @param fileStream Filestream of video data
@@ -94,6 +96,7 @@ export async function uploadVideo(
 
 /**
  * Delete a video from the CDN
+ * @param context Invocation context
  * @param id ID of a videos content record to delete
  */
 export async function deleteVideo(context: IServiceInvocationContext, id: tID) {

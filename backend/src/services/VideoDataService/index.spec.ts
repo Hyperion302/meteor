@@ -494,10 +494,7 @@ describe('Video Data Service', () => {
                 mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
-            expect(searchService.removeVideo).toHaveBeenCalledWith(
-                mockContext,
-                '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-            );
+            expect(searchService.removeVideo).toHaveBeenCalled();
         });
 
         it('Deletes the video content', async () => {

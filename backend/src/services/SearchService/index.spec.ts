@@ -85,7 +85,7 @@ describe('Search Service', () => {
     });
     describe('removeVideo', () => {
         it('Removes video object from Algolia', async () => {
-            await SearchService.removeVideo(mockContext, testVideo.id);
+            await SearchService.removeVideo(mockContext, testVideo);
 
             expect(sharedInstances.mockDeleteObject).toHaveBeenCalledWith(
                 testVideo.id,
@@ -123,7 +123,7 @@ describe('Search Service', () => {
     });
     describe('removeChannel', () => {
         it('Removes channel object from Algolia', async () => {
-            await SearchService.removeChannel(mockContext, testChannel.id);
+            await SearchService.removeChannel(mockContext, testChannel);
 
             expect(sharedInstances.mockDeleteObject).toHaveBeenCalledWith(
                 testChannel.id,

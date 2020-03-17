@@ -258,7 +258,7 @@ export async function deleteVideo(context: IServiceInvocationContext, id: tID) {
     }
 
     // Delete from search index
-    await searchService.removeVideo(context, id);
+    await searchService.removeVideo(context, videoData);
 
     // Delete content if it exists
     if (videoData.content) {
