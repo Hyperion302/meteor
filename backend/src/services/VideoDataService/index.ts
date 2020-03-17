@@ -1,4 +1,4 @@
-import { tID, IError } from '../../definitions';
+import { tID, IError, IServiceInvocationContext } from '../../definitions';
 import { IVideo, IVideoQuery, IVideoSchema, IVideoUpdate } from './definitions';
 import uuid from 'uuid/v4';
 import { firestoreInstance } from '../../sharedInstances';
@@ -12,7 +12,10 @@ import * as searchService from '../SearchService';
  * @returns Promise that resolves to a found video record
  * @ignore
  */
-async function getSingleVideoRecord(id: tID): Promise<IVideo> {
+async function getSingleVideoRecord(
+    context: IServiceInvocationContext,
+    id: tID,
+): Promise<IVideo> {
     // Get basic video data
     const videoDoc = firestoreInstance.doc(`videos/${id}`);
     const videoDocSnap = await videoDoc.get();
@@ -26,11 +29,14 @@ async function getSingleVideoRecord(id: tID): Promise<IVideo> {
     const videoData = videoDocSnap.data();
 
     // Get channel data
-    const channelData = await channelDataService.getChannel(videoData.channel);
+    const channelData = await channelDataService.getChannel(
+        context,
+        videoData.channel,
+    );
 
     // Get content data.  If there's no content data that means there's no uploaded video data for a video
     const contentData = videoData.content
-        ? await videoContentService.getVideo(videoData.content)
+        ? await videoContentService.getVideo(context, videoData.content)
         : null;
 
     return {
@@ -49,7 +55,10 @@ async function getSingleVideoRecord(id: tID): Promise<IVideo> {
  * @param query Video query object
  * @returns Promise that resolves to a list of found videos
  */
-export async function queryVideo(query: IVideoQuery): Promise<IVideo[]> {
+export async function queryVideo(
+    context: IServiceInvocationContext,
+    query: IVideoQuery,
+): Promise<IVideo[]> {
     if (!(query.after || query.before || query.author || query.channel)) {
         // No query
         const error: IError = {
@@ -110,7 +119,7 @@ export async function queryVideo(query: IVideoQuery): Promise<IVideo[]> {
     // Query FS
     const querySnap = await fsQuery.get();
     const queryPromises = querySnap.docs.map((doc) => {
-        return getSingleVideoRecord(doc.id);
+        return getSingleVideoRecord(context, doc.id);
     });
 
     // Wait for all to run
@@ -123,8 +132,11 @@ export async function queryVideo(query: IVideoQuery): Promise<IVideo[]> {
  * @param id ID of video to retrieve
  * @returns Promise that resolves to retrieved video
  */
-export async function getVideo(id: tID): Promise<IVideo> {
-    return await getSingleVideoRecord(id);
+export async function getVideo(
+    context: IServiceInvocationContext,
+    id: tID,
+): Promise<IVideo> {
+    return await getSingleVideoRecord(context, id);
 }
 
 /**
@@ -136,13 +148,14 @@ export async function getVideo(id: tID): Promise<IVideo> {
  * @returns Promise that resolves to created video
  */
 export async function createVideo(
+    context: IServiceInvocationContext,
     title: string,
     description: string,
     author: string,
     channel: tID,
 ): Promise<IVideo> {
     // Fetch channel that was referenced
-    const channelData = await channelDataService.getChannel(channel);
+    const channelData = await channelDataService.getChannel(context, channel);
 
     const videoData: IVideo = {
         id: uuid(),
@@ -173,7 +186,11 @@ export async function createVideo(
  * @param id ID of video to update
  * @param update Update object
  */
-export async function updateVideo(id: tID, update: IVideoUpdate) {
+export async function updateVideo(
+    context: IServiceInvocationContext,
+    id: tID,
+    update: IVideoUpdate,
+) {
     // Fetch video to make sure it exists
     const videoDoc = firestoreInstance.doc(`videos/${id}`);
     const videoDocSnap = await videoDoc.get();
@@ -186,15 +203,15 @@ export async function updateVideo(id: tID, update: IVideoUpdate) {
     }
     // Update doc in DB and fetch it again
     await videoDoc.update(update);
-    const newVideo = await getSingleVideoRecord(id);
+    const newVideo = await getSingleVideoRecord(context, id);
 
     // Update doc in search index
-    await searchService.updateVideo(newVideo);
+    await searchService.updateVideo(context, newVideo);
 
     return newVideo;
 }
 
-export async function deleteVideo(id: tID) {
+export async function deleteVideo(context: IServiceInvocationContext, id: tID) {
     // Fetch video to make sure it exists
     const videoDoc = firestoreInstance.doc(`videos/${id}`);
     const videoDocSnap = await videoDoc.get();
@@ -208,11 +225,11 @@ export async function deleteVideo(id: tID) {
     const videoData = videoDocSnap.data();
 
     // Delete from search index
-    await searchService.removeVideo(id);
+    await searchService.removeVideo(context, id);
 
     // Delete content if it exists
     if (videoData.content) {
-        await videoContentService.deleteVideo(videoData.content);
+        await videoContentService.deleteVideo(context, videoData.content);
     }
 
     // Delete from firestore

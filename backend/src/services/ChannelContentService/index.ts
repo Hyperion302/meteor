@@ -1,6 +1,6 @@
 import sharp from 'sharp';
 import { firestoreInstance, storageInstance } from '../../sharedInstances';
-import { tID } from '../../definitions';
+import { tID, IServiceInvocationContext } from '../../definitions';
 import { CreateWriteStreamOptions } from '@google-cloud/storage';
 
 const sharpPipeline = sharp().png();
@@ -14,6 +14,7 @@ const pipeline_32 = sharpPipeline.clone().resize(32, 32);
  * @param imageStream Raw upload stream from the user
  */
 export async function uploadIcon(
+    context: IServiceInvocationContext,
     id: tID,
     imageStream: NodeJS.ReadableStream,
 ): Promise<void> {

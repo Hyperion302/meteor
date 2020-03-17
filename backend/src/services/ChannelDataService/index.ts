@@ -1,4 +1,4 @@
-import { tID, IError } from '../../definitions';
+import { tID, IError, IServiceInvocationContext } from '../../definitions';
 import uuid from 'uuid/v4';
 import { IChannel, IChannelQuery, IChannelUpdate } from './definitions';
 import * as search from '../SearchService';
@@ -35,7 +35,10 @@ async function getSingleChannelRecord(id: tID): Promise<IChannel> {
  * @param id ID of channel to return
  * @returns Promise that resolves to requested channel
  */
-export async function getChannel(id: tID): Promise<IChannel> {
+export async function getChannel(
+    context: IServiceInvocationContext,
+    id: tID,
+): Promise<IChannel> {
     return await getSingleChannelRecord(id);
 }
 
@@ -44,7 +47,10 @@ export async function getChannel(id: tID): Promise<IChannel> {
  * @param query Query object to query against channels
  * @returns Promise that resolves to a list of found channels
  */
-export async function queryChannel(query: IChannelQuery): Promise<IChannel[]> {
+export async function queryChannel(
+    context: IServiceInvocationContext,
+    query: IChannelQuery,
+): Promise<IChannel[]> {
     if (!query.owner) {
         // No query
         const error: IError = {
@@ -90,6 +96,7 @@ export async function queryChannel(query: IChannelQuery): Promise<IChannel[]> {
  * @returns Promise resolves to created channel
  */
 export async function createChannel(
+    context: IServiceInvocationContext,
     name: string,
     owner: string,
 ): Promise<IChannel> {
@@ -101,7 +108,7 @@ export async function createChannel(
     };
 
     // Add to search index
-    await search.addChannel(channelData);
+    await search.addChannel(context, channelData);
 
     // Write to DB
     const channelDoc = firestoreInstance.doc(`channels/${channelData.id}`);
@@ -115,6 +122,7 @@ export async function createChannel(
  * @param update Update to perform
  */
 export async function updateChannel(
+    context: IServiceInvocationContext,
     id: tID,
     update: IChannelUpdate,
 ): Promise<IChannel> {
@@ -135,7 +143,7 @@ export async function updateChannel(
     const newChannel = await getSingleChannelRecord(id);
 
     // Update search index
-    await search.updateChannel(newChannel);
+    await search.updateChannel(context, newChannel);
 
     return newChannel;
 }
@@ -144,7 +152,10 @@ export async function updateChannel(
  * Deletes a channel
  * @param id ID of channel to delete
  */
-export async function deleteChannel(id: tID): Promise<void> {
+export async function deleteChannel(
+    context: IServiceInvocationContext,
+    id: tID,
+): Promise<void> {
     // Fetch channel to make sure it exists
     const channelDoc = firestoreInstance.doc(`channels/${id}`);
     const channelDocSnap = await channelDoc.get();
@@ -158,7 +169,7 @@ export async function deleteChannel(id: tID): Promise<void> {
     }
 
     // Remove from search index
-    await search.removeChannel(id);
+    await search.removeChannel(context, id);
 
     // Remove from DB
     await channelDoc.delete();

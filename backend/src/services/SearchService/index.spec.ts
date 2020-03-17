@@ -1,10 +1,18 @@
 import * as SearchService from './';
 import { IChannel } from '../ChannelDataService/definitions';
 import { IVideo } from '../VideoDataService/definitions';
+import { IServiceInvocationContext } from '../../definitions';
 
 const sharedInstances = require('../../sharedInstances');
 
 jest.mock('../../sharedInstances');
+
+const mockContext: IServiceInvocationContext = {
+    auth: {
+        userID: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
+        token: null, // None of the services should be using this
+    },
+};
 
 const testChannel: IChannel = {
     id: '8c352a70-ee3b-4691-83e7-20c48cbc799e',
@@ -45,7 +53,7 @@ beforeEach(() => {
 describe('Search Service', () => {
     describe('addVideo', () => {
         it('Saves video object in Algolia', async () => {
-            await SearchService.addVideo(testVideo);
+            await SearchService.addVideo(mockContext, testVideo);
 
             expect(sharedInstances.mockSaveObject.mock.calls[0][0])
                 .toMatchInlineSnapshot(`
@@ -61,7 +69,7 @@ describe('Search Service', () => {
     });
     describe('updateVideo', () => {
         it('Saves video object in Algolia', async () => {
-            await SearchService.updateVideo(testVideo);
+            await SearchService.updateVideo(mockContext, testVideo);
 
             expect(sharedInstances.mockSaveObject.mock.calls[0][0])
                 .toMatchInlineSnapshot(`
@@ -77,7 +85,7 @@ describe('Search Service', () => {
     });
     describe('removeVideo', () => {
         it('Removes video object from Algolia', async () => {
-            await SearchService.removeVideo(testVideo.id);
+            await SearchService.removeVideo(mockContext, testVideo.id);
 
             expect(sharedInstances.mockDeleteObject).toHaveBeenCalledWith(
                 testVideo.id,
@@ -87,7 +95,7 @@ describe('Search Service', () => {
 
     describe('addChannel', () => {
         it('Saves channel object in Algolia', async () => {
-            await SearchService.addChannel(testChannel);
+            await SearchService.addChannel(mockContext, testChannel);
 
             expect(sharedInstances.mockSaveObject.mock.calls[0][0])
                 .toMatchInlineSnapshot(`
@@ -101,7 +109,7 @@ describe('Search Service', () => {
     });
     describe('updateChannel', () => {
         it('Saves channel object in Algolia', async () => {
-            await SearchService.updateChannel(testChannel);
+            await SearchService.updateChannel(mockContext, testChannel);
 
             expect(sharedInstances.mockSaveObject.mock.calls[0][0])
                 .toMatchInlineSnapshot(`
@@ -115,7 +123,7 @@ describe('Search Service', () => {
     });
     describe('removeChannel', () => {
         it('Removes channel object from Algolia', async () => {
-            await SearchService.removeChannel(testChannel.id);
+            await SearchService.removeChannel(mockContext, testChannel.id);
 
             expect(sharedInstances.mockDeleteObject).toHaveBeenCalledWith(
                 testChannel.id,

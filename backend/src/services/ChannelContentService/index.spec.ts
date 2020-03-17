@@ -5,9 +5,17 @@ import {
     ObjectReadableMock,
 } from 'stream-mock';
 import { SharpInstance } from '../../../__mocks__/sharp';
+import { IServiceInvocationContext } from '../../definitions';
 
 const sharedInstances = require('../../sharedInstances');
 const sharp = require('sharp');
+
+const mockContext: IServiceInvocationContext = {
+    auth: {
+        userID: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
+        token: null, // None of the services should be using this
+    },
+};
 
 jest.mock('../../sharedInstances');
 
@@ -33,7 +41,11 @@ describe('Channel Content Service', () => {
         };
         it('Passes (Compressed Test)', async () => {
             const testInput = new ObjectReadableMock(['a', 'b', 'c', 'd', 'e']);
-            await ChannelContentService.uploadIcon(testID, testInput);
+            await ChannelContentService.uploadIcon(
+                mockContext,
+                testID,
+                testInput,
+            );
 
             // References correct bucket
 

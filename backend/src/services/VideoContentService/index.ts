@@ -1,4 +1,4 @@
-import { tID, IError } from '../../definitions';
+import { tID, IError, IServiceInvocationContext } from '../../definitions';
 import { firestoreInstance, storageInstance } from '../../sharedInstances';
 import { IVideoContent } from './definitions';
 import axios from 'axios';
@@ -7,7 +7,10 @@ import axios from 'axios';
  * Retrieves a content record
  * @param id ID of content record
  */
-export async function getVideo(id: tID): Promise<IVideoContent> {
+export async function getVideo(
+    context: IServiceInvocationContext,
+    id: tID,
+): Promise<IVideoContent> {
     const contentDoc = firestoreInstance.doc(`content/${id}`);
     const contentDocSnap = await contentDoc.get();
     if (!contentDocSnap.exists) {
@@ -51,6 +54,7 @@ function promisePiper(
  * @param mime Mimetype of video
  */
 export async function uploadVideo(
+    context: IServiceInvocationContext,
     id: tID,
     uploader: tID,
     fileStream: NodeJS.ReadableStream,
@@ -92,9 +96,9 @@ export async function uploadVideo(
  * Delete a video from the CDN
  * @param id ID of a videos content record to delete
  */
-export async function deleteVideo(id: tID) {
+export async function deleteVideo(context: IServiceInvocationContext, id: tID) {
     // Retrieve content record
-    const contentRecord = await getVideo(id);
+    const contentRecord = await getVideo(context, id);
     // Delete from mux
     await axios.delete(
         `https://api.mux.com/video/v1/assets/${contentRecord.assetID}`,

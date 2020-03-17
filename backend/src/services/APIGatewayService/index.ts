@@ -19,6 +19,17 @@ const app = express();
 // #region Middleware
 app.use('/video*', authMiddleware);
 app.use('/channel*', authMiddleware);
+
+app.use(['/video*', '/channel*'], (req, res, next) => {
+    // Generate invocation context
+    req.context = {
+        auth: {
+            userID: req.user.sub,
+            token: req.user,
+        },
+    };
+    next();
+});
 // #endregion Middleware
 
 // #region External

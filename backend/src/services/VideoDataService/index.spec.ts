@@ -3,6 +3,7 @@ import 'jest-extended';
 import { IVideoUpdate, IVideo, IVideoSchema, IVideoQuery } from './definitions';
 import { IChannel } from '../ChannelDataService/definitions';
 import { IVideoContent } from '../VideoContentService/definitions';
+import { IServiceInvocationContext } from '../../definitions';
 const sharedInstances = require('../../sharedInstances');
 const channelDataService = require('../ChannelDataService');
 const videoContentService = require('../VideoContentService');
@@ -35,6 +36,13 @@ const testContent: IVideoContent = {
     id: 'b5263a52-1c05-4ab7-813d-65b8866bacfd',
     assetID: 'SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo',
     playbackID: '1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG',
+};
+
+const mockContext: IServiceInvocationContext = {
+    auth: {
+        userID: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
+        token: null, // None of the services should be using this
+    },
 };
 
 function mockImplementations() {
@@ -76,6 +84,7 @@ describe('Video Data Service', () => {
     describe('getVideo', () => {
         it('Requests the correct video ID', async () => {
             await videoDataService.getVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
             expect(sharedInstances.mockDoc).toBeCalledWith(
@@ -84,28 +93,34 @@ describe('Video Data Service', () => {
         });
         it('Checks if the video exists', async () => {
             await videoDataService.getVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
             expect(sharedInstances.mockExists).toBeCalled();
         });
         it('Requests the correct channel ID', async () => {
             await videoDataService.getVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
             expect(channelDataService.getChannel).toBeCalledWith(
+                mockContext,
                 '716886dd-c107-4bd7-9060-a47b50f81689',
             );
         });
         it('Requests the correct content ID', async () => {
             await videoDataService.getVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
             expect(videoContentService.getVideo).toBeCalledWith(
+                mockContext,
                 'b5263a52-1c05-4ab7-813d-65b8866bacfd',
             );
         });
         it('Responds with the correct video', async () => {
             const res = await videoDataService.getVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
             expect(res).toMatchInlineSnapshot(`
@@ -138,6 +153,7 @@ describe('Video Data Service', () => {
 
         it('Fetches the videos future channel', async () => {
             await videoDataService.createVideo(
+                mockContext,
                 testTitle,
                 testDescription,
                 testAuthor,
@@ -145,11 +161,13 @@ describe('Video Data Service', () => {
             );
 
             expect(channelDataService.getChannel).toHaveBeenCalledWith(
+                mockContext,
                 testChannel,
             );
         });
         it('Generates a UUID for the video', async () => {
             await videoDataService.createVideo(
+                mockContext,
                 testTitle,
                 testDescription,
                 testAuthor,
@@ -160,6 +178,7 @@ describe('Video Data Service', () => {
         });
         it('References a correct path', async () => {
             await videoDataService.createVideo(
+                mockContext,
                 testTitle,
                 testDescription,
                 testAuthor,
@@ -172,6 +191,7 @@ describe('Video Data Service', () => {
         });
         it('Sets the correct video data', async () => {
             await videoDataService.createVideo(
+                mockContext,
                 testTitle,
                 testDescription,
                 testAuthor,
@@ -190,6 +210,7 @@ describe('Video Data Service', () => {
         });
         it('Returns the correct video', async () => {
             const res = await videoDataService.createVideo(
+                mockContext,
                 testTitle,
                 testDescription,
                 testAuthor,
@@ -222,12 +243,12 @@ describe('Video Data Service', () => {
             author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
         };
         it('Fails with empty query', async () => {
-            const promise = videoDataService.queryVideo({});
+            const promise = videoDataService.queryVideo(mockContext, {});
 
             expect(promise).rejects.toThrow();
         });
         it('Fails with invalid query dates', async () => {
-            const promise = videoDataService.queryVideo({
+            const promise = videoDataService.queryVideo(mockContext, {
                 before: 10,
                 after: 5,
             });
@@ -235,12 +256,12 @@ describe('Video Data Service', () => {
             expect(promise).rejects.toThrow();
         });
         it('References correct collection', async () => {
-            await videoDataService.queryVideo(sampleQuery);
+            await videoDataService.queryVideo(mockContext, sampleQuery);
 
             expect(sharedInstances.mockCollection).toBeCalledWith('videos');
         });
         it("Constructs the correct query for 'after'", async () => {
-            await videoDataService.queryVideo(sampleQuery);
+            await videoDataService.queryVideo(mockContext, sampleQuery);
 
             expect(sharedInstances.mockWhere).toHaveBeenCalledWith(
                 'uploadDate',
@@ -249,7 +270,7 @@ describe('Video Data Service', () => {
             );
         });
         it("Constructs the correct query for 'before'", async () => {
-            await videoDataService.queryVideo(sampleQuery);
+            await videoDataService.queryVideo(mockContext, sampleQuery);
 
             expect(sharedInstances.mockWhere).toHaveBeenCalledWith(
                 'uploadDate',
@@ -258,7 +279,7 @@ describe('Video Data Service', () => {
             );
         });
         it("Constructs the correct query for 'channel'", async () => {
-            await videoDataService.queryVideo(sampleQuery);
+            await videoDataService.queryVideo(mockContext, sampleQuery);
 
             expect(sharedInstances.mockWhere).toHaveBeenCalledWith(
                 'channel',
@@ -267,7 +288,7 @@ describe('Video Data Service', () => {
             );
         });
         it("Constructs the correct query for 'author'", async () => {
-            await videoDataService.queryVideo(sampleQuery);
+            await videoDataService.queryVideo(mockContext, sampleQuery);
 
             expect(sharedInstances.mockWhere).toHaveBeenCalledWith(
                 'author',
@@ -276,12 +297,15 @@ describe('Video Data Service', () => {
             );
         });
         it('Properly maps query responses', async () => {
-            await videoDataService.queryVideo(sampleQuery);
+            await videoDataService.queryVideo(mockContext, sampleQuery);
 
             expect(sharedInstances.mockMap).toHaveBeenCalled();
         });
         it('Returns the correct data', async () => {
-            const res = await videoDataService.queryVideo(sampleQuery);
+            const res = await videoDataService.queryVideo(
+                mockContext,
+                sampleQuery,
+            );
 
             expect(res).toBeArray(); // Probably should test return value
         });
@@ -319,6 +343,7 @@ describe('Video Data Service', () => {
         const testBlankUpdate: IVideoUpdate = {};
         it('Checks to see if the video exists first', async () => {
             await videoDataService.updateVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
                 testFullUpdate,
             );
@@ -326,6 +351,7 @@ describe('Video Data Service', () => {
         });
         it('Updates the video record', async () => {
             await videoDataService.updateVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
                 testFullUpdate,
             );
@@ -333,6 +359,7 @@ describe('Video Data Service', () => {
         });
         it('Updates the correct video record', async () => {
             await videoDataService.updateVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
                 testFullUpdate,
             );
@@ -340,6 +367,7 @@ describe('Video Data Service', () => {
         });
         it('Only updates title if given only a title', async () => {
             await videoDataService.updateVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
                 testTitleUpdate,
             );
@@ -347,6 +375,7 @@ describe('Video Data Service', () => {
         });
         it('Only updates description if given only a description', async () => {
             await videoDataService.updateVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
                 testDescriptionUpdate,
             );
@@ -356,6 +385,7 @@ describe('Video Data Service', () => {
         });
         it('Silently performs no update if given no changes', async () => {
             await videoDataService.updateVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
                 testBlankUpdate,
             );
@@ -363,6 +393,7 @@ describe('Video Data Service', () => {
         });
         it('Requests a new video record after updating', async () => {
             await videoDataService.updateVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
                 testFullUpdate,
             );
@@ -370,6 +401,7 @@ describe('Video Data Service', () => {
         });
         it('Requests the correct new video record', async () => {
             await videoDataService.updateVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
                 testFullUpdate,
             );
@@ -379,6 +411,7 @@ describe('Video Data Service', () => {
         });
         it('Updates the search index', async () => {
             await videoDataService.updateVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
                 testFullUpdate,
             );
@@ -390,10 +423,12 @@ describe('Video Data Service', () => {
                 return updatedVideoSchema; // Updated test video schema.  Updated with test update data
             });
             await videoDataService.updateVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
                 testFullUpdate,
             );
             expect(searchService.updateVideo).toBeCalledWith(
+                mockContext,
                 expectedUpdatedVideo,
             );
         });
@@ -403,6 +438,7 @@ describe('Video Data Service', () => {
                 return updatedVideoSchema; // Updated test video schema.  Updated with test update data
             });
             const res = await videoDataService.updateVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
                 testFullUpdate,
             );
@@ -413,6 +449,7 @@ describe('Video Data Service', () => {
     describe('deleteVideo', () => {
         it('Checks to see if the video exists first', async () => {
             await videoDataService.deleteVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
 
@@ -425,6 +462,7 @@ describe('Video Data Service', () => {
 
         it('Deletes everything in the right order', async () => {
             await videoDataService.deleteVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
 
@@ -438,6 +476,7 @@ describe('Video Data Service', () => {
 
         it('Deletes the search index', async () => {
             await videoDataService.deleteVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
             expect(searchService.removeVideo).toHaveBeenCalled();
@@ -445,15 +484,18 @@ describe('Video Data Service', () => {
 
         it('Deletes the correct search index', async () => {
             await videoDataService.deleteVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
             expect(searchService.removeVideo).toHaveBeenCalledWith(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
         });
 
         it('Deletes the video content', async () => {
             await videoDataService.deleteVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
             expect(videoContentService.deleteVideo).toHaveBeenCalled();
@@ -461,9 +503,11 @@ describe('Video Data Service', () => {
 
         it('Deletes the correct video content', async () => {
             await videoDataService.deleteVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
             expect(videoContentService.deleteVideo).toHaveBeenCalledWith(
+                mockContext,
                 'b5263a52-1c05-4ab7-813d-65b8866bacfd',
             );
         });
@@ -490,6 +534,7 @@ describe('Video Data Service', () => {
                 return retVal;
             });
             await videoDataService.deleteVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
             expect(videoContentService.deleteVideo).not.toHaveBeenCalled();
@@ -497,6 +542,7 @@ describe('Video Data Service', () => {
 
         it('Deletes the video record', async () => {
             await videoDataService.deleteVideo(
+                mockContext,
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
             expect(sharedInstances.mockDelete).toHaveBeenCalled();
