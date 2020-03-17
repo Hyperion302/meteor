@@ -98,12 +98,11 @@ export async function queryChannel(
 export async function createChannel(
     context: IServiceInvocationContext,
     name: string,
-    owner: string,
 ): Promise<IChannel> {
     // Build channel object
     const channelData: IChannel = {
         id: uuid(),
-        owner,
+        owner: context.auth.userID,
         name,
     };
 

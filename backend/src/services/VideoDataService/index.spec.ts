@@ -148,7 +148,6 @@ describe('Video Data Service', () => {
     describe('createVideo', () => {
         const testTitle = 'Cool vid';
         const testDescription = 'Cool video description';
-        const testAuthor = 'FDJIVPG1xgXfXmm67ETETSn9MSe2';
         const testChannel = '716886dd-c107-4bd7-9060-a47b50f81689';
 
         it('Fetches the videos future channel', async () => {
@@ -156,7 +155,6 @@ describe('Video Data Service', () => {
                 mockContext,
                 testTitle,
                 testDescription,
-                testAuthor,
                 testChannel,
             );
 
@@ -170,7 +168,6 @@ describe('Video Data Service', () => {
                 mockContext,
                 testTitle,
                 testDescription,
-                testAuthor,
                 testChannel,
             );
 
@@ -181,7 +178,6 @@ describe('Video Data Service', () => {
                 mockContext,
                 testTitle,
                 testDescription,
-                testAuthor,
                 testChannel,
             );
 
@@ -194,13 +190,12 @@ describe('Video Data Service', () => {
                 mockContext,
                 testTitle,
                 testDescription,
-                testAuthor,
                 testChannel,
             );
 
             expect(sharedInstances.mockSet).toHaveBeenCalledWith({
                 id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-                author: testAuthor,
+                author: mockContext.auth.userID,
                 channel: testChannel,
                 title: testTitle,
                 description: testDescription,
@@ -213,7 +208,6 @@ describe('Video Data Service', () => {
                 mockContext,
                 testTitle,
                 testDescription,
-                testAuthor,
                 testChannel,
             );
 

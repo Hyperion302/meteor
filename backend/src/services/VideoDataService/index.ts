@@ -155,7 +155,6 @@ export async function createVideo(
     context: IServiceInvocationContext,
     title: string,
     description: string,
-    author: string,
     channel: tID,
 ): Promise<IVideo> {
     // Fetch channel that was referenced
@@ -174,7 +173,7 @@ export async function createVideo(
 
     const videoData: IVideo = {
         id: uuid(),
-        author,
+        author: context.auth.userID,
         channel: channelData,
         title,
         description,

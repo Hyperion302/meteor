@@ -109,42 +109,29 @@ describe('Channel Data Sevice', () => {
 
     describe('createChannel', () => {
         const testName = 'New channel';
-        const testOwner = 'FDJIVPG1xgXfXmm67ETETSn9MSe2';
 
         it('Adds the channel to the search index', async () => {
-            await ChannelDataService.createChannel(
-                mockContext,
-                testName,
-                testOwner,
-            );
+            await ChannelDataService.createChannel(mockContext, testName);
 
             expect(searchService.addChannel).toHaveBeenCalledWith(mockContext, {
                 id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-                owner: testOwner,
+                owner: mockContext.auth.userID,
                 name: testName,
             });
         });
         it('References the correct new document', async () => {
-            await ChannelDataService.createChannel(
-                mockContext,
-                testName,
-                testOwner,
-            );
+            await ChannelDataService.createChannel(mockContext, testName);
 
             expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
                 'channels/3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
         });
         it('Sets the correct data', async () => {
-            await ChannelDataService.createChannel(
-                mockContext,
-                testName,
-                testOwner,
-            );
+            await ChannelDataService.createChannel(mockContext, testName);
 
             expect(sharedInstances.mockSet).toHaveBeenCalledWith({
                 id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-                owner: testOwner,
+                owner: mockContext.auth.userID,
                 name: testName,
             });
         });
@@ -152,7 +139,6 @@ describe('Channel Data Sevice', () => {
             const res = await ChannelDataService.createChannel(
                 mockContext,
                 testName,
-                testOwner,
             );
 
             expect(res).toMatchInlineSnapshot(`
