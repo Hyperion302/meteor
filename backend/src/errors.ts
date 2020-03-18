@@ -18,12 +18,6 @@ export class GenericError extends Error {
         super(`[${service}] ${message}`);
         Error.captureStackTrace(this, this.constructor);
     }
-
-    toAPIError(): any {
-        return {
-            message: this.message,
-        };
-    }
 }
 
 export class AuthorizationError extends GenericError {
