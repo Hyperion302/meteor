@@ -1,6 +1,6 @@
 cache:
     paths:
-        - node_modules/
+        - backend/node_modules/
 
 install_node_deps:
     image: node:latest
