@@ -159,12 +159,6 @@ describe('Video Content Service', () => {
                 .then(() => {
                     moxios.wait(() => {
                         let request = moxios.requests.mostRecent();
-                        expect(
-                            request.config.auth.password,
-                        ).not.toBeUndefined();
-                        expect(
-                            request.config.auth.username,
-                        ).not.toBeUndefined();
                         expect(request.config.method).toEqual('post');
                         expect(request.config.data).toMatchInlineSnapshot(
                             `"{\\"input\\":\\"https://storage.googleapis.com/meteor-videos/masters/FDJIVPG1xgXfXmm67ETETSn9MSe2/3d1afd2a-04a2-47f9-9c65-e34b6465b83a\\",\\"playback_policy\\":[\\"public\\"],\\"passthrough\\":\\"3d1afd2a-04a2-47f9-9c65-e34b6465b83a\\"}"`,
