@@ -6,10 +6,10 @@ install_node_deps:
     image: node:latest
     stage: build
     script:
-        - npm install
+        - cd backend && npm install
 
 test_backend:
     image: node:latest
     stage: test
     script:
-        - npm run test:coverage
+        - cd backend && npm run test:coverage
