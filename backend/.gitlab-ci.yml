@@ -3,11 +3,13 @@ cache:
         - node_modules/
 
 install_node_deps:
+    image: node:latest
     stage: build
     script:
         - npm install
 
 test_backend:
+    image: node:latest
     stage: test
     script:
         - npm run test:coverage
