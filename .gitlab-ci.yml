@@ -16,7 +16,7 @@ setup_backend:
     stage: setup
     script:
         # Configure NPM to cache node modules
-        - npm ci --cache ${CI_PROJECT_DIR}/.npm/ --prefer-offline
+        - cd backend && npm ci --cache ${CI_PROJECT_DIR}/.npm/ --prefer-offline
 
 build_backend:
     image: node:latest
