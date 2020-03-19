@@ -12,12 +12,14 @@ cache:
         - .npm/
 
 setup_backend:
+    image: node:latest
     stage: setup
     script:
         # Configure NPM to cache node modules
         - npm ci --cache ${CI_PROJECT_DIR}/.npm/ --prefer-offline
 
 build_backend:
+    image: node:latest
     stage: build
     script:
         - cd backend && npm run build
@@ -26,6 +28,7 @@ build_backend:
             - ${CI_PROJECT_DIR}/backend/dist/
 
 test_backend:
+    image: node:latest
     stage: test
     script:
         - cd backend && npm run test:coverage
