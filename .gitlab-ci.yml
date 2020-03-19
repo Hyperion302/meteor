@@ -1,6 +1,31 @@
 stages:
+    - setup
     - build
     - test
+    # - release
+    # - deploy
 
-include:
-    - '/backend/.gitlab-ci.yml'
+cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+        # Cache node_modules
+        - .npm/
+
+setup_backend:
+    stage: setup
+    script:
+        # Configure NPM to cache node modules
+        - npm ci --cache ${CI_PROJECT_DIR}/.npm/ --prefer-offline
+
+build_backend:
+    stage: build
+    script:
+        - cd backend && npm run build
+    artifacts:
+        paths:
+            - ${CI_PROJECT_DIR}/backend/dist/
+
+test_backend:
+    stage: test
+    script:
+        - cd backend && npm run test:coverage
