@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: swish
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: swish
+    template:
+        metadata:
+            labels:
+                app: swish
+        spec:
+            containers:
+                - name: app
+                  image: <REPLACEME>
+                  ports:
+                      - containerPort: 8080
+                  imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: swish
+spec:
+    selector:
+        app: swish
+    ports:
+        - port: 80
+          targetPort: 8080
+    type: LoadBalancer
