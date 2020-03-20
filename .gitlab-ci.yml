@@ -47,7 +47,6 @@ release_backend:
         - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
     script:
         - cd backend
-        - docker pull ${CONTAINER_IMAGE_LATEST}
         - docker build -t ${CONTAINER_IMAGE} --cache-from ${CONTAINER_IMAGE_LATEST} .
         - docker tag ${CONTAINER_IMAGE} ${CONTAINER_IMAGE_LATEST}
         - docker push ${CONTAINER_IMAGE}
