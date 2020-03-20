@@ -38,9 +38,12 @@ test_backend:
         - cd backend && npm run test:coverage
 
 release_backend:
-    image: docker:19
+    image: docker:19.03.1
     stage: release
+    services:
+        - docker:19.03.1-dind
     before_script:
+        - docker info
         - echo -n $CI_JOB_TOKEN | docker login -u gitlab-ci-token --password-stdin $CI_REGISTRY
     script:
         - cd backend
