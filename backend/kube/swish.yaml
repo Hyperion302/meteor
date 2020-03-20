@@ -20,7 +20,7 @@ spec:
                 - name: deploy-token
             containers:
                 - name: app
-                  image: registry.gitlab.com/j_t_s/swish:master_10b80f90d3fe567180693394fb5dd0d609bdc404
+                  image: registry.gitlab.com/j_t_s/swish:latest
                   ports:
                       - containerPort: 8080
                   imagePullPolicy: Always
