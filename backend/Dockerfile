@@ -6,4 +6,4 @@ WORKDIR /app
 
 COPY dist/ ./
 
-CMD [ "node", "main.js" ]
+CMD [ "node", "src/main.js" ]
