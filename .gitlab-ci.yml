@@ -9,14 +9,14 @@ cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
         # Cache node_modules
-        - .npm/
+        - backend/node_modules
 
 setup_backend:
     image: node:latest
     stage: setup
     script:
         # Configure NPM to cache node modules
-        - cd backend && npm ci --cache ${CI_PROJECT_DIR}/.npm/ --prefer-offline
+        - cd backend && npm install --prefer-offline
 
 build_backend:
     image: node:latest
