@@ -12,12 +12,49 @@ spec:
             labels:
                 app: swish
         spec:
+            volumes:
+                - name: gcs-key
+                  secret:
+                      secretName: gcs-key
+            imagePullSecrets:
+                - name: deploy-token
             containers:
                 - name: app
-                  image: <REPLACEME>
+                  image: registry.gitlab.com/j_t_s/swish:master_10b80f90d3fe567180693394fb5dd0d609bdc404
                   ports:
                       - containerPort: 8080
                   imagePullPolicy: Always
+                  volumeMounts:
+                      - name: gcs-key
+                        mountPath: /var/secrets/google
+                  env:
+                      - name: GOOGLE_APPLICATION_CREDENTIALS
+                        value: /var/secrets/google/key.json
+                      - name: MUXID
+                        valueFrom:
+                            secretKeyRef:
+                                name: external-service-secrets
+                                key: muxid
+                      - name: MUXSECRET
+                        valueFrom:
+                            secretKeyRef:
+                                name: external-service-secrets
+                                key: muxsecret
+                      - name: MUXWEBHOOKSECRET
+                        valueFrom:
+                            secretKeyRef:
+                                name: external-service-secrets
+                                key: muxwebhooksecret
+                      - name: ALGOLIAID
+                        valueFrom:
+                            secretKeyRef:
+                                name: external-service-secrets
+                                key: algoliaid
+                      - name: ALGOLIASECRET
+                        valueFrom:
+                            secretKeyRef:
+                                name: external-service-secrets
+                                key: algoliasecret
 ---
 apiVersion: v1
 kind: Service
