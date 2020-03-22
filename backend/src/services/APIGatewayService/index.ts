@@ -17,6 +17,15 @@ import authMiddleware from './auth';
 
 const app = express();
 
+// Health Check-able /
+app.get('/', (req, res) => {
+    res.sendStatus(200);
+});
+// Custom /healthz
+app.get('/healthz', (req, res) => {
+    res.sendStatus(200);
+});
+
 // #region Middleware
 // Auth
 app.use('/video*', authMiddleware);
