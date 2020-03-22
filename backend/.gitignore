@@ -4,3 +4,5 @@ credentials.json
 /dist
 /docs
 coverage/
+secrets.yaml
+_secrets.yaml

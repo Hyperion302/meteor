@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ include "swish-chart.fullname" . }}
+  labels:
+    {{- include "swish-chart.labels" . | nindent 4 }}
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: {{ .Values.ingress.staticIPName }}
+
+spec:
+  rules:
+    {{ range $hostName, $hostVal := .Values.ingress.hosts -}}
+    {{ if $hostVal.useHostname -}}
+    - host: {{ $hostVal.host }}
+      http:
+    {{- else -}}
+    - http:
+    {{- end }}
+        paths:
+        {{- range $pathName, $pathVal := $hostVal.paths }}
+          - path: {{ $pathVal.path }}
+            backend:
+                servicePort: {{ $pathVal.port }}
+                serviceName: {{ include "swish-chart.fullname" $ }}
+        {{ end }}
+    {{ end }}

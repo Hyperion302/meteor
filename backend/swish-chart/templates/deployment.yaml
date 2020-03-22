@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: {{ include "swish-chart.fullname" . }}
+    labels:
+        {{- include "swish-chart.labels" . | nindent 8 }}
+spec:
+    replicas: {{ .Values.replicaCount }}
+    selector:
+      matchLabels:
+            {{- include "swish-chart.selectorLabels" . | nindent 12 }}
+    template:
+        metadata:
+            labels:
+                {{- include "swish-chart.selectorLabels" . | nindent 20 }}
+        spec:
+              serviceAccountName: {{ tpl "service-account-{{ include \"swish-chart.fullname\" . }}" . | trunc 63}}
+              volumes:
+                - name: gcs-key
+                  secret:
+                    secretName: {{ .Values.secrets.gcsSecret.name }}
+              containers:
+                  - name: {{ .Chart.Name }}
+                    image: "{{ .Values.image.repository }}/{{ .Values.image.image }}:{{ .Values.image.tag }}"
+                    imagePullPolicy: {{ .Values.image.pullPolicy }}
+                    livenessProbe:
+                        httpGet:
+                            path: /healthz
+                            port: 8080
+                        initialDelaySeconds: 5
+                        periodSeconds: 5
+                    readinessProbe:
+                        httpGet:
+                            path: /healthz
+                            port: 8080
+                        initialDelaySeconds: 5
+                        periodSeconds: 5
+                    #ports:
+                    #  - name: http
+                    #    containerPort: 8080
+                    #    protocol: TCP
+                    resources:
+                      {{- toYaml .Values.resources | nindent 22 }}
+                    envFrom:
+                      - secretRef:
+                            name: {{ .Values.secrets.externalServiceSecret }}
+                    volumeMounts:
+                      - name: gcs-key
+                        mountPath: /var/secrets/google
+                    env:
+                      - name: GOOGLE_APPLICATION_CREDENTIALS
+                        value: /var/secrets/google/key.json
