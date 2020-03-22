@@ -55,7 +55,7 @@ release_backend:
         - docker push ${CONTAINER_IMAGE_LATEST}
 
 deploy_staging_backend:
-    image: alpine/helm
+    image: devth/helm
     stage: deploy
     script:
         - helm init --upgrade --wait
