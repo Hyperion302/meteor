@@ -58,7 +58,7 @@ deploy_staging_backend:
     image: devth/helm
     stage: deploy
     script:
-        - helm init --wait
+        - helm init
         - helm upgrade
           --install
           --set tag=${CONTAINER_IMAGE_TAG}
