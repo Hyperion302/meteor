@@ -10,7 +10,11 @@ import {
     IChannelQuery,
     IChannelUpdate,
 } from '../ChannelDataService/definitions';
-import { GenericError, InvalidFieldError } from '../../errors';
+import {
+    GenericError,
+    InvalidFieldError,
+    AuthorizationError,
+} from '../../errors';
 import { createHmac } from 'crypto';
 import { isArray } from 'util';
 import authMiddleware from './auth';
@@ -46,7 +50,7 @@ app.use(['/video*', '/channel*'], (req, res, next) => {
 // #endregion Middleware
 
 // #region External
-app.post('/muxWebhook', async (req, res) => {
+app.post('/muxWebhook', async (req, res, next) => {
     // Check security
     if (!req.headers['Mux-Signature']) {
         res.status(500).send('Invalid Header');
@@ -60,15 +64,21 @@ app.post('/muxWebhook', async (req, res) => {
     const signatureTimestamp = muxSignature.split(',')[0].split('=')[1]; // Pulls the number after t=
     const signature = muxSignature.split(',')[1].split('=')[1]; // Pulls the hash after the v1=
     const payload = `${signatureTimestamp}.${req.body}`;
+    console.log(`Payload: ${payload}`);
     const hmac = createHmac('sha256', process.env.MUXWEBHOOKSECRET);
     hmac.update(payload);
     const digest = hmac.digest('hex');
     if (digest !== signature) {
-        res.status(500).send('Invalid Signature');
+        console.log(`Digest: ${digest}`);
+        console.log(`Signature: ${signature}`);
+        next(new AuthorizationError('Gateway', 'send webhook event'));
+        // res.status(500).send('Invalid Signature');
     }
     // TODO: Check timestamp for tolerance
 
-    // TODO: Develop after having a deployed version (so I can properly test URLs)
+    // Forward request to VideoContentService
+    console.log(`Body: ${req.body}`);
+    res.sendStatus(200);
 });
 // #endregion External
 
