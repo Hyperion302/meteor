@@ -62,8 +62,10 @@ app.post('/muxWebhook', async (req, res, next) => {
     } else {
         muxSignature = req.headers['Mux-Signature'];
     }
-    const signatureTimestamp = muxSignature.split(',')[0].split('=')[1]; // Pulls the number after t=
-    const signature = muxSignature.split(',')[1].split('=')[1]; // Pulls the hash after the v1=
+    const splitSignature = muxSignature.split(',');
+    console.log(`Split: ${splitSignature}`);
+    const signatureTimestamp = splitSignature[0].split('=')[1]; // Pulls the number after t=
+    const signature = splitSignature[1].split('=')[1]; // Pulls the hash after the v1=
     const payload = `${signatureTimestamp}.${req.body}`;
     console.log(`Payload: ${payload}`);
     const hmac = createHmac('sha256', process.env.MUXWEBHOOKSECRET);
