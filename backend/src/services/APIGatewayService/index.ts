@@ -52,6 +52,7 @@ app.use(['/video*', '/channel*'], (req, res, next) => {
 // #region External
 app.post('/muxWebhook', async (req, res, next) => {
     // Check security
+    console.log(`Headers: ${req.headers}`);
     if (!req.headers['Mux-Signature']) {
         res.status(500).send('Invalid Header');
     }
