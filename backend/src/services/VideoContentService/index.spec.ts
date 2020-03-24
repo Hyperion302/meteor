@@ -5,11 +5,13 @@ import { IServiceInvocationContext } from '../../definitions';
 import moxios from 'moxios';
 import { IVideo } from '../VideoDataService/definitions';
 
+const uuid = require('uuid/v4');
 const sharedInstances = require('../../sharedInstances');
 const VideoDataService = require('../VideoDataService');
 
 jest.mock('../../sharedInstances');
 jest.mock('../VideoDataService');
+jest.mock('uuid/v4');
 
 const mockContext: IServiceInvocationContext = {
     auth: {
@@ -44,6 +46,11 @@ function mockImplementations() {
 
     // Mock video
     VideoDataService.getVideo.mockImplementation(() => testVideo);
+
+    // Mock UUID
+    uuid.mockImplementation(() => {
+        return '3d1afd2a-04a2-47f9-9c65-e34b6465b83a';
+    });
 }
 
 beforeAll(() => {
@@ -161,7 +168,7 @@ describe('Video Content Service', () => {
                         const request = moxios.requests.mostRecent();
                         expect(request.config.method).toEqual('post');
                         expect(request.config.data).toMatchInlineSnapshot(
-                            `"{\\"input\\":\\"https://storage.googleapis.com/meteor-videos/masters/FDJIVPG1xgXfXmm67ETETSn9MSe2/3d1afd2a-04a2-47f9-9c65-e34b6465b83a\\",\\"playback_policy\\":[\\"public\\"],\\"passthrough\\":\\"3d1afd2a-04a2-47f9-9c65-e34b6465b83a\\"}"`,
+                            `"{\\"input\\":\\"https://storage.googleapis.com/meteor-videos/masters/FDJIVPG1xgXfXmm67ETETSn9MSe2/3d1afd2a-04a2-47f9-9c65-e34b6465b83a\\",\\"playback_policy\\":[\\"public\\"],\\"passthrough\\":\\"3d1afd2a-04a2-47f9-9c65-e34b6465b83a:3d1afd2a-04a2-47f9-9c65-e34b6465b83a\\"}"`,
                         );
                         done();
                     });
@@ -206,11 +213,6 @@ describe('Video Content Service', () => {
                         done();
                     });
                 });
-        });
-        it('Deletes the content record', async () => {
-            await videoContentService.deleteVideo(mockContext, testContent.id);
-
-            expect(sharedInstances.mockDelete).toHaveBeenCalled();
         });
     });
 });

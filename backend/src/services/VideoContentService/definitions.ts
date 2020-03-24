@@ -8,3 +8,26 @@ export interface IVideoContent {
     assetID: string;
     playbackID: string;
 }
+
+export interface IMuxAssetReadyEvent {
+    type: 'ready';
+    videoID: tID; // Passthrough value
+    contentID: tID; // Passthrough value
+    assetID: string;
+    playbackID: string;
+    environment: {
+        name: string;
+        id: string;
+    };
+}
+
+export interface IMuxAssetDeletedEvent {
+    type: 'deleted';
+    videoID: tID; // Passthrough value
+    contentID: tID; // Passthrough value
+    assetID: string;
+    environment: {
+        name: string;
+        id: string;
+    };
+}

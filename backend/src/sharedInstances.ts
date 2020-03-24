@@ -1,6 +1,8 @@
 import { Firestore } from '@google-cloud/firestore';
 import { Storage, StorageOptions } from '@google-cloud/storage';
+import { PubSub } from '@google-cloud/pubsub';
 import algoliasearch from 'algoliasearch';
+import { ClientConfig } from '@google-cloud/pubsub/build/src/pubsub';
 
 const production: boolean = process.env.NODE_ENV === 'prod';
 
@@ -41,3 +43,20 @@ export const algoliaIndexInstance = algoliaClientInstance.initIndex(
     'dev_videos',
 );
 // #endregion Algolia
+
+// #region PubSub
+let pubsubOptions: ClientConfig;
+if (production) {
+    pubsubOptions = {};
+} else {
+    pubsubOptions = {
+        keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+    };
+}
+export const pubsubSubscriptionID =
+    process.env.MUXEVENTSUBSCRIPTIONID || 'swish-api';
+export const pubsubClient = new PubSub(pubsubOptions);
+export const pubsubSubscription = pubsubClient.subscription(
+    pubsubSubscriptionID,
+);
+// #endregion PubSub

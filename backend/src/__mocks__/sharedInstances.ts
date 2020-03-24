@@ -121,3 +121,12 @@ export class MockedAlgolia {
 
 export const algoliaClientInstance = {};
 export const algoliaIndexInstance = new MockedAlgolia();
+
+// Mock PubSub
+export class MockPubSubSubscription {
+    on() {}
+}
+export const pubsubSubscriptionID =
+    process.env.MUXEVENTSUBSCRIPTIONID || 'swish-api';
+export const pubsubClient = {};
+export const pubsubSubscription = new MockPubSubSubscription();
