@@ -30,8 +30,8 @@ swish:
     prod: prod_swish
   mux:
     subscription:
-        dev: dev-mux-api
-        prod: prod-mux-api
+        dev: dev-swish-api
+        prod: prod-swish-api
   dbPrefix:
     dev: dev
     prod: prod
