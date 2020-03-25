@@ -88,9 +88,9 @@ describe('Video Data Service', () => {
                 '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
             );
             expect(sharedInstances.mockDoc).toBeCalledWith(
-                `videos/${
+                `${
                     sharedInstances.mockConfig().dbPrefix
-                }3d1afd2a-04a2-47f9-9c65-e34b6465b83a`,
+                }videos/3d1afd2a-04a2-47f9-9c65-e34b6465b83a`,
             );
         });
         it('Checks if the video exists', async () => {
@@ -184,9 +184,9 @@ describe('Video Data Service', () => {
             );
 
             expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
-                `videos/${
+                `${
                     sharedInstances.mockConfig().dbPrefix
-                }3d1afd2a-04a2-47f9-9c65-e34b6465b83a`,
+                }videos/3d1afd2a-04a2-47f9-9c65-e34b6465b83a`,
             );
         });
         it('Sets the correct video data', async () => {
@@ -256,7 +256,9 @@ describe('Video Data Service', () => {
         it('References correct collection', async () => {
             await videoDataService.queryVideo(mockContext, sampleQuery);
 
-            expect(sharedInstances.mockCollection).toBeCalledWith('videos');
+            expect(sharedInstances.mockCollection).toBeCalledWith(
+                `${sharedInstances.mockConfig().dbPrefix}videos`,
+            );
         });
         it("Constructs the correct query for 'after'", async () => {
             await videoDataService.queryVideo(mockContext, sampleQuery);
@@ -404,9 +406,9 @@ describe('Video Data Service', () => {
                 testFullUpdate,
             );
             expect(sharedInstances.mockDoc).toHaveBeenLastCalledWith(
-                `videos/${
+                `${
                     sharedInstances.mockConfig().dbPrefix
-                }3d1afd2a-04a2-47f9-9c65-e34b6465b83a`,
+                }videos/3d1afd2a-04a2-47f9-9c65-e34b6465b83a`,
             );
         });
         it('Updates the search index', async () => {
@@ -460,9 +462,9 @@ describe('Video Data Service', () => {
             );
 
             expect(sharedInstances.mockDoc).toBeCalledWith(
-                `videos/${
+                `${
                     sharedInstances.mockConfig().dbPrefix
-                }3d1afd2a-04a2-47f9-9c65-e34b6465b83a`,
+                }videos/3d1afd2a-04a2-47f9-9c65-e34b6465b83a`,
             );
 
             expect(sharedInstances.mockExists).toBeCalled();

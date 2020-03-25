@@ -26,7 +26,7 @@ async function getSingleVideoRecord(
 ): Promise<IVideo> {
     // Get basic video data
     const videoDoc = firestoreInstance.doc(
-        `videos/${toNamespaced(id, appConfig.dbPrefix)}`,
+        toNamespaced(`videos/${id}`, appConfig.dbPrefix),
     );
     const videoDocSnap = await videoDoc.get();
     if (!videoDocSnap.exists) {
@@ -75,7 +75,9 @@ export async function queryVideo(
         throw new InvalidQueryError('VideoData', query);
     }
     // Build FS query
-    const collection = firestoreInstance.collection('videos');
+    const collection = firestoreInstance.collection(
+        toNamespaced('videos', appConfig.dbPrefix),
+    );
     let fsQuery;
     if (query.after) {
         fsQuery = (fsQuery ? fsQuery : collection).where(
@@ -116,10 +118,7 @@ export async function queryVideo(
     const querySnap = await fsQuery.get();
     const queryPromises = querySnap.docs.map((doc) => {
         // doc.id is in namespaced form
-        return getSingleVideoRecord(
-            context,
-            toGlobal(doc.id, appConfig.dbPrefix),
-        );
+        return getSingleVideoRecord(context, doc.id);
     });
 
     // Wait for all to run
@@ -180,7 +179,7 @@ export async function createVideo(
 
     // Add to DB
     const videoDoc = firestoreInstance.doc(
-        `videos/${toNamespaced(videoData.id, appConfig.dbPrefix)}`,
+        toNamespaced(`videos/${videoData.id}`, appConfig.dbPrefix),
     );
     await videoDoc.set({
         id: videoData.id,
@@ -207,7 +206,7 @@ export async function updateVideo(
 ) {
     // Fetch video to make sure it exists
     const videoDoc = firestoreInstance.doc(
-        `videos/${toNamespaced(id, appConfig.dbPrefix)}`,
+        toNamespaced(`videos/${id}`, appConfig.dbPrefix),
     );
     const oldVideo = await getSingleVideoRecord(context, id);
 
@@ -239,7 +238,7 @@ export async function updateVideo(
 export async function deleteVideo(context: IServiceInvocationContext, id: tID) {
     // Fetch video to make sure it exists
     const videoDoc = firestoreInstance.doc(
-        `videos/${toNamespaced(id, appConfig.dbPrefix)}`,
+        toNamespaced(`videos/${id}`, appConfig.dbPrefix),
     );
     const videoData = await getSingleVideoRecord(context, id);
 

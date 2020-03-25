@@ -20,7 +20,7 @@ import { toGlobal, toNamespaced } from '../../utils';
 async function getSingleChannelRecord(id: tID): Promise<IChannel> {
     // Get basic channel data
     const channelDoc = firestoreInstance.doc(
-        `channels/${toNamespaced(id, appConfig.dbPrefix)}`,
+        toNamespaced(`channels/${id}`, appConfig.dbPrefix),
     );
     const channelDocSnap = await channelDoc.get();
     if (!channelDocSnap.exists) {
@@ -60,7 +60,9 @@ export async function queryChannel(
         // No query
         throw new InvalidQueryError('ChannelData', query);
     }
-    const collection = firestoreInstance.collection('channels');
+    const collection = firestoreInstance.collection(
+        toNamespaced('channels', appConfig.dbPrefix),
+    );
     let fsQuery;
     if (query.owner) {
         fsQuery = (fsQuery ? fsQuery : collection).where(
@@ -79,8 +81,7 @@ export async function queryChannel(
     // Query FS
     const querySnap = await fsQuery.get();
     const queryPromises = querySnap.docs.map((doc) => {
-        // This ID is namespaced
-        return getSingleChannelRecord(toGlobal(doc.id, appConfig.dbPrefix));
+        return getSingleChannelRecord(doc.id);
     });
 
     // Wait for all to run
@@ -110,7 +111,7 @@ export async function createChannel(
 
     // Write to DB
     const channelDoc = firestoreInstance.doc(
-        `channels/${toNamespaced(channelData.id, appConfig.dbPrefix)}`,
+        toNamespaced(`channels/${channelData.id}`, appConfig.dbPrefix),
     );
     await channelDoc.set(channelData);
     return channelData;
@@ -129,7 +130,7 @@ export async function updateChannel(
 ): Promise<IChannel> {
     // Fetch channel to make sure it exists
     const channelDoc = firestoreInstance.doc(
-        `channels/${toNamespaced(id, appConfig.dbPrefix)}`,
+        toNamespaced(`channels/${id}`, appConfig.dbPrefix),
     );
     const oldChannel = await getSingleChannelRecord(id);
 
@@ -160,7 +161,7 @@ export async function deleteChannel(
 ): Promise<void> {
     // Fetch channel to make sure it exists
     const channelDoc = firestoreInstance.doc(
-        `channels/${toNamespaced(id, appConfig.dbPrefix)}`,
+        `${appConfig.dbPrefix}channels/${id}`,
     );
     const channelData = await getSingleChannelRecord(id);
 

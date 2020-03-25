@@ -47,7 +47,7 @@ describe('Channel Data Sevice', () => {
         it('Requests the correct channel ID', async () => {
             await ChannelDataService.getChannel(mockContext, testChannel.id);
             expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
-                `channels/${sharedInstances.mockConfig().dbPrefix}${
+                `${sharedInstances.mockConfig().dbPrefix}channels/${
                     testChannel.id
                 }`,
             );
@@ -83,7 +83,9 @@ describe('Channel Data Sevice', () => {
         it('References correct collection', async () => {
             await ChannelDataService.queryChannel(mockContext, sampleQuery);
 
-            expect(sharedInstances.mockCollection).toBeCalledWith('channels');
+            expect(sharedInstances.mockCollection).toBeCalledWith(
+                `${sharedInstances.mockConfig().dbPrefix}channels`,
+            );
         });
         it("Constructs the correct query for 'owner'", async () => {
             await ChannelDataService.queryChannel(mockContext, sampleQuery);
@@ -125,9 +127,9 @@ describe('Channel Data Sevice', () => {
             await ChannelDataService.createChannel(mockContext, testName);
 
             expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
-                `channels/${
+                `${
                     sharedInstances.mockConfig().dbPrefix
-                }3d1afd2a-04a2-47f9-9c65-e34b6465b83a`,
+                }channels/3d1afd2a-04a2-47f9-9c65-e34b6465b83a`,
             );
         });
         it('Sets the correct data', async () => {
@@ -187,7 +189,7 @@ describe('Channel Data Sevice', () => {
             );
 
             expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
-                `channels/${sharedInstances.mockConfig().dbPrefix}${
+                `${sharedInstances.mockConfig().dbPrefix}channels/${
                     testChannel.id
                 }`,
             );
@@ -220,7 +222,7 @@ describe('Channel Data Sevice', () => {
             );
 
             expect(sharedInstances.mockDoc).toHaveBeenLastCalledWith(
-                `channels/${sharedInstances.mockConfig().dbPrefix}${
+                `${sharedInstances.mockConfig().dbPrefix}channels/${
                     testChannel.id
                 }`,
             );
@@ -263,7 +265,7 @@ describe('Channel Data Sevice', () => {
             await ChannelDataService.deleteChannel(mockContext, testChannel.id);
 
             expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
-                `channels/${sharedInstances.mockConfig().dbPrefix}${
+                `${sharedInstances.mockConfig().dbPrefix}channels/${
                     testChannel.id
                 }`,
             );

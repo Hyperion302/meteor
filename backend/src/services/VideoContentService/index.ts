@@ -77,7 +77,7 @@ export async function handleMuxAssetReady(
 ): Promise<void> {
     // Get the current video doc and make sure it exists
     const videoDoc = firestoreInstance.doc(
-        `videos/${toNamespaced(muxEvent.videoID, appConfig.dbPrefix)}`,
+        toNamespaced(`videos/${muxEvent.videoID}`, appConfig.dbPrefix),
     );
     const videoDocSnap = await videoDoc.get();
     if (!videoDocSnap.exists) {
@@ -94,7 +94,7 @@ export async function handleMuxAssetReady(
         playbackID: muxEvent.playbackID,
     };
     const videoContentDoc = firestoreInstance.doc(
-        `content/${toNamespaced(videoContent.id, appConfig.dbPrefix)}`,
+        toNamespaced(`content/${muxEvent.contentID}`, appConfig.dbPrefix),
     );
     await videoContentDoc.set(videoContent);
     // Update the current video doc to reference the new content doc
@@ -112,7 +112,7 @@ export async function handleMuxAssetDeleted(
 ): Promise<void> {
     // Make sure the content doc exists
     const contentDoc = firestoreInstance.doc(
-        `content/${toNamespaced(muxEvent.contentID, appConfig.dbPrefix)}`,
+        toNamespaced(`content/${muxEvent.contentID}`, appConfig.dbPrefix),
     );
     const contentDocSnap = await contentDoc.get();
     if (!contentDocSnap.exists) {
@@ -136,7 +136,7 @@ export async function getVideo(
     id: tID,
 ): Promise<IVideoContent> {
     const contentDoc = firestoreInstance.doc(
-        `content/${toNamespaced(id, appConfig.dbPrefix)}`,
+        toNamespaced(`content/${id}`, appConfig.dbPrefix),
     );
     const contentDocSnap = await contentDoc.get();
     if (!contentDocSnap.exists) {

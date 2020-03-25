@@ -67,7 +67,7 @@ describe('Video Content Service', () => {
             await videoContentService.getVideo(mockContext, testContent.id);
 
             expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
-                `content/${sharedInstances.mockConfig().dbPrefix}${
+                `${sharedInstances.mockConfig().dbPrefix}content/${
                     testContent.id
                 }`,
             );
@@ -199,7 +199,7 @@ describe('Video Content Service', () => {
             await videoContentService.deleteVideo(mockContext, testContent.id);
 
             expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
-                `content/${sharedInstances.mockConfig().dbPrefix}${
+                `${sharedInstances.mockConfig().dbPrefix}content/${
                     testContent.id
                 }`,
             );

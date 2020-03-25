@@ -1,41 +1,41 @@
 import { tID } from './definitions';
 
-export function toNamespaced(id: tID, namespacePrefix: string): string {
+export function toNamespaced(path: string, namespacePrefix: string): string {
     // Detect an expected preexsting prefix
-    if (id.startsWith(namespacePrefix)) {
+    if (path.startsWith(namespacePrefix)) {
         console.warn(
-            `WARNING: Tried to namespace an already namespaced ID ${id}`,
+            `WARNING: Tried to namespace an already namespaced path ${path}`,
         );
-        return id;
+        return path;
     }
     // Detect an *unexpected* prefix.  We're operating on the wrong database
-    else if (id.startsWith('dev') || id.startsWith('prod')) {
+    else if (path.startsWith('dev') || path.startsWith('prod')) {
         console.warn(
-            `WARNING: Tried to namespace an ID already namespaced with an *out of scope* ID ${id}`,
+            `WARNING: Tried to namespace a path already namespaced with an *out of scope* prefix: ${path}`,
         );
-        return id;
+        return path;
     }
     // Attach the namespace prefix
-    return `${namespacePrefix}${id}`;
+    return `${namespacePrefix}${path}`;
 }
 
-export function toGlobal(id: string, namespacePrefix: string): tID {
+export function toGlobal(path: string, namespacePrefix: string): tID {
     // Detect a missing prefix
-    if (!id.startsWith(namespacePrefix)) {
+    if (!path.startsWith(namespacePrefix)) {
         console.warn(
-            `WARNING: Tried to remove namespace from ID without namespace ${id}`,
+            `WARNING: Tried to remove namespace from a path without a namespace ${path}`,
         );
-        return id;
+        return path;
     }
     // Detect an unexpected preexisting prefix
     if (
-        !id.startsWith(namespacePrefix) &&
-        (id.startsWith('dev') || id.startsWith('prod'))
+        !path.startsWith(namespacePrefix) &&
+        (path.startsWith('dev') || path.startsWith('prod'))
     ) {
         console.warn(
-            `WARNING: Detected an ID namespaced with an *out of scope* ID ${id}, prefix will not be removed`,
+            `WARNING: Detected a path namespaced with an *out of scope* prefix: ${path}, prefix will not be removed`,
         );
     }
     // Remove namespace
-    return id.replace(namespacePrefix, '');
+    return path.replace(namespacePrefix, '');
 }
