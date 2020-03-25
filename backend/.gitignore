@@ -6,3 +6,5 @@ credentials.json
 coverage/
 secrets.yaml
 _secrets.yaml
+*.pem
+*.key

@@ -8,6 +8,10 @@ metadata:
     kubernetes.io/ingress.global-static-ip-name: {{ .Values.ingress.staticIPName }}
 
 spec:
+  {{- if .Values.ingress.tls.enabled }}
+  tls:
+    - secretName: {{ .Values.ingress.tls.secret }}
+  {{- end }}
   rules:
     {{ range $hostName, $hostVal := .Values.ingress.hosts -}}
     {{ if $hostVal.useHostname -}}

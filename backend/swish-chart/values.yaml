@@ -55,7 +55,10 @@ ingress:
             rootPath:
                 path: /*
                 port: 8080
-  tls: []
+  tls:
+    enabled: true
+    secret: tls-secret
+
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local

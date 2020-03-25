@@ -12,7 +12,7 @@ The Swish backend is run locally by starting node (or ts-node-dev in dev mode) a
 
 ### Helm Chart
 
-When running the helm chart locally (on minikube for example), 3 secrets must be loaded. `external-service-secret` must be loaded with SaaS tokens and IDs. `image-pull-secret` must be loaded with an image pull credential for the Swish backend image. `gcs-secret` must be loaded with a JSON credentials file for an applicable GCS Service Account. The JSON file must be named `key.json`.
+When running the helm chart locally (on minikube for example), 3 secrets must be loaded. `external-service-secret` must be loaded with SaaS tokens and IDs. `image-pull-secret` must be loaded with an image pull credential for the Swish backend image. `gcs-secret` must be loaded with a JSON credentials file for an applicable GCS Service Account. The JSON file must be named `key.json`. `tls-secret` must be loaded with a valid tls key for the configured Ingress host.
 
 ## Running remotely
 
