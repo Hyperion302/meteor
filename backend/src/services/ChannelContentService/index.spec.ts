@@ -60,16 +60,16 @@ describe('Channel Content Service', () => {
 
             expect(sharedInstances.mockBucket).toHaveBeenNthCalledWith(
                 1,
-                'meteor-videos',
+                sharedInstances.mockConfig().bucket,
             );
             expect(sharedInstances.mockBucket).toHaveBeenNthCalledWith(
                 2,
-                'meteor-videos',
+                sharedInstances.mockConfig().bucket,
             );
 
             expect(sharedInstances.mockBucket).toHaveBeenNthCalledWith(
                 3,
-                'meteor-videos',
+                sharedInstances.mockConfig().bucket,
             );
 
             // References correct paths

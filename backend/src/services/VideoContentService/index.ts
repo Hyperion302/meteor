@@ -3,6 +3,7 @@ import {
     firestoreInstance,
     storageInstance,
     pubsubSubscription,
+    appConfig,
 } from '../../sharedInstances';
 import {
     IVideoContent,
@@ -14,6 +15,7 @@ import axios from 'axios';
 import { ResourceNotFoundError, AuthorizationError } from '../../errors';
 import { Message } from '@google-cloud/pubsub';
 import uuid from 'uuid/v4';
+import { toNamespaced } from '../../utils';
 
 // #region Pubsub handler registration
 pubsubSubscription.on('message', async (message: Message) => {
@@ -74,7 +76,9 @@ export async function handleMuxAssetReady(
     muxEvent: IMuxAssetReadyEvent,
 ): Promise<void> {
     // Get the current video doc and make sure it exists
-    const videoDoc = firestoreInstance.doc(`videos/${muxEvent.videoID}`);
+    const videoDoc = firestoreInstance.doc(
+        `videos/${toNamespaced(muxEvent.videoID, appConfig.dbPrefix)}`,
+    );
     const videoDocSnap = await videoDoc.get();
     if (!videoDocSnap.exists) {
         throw new ResourceNotFoundError(
@@ -89,7 +93,9 @@ export async function handleMuxAssetReady(
         assetID: muxEvent.assetID,
         playbackID: muxEvent.playbackID,
     };
-    const videoContentDoc = firestoreInstance.doc(`content/${videoContent.id}`);
+    const videoContentDoc = firestoreInstance.doc(
+        `content/${toNamespaced(videoContent.id, appConfig.dbPrefix)}`,
+    );
     await videoContentDoc.set(videoContent);
     // Update the current video doc to reference the new content doc
     await videoDoc.update({
@@ -105,7 +111,9 @@ export async function handleMuxAssetDeleted(
     muxEvent: IMuxAssetDeletedEvent,
 ): Promise<void> {
     // Make sure the content doc exists
-    const contentDoc = firestoreInstance.doc(`content/${muxEvent.contentID}`);
+    const contentDoc = firestoreInstance.doc(
+        `content/${toNamespaced(muxEvent.contentID, appConfig.dbPrefix)}`,
+    );
     const contentDocSnap = await contentDoc.get();
     if (!contentDocSnap.exists) {
         throw new ResourceNotFoundError(
@@ -127,7 +135,9 @@ export async function getVideo(
     context: IServiceInvocationContext,
     id: tID,
 ): Promise<IVideoContent> {
-    const contentDoc = firestoreInstance.doc(`content/${id}`);
+    const contentDoc = firestoreInstance.doc(
+        `content/${toNamespaced(id, appConfig.dbPrefix)}`,
+    );
     const contentDocSnap = await contentDoc.get();
     if (!contentDocSnap.exists) {
         throw new ResourceNotFoundError('VideoContent', 'videoContent', id);
@@ -180,7 +190,7 @@ export async function uploadVideo(
 
     // Build our storage path
     const path = `masters/${context.auth.userID}/${id}`;
-    const storageObject = storageInstance.bucket('meteor-videos').file(path);
+    const storageObject = storageInstance.bucket(appConfig.bucket).file(path);
     // Create the storage writestream
     const storageWritestream = storageObject.createWriteStream({
         metadata: {
@@ -198,15 +208,21 @@ export async function uploadVideo(
     await axios.post(
         'https://api.mux.com/video/v1/assets',
         {
-            input: `https://storage.googleapis.com/meteor-videos/${path}`,
+            input: `https://storage.googleapis.com/${appConfig.bucket}/${path}`,
             playback_policy: ['public'],
             passthrough: `${id}:${uuid()}`,
         },
         {
-            auth: {
-                username: process.env.MUXID,
-                password: process.env.MUXSECRET,
-            },
+            auth:
+                appConfig.environment == 'prod'
+                    ? {
+                          username: process.env.PROD_MUXID,
+                          password: process.env.PROD_MUXSECRET,
+                      }
+                    : {
+                          username: process.env.DEV_MUXID,
+                          password: process.env.DEV_MUXSECRET,
+                      },
         },
     );
     // We're done here
@@ -224,10 +240,16 @@ export async function deleteVideo(context: IServiceInvocationContext, id: tID) {
     await axios.delete(
         `https://api.mux.com/video/v1/assets/${contentRecord.assetID}`,
         {
-            auth: {
-                username: process.env.MUXID,
-                password: process.env.MUXSECRET,
-            },
+            auth:
+                appConfig.environment == 'prod'
+                    ? {
+                          username: process.env.PROD_MUXID,
+                          password: process.env.PROD_MUXSECRET,
+                      }
+                    : {
+                          username: process.env.DEV_MUXID,
+                          password: process.env.DEV_MUXSECRET,
+                      },
         },
     );
 }

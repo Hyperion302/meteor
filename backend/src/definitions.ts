@@ -33,3 +33,14 @@ export interface IError {
     message: string;
     longMessage?: string;
 }
+
+/**
+ * Holder interface for our app configuration
+ */
+export interface IAppConfiguration {
+    environment: string;
+    searchIndex: string;
+    bucket: string;
+    dbPrefix: string;
+    muxSubscription: string;
+}

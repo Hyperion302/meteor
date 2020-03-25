@@ -67,7 +67,9 @@ describe('Video Content Service', () => {
             await videoContentService.getVideo(mockContext, testContent.id);
 
             expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
-                `content/${testContent.id}`,
+                `content/${sharedInstances.mockConfig().dbPrefix}${
+                    testContent.id
+                }`,
             );
         });
         it('Checks to see if the content record exists', async () => {
@@ -118,7 +120,9 @@ describe('Video Content Service', () => {
                 testMime,
             );
 
-            expect(sharedInstances.mockBucket).toBeCalledWith('meteor-videos');
+            expect(sharedInstances.mockBucket).toBeCalledWith(
+                sharedInstances.mockConfig().bucket,
+            );
         });
         it('References the correct file path', async () => {
             const testInput = new ObjectReadableMock([0, 1, 2, 3, 4]);
@@ -168,7 +172,7 @@ describe('Video Content Service', () => {
                         const request = moxios.requests.mostRecent();
                         expect(request.config.method).toEqual('post');
                         expect(request.config.data).toMatchInlineSnapshot(
-                            `"{\\"input\\":\\"https://storage.googleapis.com/meteor-videos/masters/FDJIVPG1xgXfXmm67ETETSn9MSe2/3d1afd2a-04a2-47f9-9c65-e34b6465b83a\\",\\"playback_policy\\":[\\"public\\"],\\"passthrough\\":\\"3d1afd2a-04a2-47f9-9c65-e34b6465b83a:3d1afd2a-04a2-47f9-9c65-e34b6465b83a\\"}"`,
+                            `"{\\"input\\":\\"https://storage.googleapis.com/dev-swish/masters/FDJIVPG1xgXfXmm67ETETSn9MSe2/3d1afd2a-04a2-47f9-9c65-e34b6465b83a\\",\\"playback_policy\\":[\\"public\\"],\\"passthrough\\":\\"3d1afd2a-04a2-47f9-9c65-e34b6465b83a:3d1afd2a-04a2-47f9-9c65-e34b6465b83a\\"}"`,
                         );
                         done();
                     });
@@ -195,7 +199,9 @@ describe('Video Content Service', () => {
             await videoContentService.deleteVideo(mockContext, testContent.id);
 
             expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
-                `content/${testContent.id}`,
+                `content/${sharedInstances.mockConfig().dbPrefix}${
+                    testContent.id
+                }`,
             );
             expect(sharedInstances.mockExists).toHaveBeenCalled();
         });

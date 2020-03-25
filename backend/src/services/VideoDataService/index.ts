@@ -1,7 +1,7 @@
 import { tID, IError, IServiceInvocationContext } from '../../definitions';
 import { IVideo, IVideoQuery, IVideoSchema, IVideoUpdate } from './definitions';
 import uuid from 'uuid/v4';
-import { firestoreInstance } from '../../sharedInstances';
+import { firestoreInstance, appConfig } from '../../sharedInstances';
 import * as channelDataService from '../ChannelDataService';
 import * as videoContentService from '../VideoContentService';
 import * as searchService from '../SearchService';
@@ -11,6 +11,7 @@ import {
     InvalidQueryError,
     InternalError,
 } from '../../errors';
+import { toNamespaced, toGlobal } from '../../utils';
 
 /**
  * Get a single video record
@@ -24,7 +25,9 @@ async function getSingleVideoRecord(
     id: tID,
 ): Promise<IVideo> {
     // Get basic video data
-    const videoDoc = firestoreInstance.doc(`videos/${id}`);
+    const videoDoc = firestoreInstance.doc(
+        `videos/${toNamespaced(id, appConfig.dbPrefix)}`,
+    );
     const videoDocSnap = await videoDoc.get();
     if (!videoDocSnap.exists) {
         throw new ResourceNotFoundError('VideoData', 'video', id);
@@ -112,7 +115,11 @@ export async function queryVideo(
     // Query FS
     const querySnap = await fsQuery.get();
     const queryPromises = querySnap.docs.map((doc) => {
-        return getSingleVideoRecord(context, doc.id);
+        // doc.id is in namespaced form
+        return getSingleVideoRecord(
+            context,
+            toGlobal(doc.id, appConfig.dbPrefix),
+        );
     });
 
     // Wait for all to run
@@ -172,7 +179,9 @@ export async function createVideo(
     };
 
     // Add to DB
-    const videoDoc = firestoreInstance.doc(`videos/${videoData.id}`);
+    const videoDoc = firestoreInstance.doc(
+        `videos/${toNamespaced(videoData.id, appConfig.dbPrefix)}`,
+    );
     await videoDoc.set({
         id: videoData.id,
         author: videoData.author,
@@ -197,7 +206,9 @@ export async function updateVideo(
     update: IVideoUpdate,
 ) {
     // Fetch video to make sure it exists
-    const videoDoc = firestoreInstance.doc(`videos/${id}`);
+    const videoDoc = firestoreInstance.doc(
+        `videos/${toNamespaced(id, appConfig.dbPrefix)}`,
+    );
     const oldVideo = await getSingleVideoRecord(context, id);
 
     // Authorization check
@@ -227,7 +238,9 @@ export async function updateVideo(
  */
 export async function deleteVideo(context: IServiceInvocationContext, id: tID) {
     // Fetch video to make sure it exists
-    const videoDoc = firestoreInstance.doc(`videos/${id}`);
+    const videoDoc = firestoreInstance.doc(
+        `videos/${toNamespaced(id, appConfig.dbPrefix)}`,
+    );
     const videoData = await getSingleVideoRecord(context, id);
 
     // Authorization check

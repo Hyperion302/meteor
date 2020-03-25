@@ -3,35 +3,41 @@ import { Storage, StorageOptions } from '@google-cloud/storage';
 import { PubSub } from '@google-cloud/pubsub';
 import algoliasearch from 'algoliasearch';
 import { ClientConfig } from '@google-cloud/pubsub/build/src/pubsub';
+import { IAppConfiguration } from './definitions';
 
-const production: boolean = process.env.NODE_ENV === 'prod';
+const runtimeEnv = process.env.RUNTIMEENV;
 
-console.log(`Running in production: ${production}`);
+console.log(`Running in: ${runtimeEnv}`);
+
+// #region App Configuration
+export const appConfig: IAppConfiguration = {
+    environment: runtimeEnv,
+    searchIndex:
+        runtimeEnv == 'prod' ? process.env.PROD_INDEX : process.env.DEV_INDEX,
+    bucket:
+        runtimeEnv == 'prod' ? process.env.PROD_BUCKET : process.env.DEV_BUCKET,
+    dbPrefix:
+        runtimeEnv == 'prod'
+            ? process.env.PROD_DBPREFIX
+            : process.env.DEV_DBPREFIX,
+    muxSubscription:
+        runtimeEnv == 'prod'
+            ? process.env.PROD_MUXEVENTSUBSCRIPTION
+            : process.env.DEV_MUXEVENTSUBSCRIPTION,
+};
+// //#endregion App Configuration
 
 // #region Firestore
-let firestoreOptions: FirebaseFirestore.Settings;
-if (production) {
-    firestoreOptions = {};
-} else {
-    firestoreOptions = {
-        keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-    };
-}
-
-export const firestoreInstance = new Firestore(firestoreOptions);
+export const firestoreInstance = new Firestore({
+    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+});
 
 // #endregion Firestore
 
 // #region Storage
-let storageOptions: StorageOptions;
-if (production) {
-    storageOptions = {};
-} else {
-    storageOptions = {
-        keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-    };
-}
-export const storageInstance = new Storage(storageOptions);
+export const storageInstance = new Storage({
+    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+});
 // #endregion Storage
 
 // #region Algolia
@@ -40,23 +46,15 @@ export const algoliaClientInstance = algoliasearch(
     process.env.ALGOLIASECRET,
 );
 export const algoliaIndexInstance = algoliaClientInstance.initIndex(
-    'dev_videos',
+    appConfig.searchIndex,
 );
 // #endregion Algolia
 
 // #region PubSub
-let pubsubOptions: ClientConfig;
-if (production) {
-    pubsubOptions = {};
-} else {
-    pubsubOptions = {
-        keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-    };
-}
-export const pubsubSubscriptionID =
-    process.env.MUXEVENTSUBSCRIPTIONID || 'swish-api';
-export const pubsubClient = new PubSub(pubsubOptions);
+export const pubsubClient = new PubSub({
+    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
+});
 export const pubsubSubscription = pubsubClient.subscription(
-    pubsubSubscriptionID,
+    appConfig.muxSubscription,
 );
 // #endregion PubSub

@@ -1,5 +1,34 @@
 import { ObjectWritableMock } from 'stream-mock';
 
+// Mock appConfig
+export const mockConfig = jest.fn(() => {
+    return {
+        environment: 'dev',
+        searchIndex: 'dev_swish',
+        bucket: 'dev-swish',
+        dbPrefix: 'dev',
+        muxSubscription: 'dev-swish-api',
+    };
+});
+export class MockedAppConfig {
+    get environment() {
+        return mockConfig().environment;
+    }
+    get searchIndex() {
+        return mockConfig().searchIndex;
+    }
+    get bucket() {
+        return mockConfig().bucket;
+    }
+    get dbPrefix() {
+        return mockConfig().dbPrefix;
+    }
+    get muxSubscription() {
+        return mockConfig().muxSubscription;
+    }
+}
+export const appConfig = new MockedAppConfig();
+
 // Mock Firestore
 export const mockDoc = jest.fn();
 export const mockCollection = jest.fn();

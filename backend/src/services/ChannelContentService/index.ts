@@ -1,5 +1,9 @@
 import sharp from 'sharp';
-import { firestoreInstance, storageInstance } from '../../sharedInstances';
+import {
+    firestoreInstance,
+    storageInstance,
+    appConfig,
+} from '../../sharedInstances';
 import { tID, IServiceInvocationContext } from '../../definitions';
 import { AuthorizationError } from '../../errors';
 import { CreateWriteStreamOptions } from '@google-cloud/storage';
@@ -36,13 +40,13 @@ export async function uploadIcon(
     const path_64 = `channelIcons/${id}_64.png`;
     const path_32 = `channelIcons/${id}_32.png`;
     const storageObject_128 = storageInstance
-        .bucket('meteor-videos')
+        .bucket(appConfig.bucket)
         .file(path_128);
     const storageObject_64 = storageInstance
-        .bucket('meteor-videos')
+        .bucket(appConfig.bucket)
         .file(path_64);
     const storageObject_32 = storageInstance
-        .bucket('meteor-videos')
+        .bucket(appConfig.bucket)
         .file(path_32);
     const storageMetadata: CreateWriteStreamOptions = {
         metadata: {

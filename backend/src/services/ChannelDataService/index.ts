@@ -8,7 +8,8 @@ import {
 import uuid from 'uuid/v4';
 import { IChannel, IChannelQuery, IChannelUpdate } from './definitions';
 import * as search from '../SearchService';
-import { firestoreInstance } from '../../sharedInstances';
+import { firestoreInstance, appConfig } from '../../sharedInstances';
+import { toGlobal, toNamespaced } from '../../utils';
 
 /**
  * Retrieves a single channel record
@@ -18,7 +19,9 @@ import { firestoreInstance } from '../../sharedInstances';
  */
 async function getSingleChannelRecord(id: tID): Promise<IChannel> {
     // Get basic channel data
-    const channelDoc = firestoreInstance.doc(`channels/${id}`);
+    const channelDoc = firestoreInstance.doc(
+        `channels/${toNamespaced(id, appConfig.dbPrefix)}`,
+    );
     const channelDocSnap = await channelDoc.get();
     if (!channelDocSnap.exists) {
         throw new ResourceNotFoundError('ChannelData', 'channel', id);
@@ -76,7 +79,8 @@ export async function queryChannel(
     // Query FS
     const querySnap = await fsQuery.get();
     const queryPromises = querySnap.docs.map((doc) => {
-        return getSingleChannelRecord(doc.id);
+        // This ID is namespaced
+        return getSingleChannelRecord(toGlobal(doc.id, appConfig.dbPrefix));
     });
 
     // Wait for all to run
@@ -105,7 +109,9 @@ export async function createChannel(
     await search.addChannel(context, channelData);
 
     // Write to DB
-    const channelDoc = firestoreInstance.doc(`channels/${channelData.id}`);
+    const channelDoc = firestoreInstance.doc(
+        `channels/${toNamespaced(channelData.id, appConfig.dbPrefix)}`,
+    );
     await channelDoc.set(channelData);
     return channelData;
 }
@@ -122,7 +128,9 @@ export async function updateChannel(
     update: IChannelUpdate,
 ): Promise<IChannel> {
     // Fetch channel to make sure it exists
-    const channelDoc = firestoreInstance.doc(`channels/${id}`);
+    const channelDoc = firestoreInstance.doc(
+        `channels/${toNamespaced(id, appConfig.dbPrefix)}`,
+    );
     const oldChannel = await getSingleChannelRecord(id);
 
     // Authorization Check
@@ -151,7 +159,9 @@ export async function deleteChannel(
     id: tID,
 ): Promise<void> {
     // Fetch channel to make sure it exists
-    const channelDoc = firestoreInstance.doc(`channels/${id}`);
+    const channelDoc = firestoreInstance.doc(
+        `channels/${toNamespaced(id, appConfig.dbPrefix)}`,
+    );
     const channelData = await getSingleChannelRecord(id);
 
     // Authorization Check

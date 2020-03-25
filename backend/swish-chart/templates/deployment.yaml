@@ -44,6 +44,8 @@ spec:
                     envFrom:
                       - secretRef:
                             name: {{ .Values.secrets.externalServiceSecret }}
+                      - configMapRef:
+                            name: swish-config
                     volumeMounts:
                       - name: gcs-key
                         mountPath: /var/secrets/google

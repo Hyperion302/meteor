@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: swish-config
+data:
+    RUNTIMEENV: {{ .Values.swish.env }}
+    DEV_BUCKET: {{ .Values.swish.bucket.dev }}
+    PROD_BUCKET: {{ .Values.swish.bucket.prod }}
+    DEV_INDEX: {{ .Values.swish.index.dev }}
+    PROD_INDEX: {{ .Values.swish.index.prod }}
+    DEV_DBPREFIX: {{ .Values.swish.dbPrefix.dev }}
+    PROD_DBPREFIX: {{ .Values.swish.dbPrefix.prod }}
+    DEV_MUXEVENTSUBSCRIPTION: {{ .Values.swish.mux.subscription.dev }}
+    PROD_MUXEVENTSUBSCRIPTION: {{ .Values.swish.mux.subscription.prod }}

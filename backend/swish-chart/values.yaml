@@ -20,6 +20,22 @@ secrets:
     name: gcs-secret
     filename: key.json
 
+swish:
+  env: prod
+  bucket:
+    dev: dev-swish
+    prod: prod-swish
+  index:
+    dev: dev_swish
+    prod: prod_swish
+  mux:
+    subscription:
+        dev: dev-mux-api
+        prod: prod-mux-api
+  dbPrefix:
+    dev: dev
+    prod: prod
+
 service:
   type: NodePort
   targetPort: 8080
