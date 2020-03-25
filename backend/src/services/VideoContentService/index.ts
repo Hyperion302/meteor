@@ -21,7 +21,6 @@ import { toNamespaced } from '../../utils';
 pubsubSubscription.on('message', async (message: Message) => {
     // Process the message and parse it into something we understand
     const bodyData: any = JSON.parse(message.data.toString());
-    console.log(bodyData);
     message.ack();
 
     // Call muxWebhook
@@ -64,7 +63,7 @@ pubsubSubscription.on('message', async (message: Message) => {
 });
 pubsubSubscription.on('error', (error) => {
     // Log the error since there is no point in throwing
-    console.log(error);
+    console.error(`Received PubSub error: ${error}`);
 });
 // #endregion Pubsub handler registration
 
@@ -97,9 +96,10 @@ export async function handleMuxAssetReady(
         toNamespaced(`content/${muxEvent.contentID}`, appConfig.dbPrefix),
     );
     await videoContentDoc.set(videoContent);
-    // Update the current video doc to reference the new content doc
+    // Update the current video doc to reference the new content doc and mark the upload date
     await videoDoc.update({
         content: videoContent.id,
+        uploadDate: Math.floor(Date.now() / 1000),
     });
 }
 

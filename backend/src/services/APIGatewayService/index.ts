@@ -229,7 +229,6 @@ app.post('/channel/:id/uploadIcon', (req, res, next) => {
     busboyInstance.on(
         'file',
         (fieldname, file, filename, encoding, mimetype) => {
-            console.log(`Got ${fieldname}`);
             channelContentService
                 .uploadIcon(req.context, req.params.id, file)
                 .then(() => {
