@@ -278,6 +278,7 @@ app.delete('/channel/:id', async (req, res, next) => {
 
 // any in this case because TS *refuses* to acknowledge the override
 app.use((err: GenericError, req: any, res: any, next: any) => {
+    console.error(err);
     res.status(err.status ? err.status : 500).send({
         status: 'error',
         message: err.toString(),
