@@ -21,6 +21,10 @@ setup_backend:
     script:
         # Configure NPM to cache node modules
         - cd backend && npm install --prefer-offline
+    only:
+        changes:
+            # If backend commit
+            - backend/*
 
 build_backend:
     image: node:13
@@ -30,12 +34,20 @@ build_backend:
     artifacts:
         paths:
             - ${CI_PROJECT_DIR}/backend/dist/
+    only:
+        changes:
+            # If backend commit
+            - backend/*
 
 test_backend:
     image: node:13
     stage: test
     script:
         - cd backend && npm run test:coverage
+    only:
+        changes:
+            # If backend commit
+            - backend/*
 
 release_backend:
     image: docker:19.03.1
@@ -51,3 +63,7 @@ release_backend:
         - docker tag ${CONTAINER_IMAGE} ${CONTAINER_IMAGE_LATEST}
         - docker push ${CONTAINER_IMAGE}
         - docker push ${CONTAINER_IMAGE_LATEST}
+    only:
+        changes:
+            # If backend commit
+            - backend/*
