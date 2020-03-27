@@ -83,14 +83,14 @@ export async function queryVideo(
         fsQuery = (fsQuery ? fsQuery : collection).where(
             'uploadDate',
             '>',
-            query.after,
+            parseInt(query.after),
         );
     }
     if (query.before) {
         fsQuery = (fsQuery ? fsQuery : collection).where(
             'uploadDate',
             '<',
-            query.before,
+            parseInt(query.before),
         );
     }
     if (query.author) {

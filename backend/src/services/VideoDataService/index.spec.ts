@@ -236,8 +236,8 @@ describe('Video Data Service', () => {
     describe('queryVideo', () => {
         const sampleQuery: IVideoQuery = {
             channel: '716886dd-c107-4bd7-9060-a47b50f81689',
-            before: 30,
-            after: 50,
+            before: '30',
+            after: '50',
             author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
         };
         it('Fails with empty query', async () => {
@@ -247,8 +247,8 @@ describe('Video Data Service', () => {
         });
         it('Fails with invalid query dates', async () => {
             const promise = videoDataService.queryVideo(mockContext, {
-                before: 10,
-                after: 5,
+                before: '10',
+                after: '5',
             });
 
             expect(promise).rejects.toThrow();
@@ -266,7 +266,7 @@ describe('Video Data Service', () => {
             expect(sharedInstances.mockWhere).toHaveBeenCalledWith(
                 'uploadDate',
                 '>',
-                sampleQuery.after,
+                parseInt(sampleQuery.after),
             );
         });
         it("Constructs the correct query for 'before'", async () => {
@@ -275,7 +275,7 @@ describe('Video Data Service', () => {
             expect(sharedInstances.mockWhere).toHaveBeenCalledWith(
                 'uploadDate',
                 '<',
-                sampleQuery.before,
+                parseInt(sampleQuery.before),
             );
         });
         it("Constructs the correct query for 'channel'", async () => {

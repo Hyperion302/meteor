@@ -34,8 +34,8 @@ export interface IVideoSchema {
 export interface IVideoQuery {
     author?: string;
     channel?: tID;
-    before?: number;
-    after?: number;
+    before?: string;
+    after?: string;
 }
 
 /**
