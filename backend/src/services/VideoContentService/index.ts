@@ -34,8 +34,6 @@ const authToken = Buffer.from(
     'utf8',
 ).toString('base64');
 
-console.log(`Authorization: Basic ${authToken}`);
-
 // #region Pubsub handler registration
 pubsubSubscription.on('message', async (message: Message) => {
     // Process the message and parse it into something we understand
