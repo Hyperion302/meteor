@@ -214,8 +214,6 @@ describe('Video Content Service', () => {
                         expect(request.url).toEqual(
                             `https://api.mux.com/video/v1/assets/${testContent.assetID}`,
                         );
-                        expect(request.config.auth.password).not.toBeUndefined;
-                        expect(request.config.auth.username).not.toBeUndefined;
                         done();
                     });
                 });

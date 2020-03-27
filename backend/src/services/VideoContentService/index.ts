@@ -205,6 +205,17 @@ export async function uploadVideo(
 
     // NOTE: Here is where I create the UUID for the new content record.
     // The passthrough value takes the form <videoID>:<contentID>
+    const username =
+        appConfig.environment == 'prod'
+            ? process.env.PROD_MUXID
+            : process.env.DEV_MUXID;
+    const password =
+        appConfig.environment == 'prod'
+            ? process.env.PROD_MUXSECRET
+            : process.env.DEV_MUXSECRET;
+    const authToken = Buffer.from(`${username}:${password}`, 'utf8').toString(
+        'base64',
+    );
     await axios.post(
         'https://api.mux.com/video/v1/assets',
         {
@@ -213,16 +224,9 @@ export async function uploadVideo(
             passthrough: `${id}:${uuid()}`,
         },
         {
-            auth:
-                appConfig.environment == 'prod'
-                    ? {
-                          username: process.env.PROD_MUXID,
-                          password: process.env.PROD_MUXSECRET,
-                      }
-                    : {
-                          username: process.env.DEV_MUXID,
-                          password: process.env.DEV_MUXSECRET,
-                      },
+            headers: {
+                Authorization: `Basic ${authToken}`,
+            },
         },
     );
     // We're done here
@@ -237,19 +241,23 @@ export async function deleteVideo(context: IServiceInvocationContext, id: tID) {
     // Retrieve content record
     const contentRecord = await getVideo(context, id);
     // Delete from mux.  Upon successful deletion the content record will be deleted
+    const username =
+        appConfig.environment == 'prod'
+            ? process.env.PROD_MUXID
+            : process.env.DEV_MUXID;
+    const password =
+        appConfig.environment == 'prod'
+            ? process.env.PROD_MUXSECRET
+            : process.env.DEV_MUXSECRET;
+    const authToken = Buffer.from(`${username}:${password}`, 'utf8').toString(
+        'base64',
+    );
     await axios.delete(
         `https://api.mux.com/video/v1/assets/${contentRecord.assetID}`,
         {
-            auth:
-                appConfig.environment == 'prod'
-                    ? {
-                          username: process.env.PROD_MUXID,
-                          password: process.env.PROD_MUXSECRET,
-                      }
-                    : {
-                          username: process.env.DEV_MUXID,
-                          password: process.env.DEV_MUXSECRET,
-                      },
+            headers: {
+                Authorization: `Basic ${authToken}`,
+            },
         },
     );
 }
