@@ -17,6 +17,22 @@ import { Message } from '@google-cloud/pubsub';
 import uuid from 'uuid/v4';
 import { toNamespaced } from '../../utils';
 
+// Auth Token
+const username =
+    appConfig.environment == 'prod'
+        ? process.env.PROD_MUXID
+        : process.env.DEV_MUXID;
+const password =
+    appConfig.environment == 'prod'
+        ? process.env.PROD_MUXSECRET
+        : process.env.DEV_MUXSECRET;
+const authToken = Buffer.from(
+    `${username.replace('\n', '')}:${password.replace('\n', '')}`,
+    'utf8',
+).toString('base64');
+
+console.log(`Authorization: Basic ${authToken}`);
+
 // #region Pubsub handler registration
 pubsubSubscription.on('message', async (message: Message) => {
     // Process the message and parse it into something we understand
@@ -205,17 +221,6 @@ export async function uploadVideo(
 
     // NOTE: Here is where I create the UUID for the new content record.
     // The passthrough value takes the form <videoID>:<contentID>
-    const username =
-        appConfig.environment == 'prod'
-            ? process.env.PROD_MUXID
-            : process.env.DEV_MUXID;
-    const password =
-        appConfig.environment == 'prod'
-            ? process.env.PROD_MUXSECRET
-            : process.env.DEV_MUXSECRET;
-    const authToken = Buffer.from(`${username}:${password}`, 'utf8').toString(
-        'base64',
-    );
     await axios.post(
         'https://api.mux.com/video/v1/assets',
         {
@@ -241,17 +246,7 @@ export async function deleteVideo(context: IServiceInvocationContext, id: tID) {
     // Retrieve content record
     const contentRecord = await getVideo(context, id);
     // Delete from mux.  Upon successful deletion the content record will be deleted
-    const username =
-        appConfig.environment == 'prod'
-            ? process.env.PROD_MUXID
-            : process.env.DEV_MUXID;
-    const password =
-        appConfig.environment == 'prod'
-            ? process.env.PROD_MUXSECRET
-            : process.env.DEV_MUXSECRET;
-    const authToken = Buffer.from(`${username}:${password}`, 'utf8').toString(
-        'base64',
-    );
+
     await axios.delete(
         `https://api.mux.com/video/v1/assets/${contentRecord.assetID}`,
         {
