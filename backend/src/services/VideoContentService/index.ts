@@ -27,7 +27,10 @@ const password =
         ? process.env.PROD_MUXSECRET
         : process.env.DEV_MUXSECRET;
 const authToken = Buffer.from(
-    `${username.replace('\n', '')}:${password.replace('\n', '')}`,
+    `${(username ? username : '').replace('\n', '')}:${(password
+        ? password
+        : ''
+    ).replace('\n', '')}`,
     'utf8',
 ).toString('base64');
 
