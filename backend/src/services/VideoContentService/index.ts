@@ -97,16 +97,6 @@ export async function handleMuxAssetReady(
     const videoDoc = firestoreInstance.doc(
         toNamespaced(`videos/${muxEvent.videoID}`, appConfig.dbPrefix),
     );
-    const videoData = await VideoDataService.getVideo(
-        {
-            auth: {
-                elevated: true,
-                userID: null,
-                token: null,
-            },
-        },
-        muxEvent.videoID,
-    );
 
     // Create a new video content record
     const videoContent: IVideoContent = {
@@ -118,7 +108,25 @@ export async function handleMuxAssetReady(
         toNamespaced(`content/${muxEvent.contentID}`, appConfig.dbPrefix),
     );
     await videoContentDoc.set(videoContent);
+
+    // Update the current video doc to reference the new content doc and mark the upload date
+    await videoDoc.update({
+        content: videoContent.id,
+        uploadDate: Math.floor(Date.now() / 1000),
+    });
+
     // Add to search index
+    // Refetch the video so it has content and an uploadDate
+    const videoData = await VideoDataService.getVideo(
+        {
+            auth: {
+                elevated: true,
+                userID: null,
+                token: null,
+            },
+        },
+        muxEvent.videoID,
+    );
     await SearchService.addVideo(
         {
             auth: {
@@ -129,11 +137,6 @@ export async function handleMuxAssetReady(
         },
         videoData,
     );
-    // Update the current video doc to reference the new content doc and mark the upload date
-    await videoDoc.update({
-        content: videoContent.id,
-        uploadDate: Math.floor(Date.now() / 1000),
-    });
 }
 
 /**
