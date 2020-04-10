@@ -11,11 +11,13 @@ import {
     IMuxAssetReadyEvent,
 } from './definitions';
 import * as VideoDataService from '../VideoDataService';
+import * as SearchService from '../SearchService';
 import axios from 'axios';
 import { ResourceNotFoundError, AuthorizationError } from '../../errors';
 import { Message } from '@google-cloud/pubsub';
 import uuid from 'uuid/v4';
 import { toNamespaced } from '../../utils';
+import { IVideo } from '../VideoDataService/definitions';
 
 // Auth Token
 const username =
@@ -95,14 +97,17 @@ export async function handleMuxAssetReady(
     const videoDoc = firestoreInstance.doc(
         toNamespaced(`videos/${muxEvent.videoID}`, appConfig.dbPrefix),
     );
-    const videoDocSnap = await videoDoc.get();
-    if (!videoDocSnap.exists) {
-        throw new ResourceNotFoundError(
-            'VideoContent',
-            'video',
-            muxEvent.videoID,
-        );
-    }
+    const videoData = await VideoDataService.getVideo(
+        {
+            auth: {
+                elevated: true,
+                userID: null,
+                token: null,
+            },
+        },
+        muxEvent.videoID,
+    );
+
     // Create a new video content record
     const videoContent: IVideoContent = {
         id: muxEvent.contentID,
@@ -113,6 +118,17 @@ export async function handleMuxAssetReady(
         toNamespaced(`content/${muxEvent.contentID}`, appConfig.dbPrefix),
     );
     await videoContentDoc.set(videoContent);
+    // Add to search index
+    await SearchService.addVideo(
+        {
+            auth: {
+                elevated: true,
+                userID: null,
+                token: null,
+            },
+        },
+        videoData,
+    );
     // Update the current video doc to reference the new content doc and mark the upload date
     await videoDoc.update({
         content: videoContent.id,

@@ -38,6 +38,7 @@ app.use(['/video*', '/channel*'], (req, res, next) => {
     // Generate invocation context
     req.context = {
         auth: {
+            elevated: false,
             userID: req.user.sub,
             token: req.user,
         },

@@ -9,6 +9,7 @@ jest.mock('../../sharedInstances');
 
 const mockContext: IServiceInvocationContext = {
     auth: {
+        elevated: false,
         userID: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
         token: null, // None of the services should be using this
     },
