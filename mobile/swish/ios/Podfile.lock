@@ -1,0 +1,43 @@
+PODS:
+  - Auth0 (1.23.0):
+    - JWTDecode
+    - SimpleKeychain
+  - Flutter (1.0.0)
+  - JWTDecode (2.4.1)
+  - SimpleKeychain (0.11.1)
+  - video_player (0.0.1):
+    - Flutter
+  - video_player_web (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Auth0 (~> 1.19)
+  - Flutter (from `Flutter`)
+  - video_player (from `.symlinks/plugins/video_player/ios`)
+  - video_player_web (from `.symlinks/plugins/video_player_web/ios`)
+
+SPEC REPOS:
+  trunk:
+    - Auth0
+    - JWTDecode
+    - SimpleKeychain
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  video_player:
+    :path: ".symlinks/plugins/video_player/ios"
+  video_player_web:
+    :path: ".symlinks/plugins/video_player_web/ios"
+
+SPEC CHECKSUMS:
+  Auth0: a0e48dc2562c33e82f3aaf3bf400f4b4071a1d79
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  JWTDecode: 4bd4da0cdf0f8154fd467fa48499f34ec057fb88
+  SimpleKeychain: 0c657949c7afff92337d2ff64052d5eb5c53823e
+  video_player: 69c5f029fac4ffe4fc8a85ea7f7b793709661549
+  video_player_web: da8cadb8274ed4f8dbee8d7171b420dedd437ce7
+
+PODFILE CHECKSUM: 4c053c3c283ab0a670ea787b4edab75e361013fb
+
+COCOAPODS: 1.8.4
