@@ -50,12 +50,12 @@ jobs:
       run: npm run test:coverage
     - name: Build App
       run: npm run build
-    - name: Upload Build Results
-    - run: |
+    - name: Setup gcloud
+      run: |
         # Set up docker to authenticate
         # via gcloud command-line tool.
         gcloud auth configure-docker
-    - name: Build and Publish
+    - name: Build Image and Publish
       uses: docker/build-push-action@v1
       with:
         username: ${{ github.actor }}
