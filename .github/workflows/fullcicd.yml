@@ -1,0 +1,57 @@
+name: Build and Deploy to GKE
+
+on:
+  push:
+    branches: [master]
+
+# Environment variables available to all jobs and steps in this workflow
+env:
+  GKE_PROJECT: ${{ secrets.GKE_PROJECT }}
+  GKE_EMAIL: ${{ secrets.GKE_EMAIL }}
+  GITHUB_SHA: ${{ github.sha }}
+  GKE_ZONE: us-central1-a
+  GKE_CLUSTER: swish-dev
+  IMAGE: swish-app
+  REGISTRY_HOSTNAME: gcr.io
+  DEPLOYMENT_NAME: swish
+
+jobs:
+  test-build-publish-deploy-backend:
+    name: Test, Build, Publish, and Deploy Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        version: '270.0.0'
+        service_account_email: ${{ secrets.GKE_EMAIL }}
+        service_account_key: ${{ secrets.GKE_KEY }}
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 10.x
+    - run: npm install
+    - name: Test
+      run: npm run test:coverage
+    - name: Build App
+      run: npm run build
+    - run: |
+        # Set up docker to authenticate
+        # via gcloud command-line tool.
+        gcloud auth configure-docker
+    - name: Build and Publish
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+        path: backend
+        registry: docker.pkg.github.com
+        repository: Hyperion302/swish/swish-app
+        tag_with_sha: true
+    #- name: Deploy
+    #  run: |
+    #    gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $GKE_PROJECT
+    #    kubectl get services -o wide
