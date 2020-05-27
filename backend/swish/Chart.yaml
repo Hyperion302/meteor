@@ -1,0 +1,6 @@
+apiVersion: v2
+name: swish
+description: Helm chart for the Swish backend
+type: application
+
+version: 0.1.2

@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: {{ tpl "ingress-{{ include \"swish.fullname\" . }}" . | trunc 63}}
+  labels:
+    {{- include "swish.labels" . | nindent 4 }}
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: {{ .Values.gcsStaticIPName }}
+spec:
+  tls:
+    - secretName: {{ tpl "tls-secret-{{ include \"swish.fullname\" . }}" . | trunc 63}}
+  backend:
+    serviceName: {{ tpl "service-{{ include \"swish.fullname\" . }}" . | trunc 63}}
+    servicePort: 8080

@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ tpl "deployment-{{ include \"swish.fullname\" . }}" . | trunc 63}}
+  labels:
+    {{- include "swish.labels" . | nindent 4 }}
+specs:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "swish.selectorLabels" . | nindent 6 }}
+      service: main
+  template:
+    metadata:
+      labels:
+        {{- include "swish.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ tpl "service-account-{{ include \"swish.fullname\" . }}" . | trunc 63}}
+      volumes:
+        - name: gcs-key
+          secret:
+            secretName: {{ tpl "gcs-secret-{{ include \"swish.fullname\" . }}" . | trunc 63}}
+      containers:
+        - name: {{ printf "%s-%s" .Chart.Name "main" | trunc 63 }}
+          image: "{{ .Values.dockerRepo }}/{{ .Values.dockerImage }}:{{ .Values.dockerTag }}"
+          imagePullPolicy: {{ .Values.dockerPullPolicy }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          envFrom:
+            - secretRef:
+              name: {{ tpl "app-secrets-{{ include \"swish.fullname\" . }}" . | trunc 63 }}
+            - configMapRef:
+              name: {{ tpl "config-{{ include \"swish.fullname\" . }}" . | trunc 63 }}
+          volumeMounts:
+            - name: gcs-key
+              mountPath: /var/secrets/google
+          env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /var/secrets/google/key.json
+
