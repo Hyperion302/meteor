@@ -16,8 +16,8 @@ env:
   DEPLOYMENT_NAME: swish
 
 jobs:
-  test-build-publish-deploy-backend:
-    name: Test, Build, Publish, and Deploy Backend
+  test-build-publish-backend:
+    name: Test, Build, and Publish the Backend
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -33,11 +33,24 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: 10.x
-    - run: npm install
+    - name: Cache Dependencies
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
+    - name: Install Dependencies
+      run: npm install
     - name: Test
       run: npm run test:coverage
     - name: Build App
       run: npm run build
+    - name: Upload Build Results
     - run: |
         # Set up docker to authenticate
         # via gcloud command-line tool.
@@ -49,9 +62,19 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
         path: backend
         registry: docker.pkg.github.com
-        repository: Hyperion302/swish/swish-app
+        repository: hyperion302/swish/swish-app
         tag_with_sha: true
-    #- name: Deploy
-    #  run: |
-    #    gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $GKE_PROJECT
-    #    kubectl get services -o wide
+  deploy-backend:
+      name: Deploy Backend
+      runs-on: ubuntu-latest
+      needs: test-build-publish-backend
+      defaults:
+        run:
+          working-directory: backend
+      steps: 
+      - name: Checkout
+        uses: actions/checkout@v2
+      #- name: Deploy
+      #  run: |
+      #    gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $GKE_PROJECT
+      #    kubectl get services -o wide
