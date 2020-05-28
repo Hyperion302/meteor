@@ -11,22 +11,10 @@ env:
   # Deploy vars
   GKE_ZONE: us-central1-a
   GKE_CLUSTER: swish-dev
-  DEPLOYMENT_NAME: swishdepl
-  SECRET_GCS: ${{ secrets.GCS }}
-  SECRET_DEVMUXID: ${{ secrets.DEVMUXID }}
-  SECRET_DEVMUXSECRET: ${{ secrets.DEVMUXSECRET }}
-  SECRET_PRODMUXID: ${{ secrets.PRODMUXID }}
-  SECRET_PRODMUXSECRET: ${{ secrets.PRODMUXSECRET }}
-  SECRET_ALGOLIAID: ${{ secrets.ALGOLIAID }}
-  SECRET_ALGOLIASECRET: ${{ secrets.ALGOLIASECRET }}
-  SECRET_TLSCRT: ${{ secrets.TLSCRT }}
-  SECRET_TLSKEY: ${{ secrets.TLSKEY }}
-  SECRET_DockerUser: ${{ secrets.DOCKERUSER }}
-  SECRET_DockerPass: ${{ secrets.DOCKERPASS }}
+  RELEASE_NAME: swishdepl
   # Publish vars
   GITHUB_SHA: ${{ github.sha }}
   IMAGE: swish-app
-  PROJECT_ID: meteor-247517
   REGISTRY_HOSTNAME: gcr.io
 
 jobs:
@@ -92,7 +80,10 @@ jobs:
         uses: azure/k8s-bake@v1
         with:
           renderEngine: 'helm'
+          releaseName: 'swishdepl'
+          helm-version: 'latest'
           helmChart: './swish/'
+          silent: false
           overrides: |
             secretGCS:${{ secrets.GCS }}
             secretDEVMUXID:${{ secrets.DEVMUXID }}
@@ -105,9 +96,12 @@ jobs:
             secretTLSKEY:${{ secrets.TLSKEY }}
             secretDockerUser:${{ secrets.DOCKERUSER }}
             secretDockerPass:${{ secrets.DOCKERPASS }}
+        id: bake
       - name: Checkpoint
         run: |
-          helm template $DEPLOYMENT_NAME swish
+          ls -al $MANIFEST_BUNDLE_PATH
+        env:
+          MANIFEST_BUNDLE_PATH: ${{ steps.bake.outputs.manifestsBundle }}
       #- name: Deploy
       #  run: |
       #    gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $GCP_PROJECT_ID
