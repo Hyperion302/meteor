@@ -14,8 +14,8 @@ secretALGOLIAID: secretALGOLIAID
 secretALGOLIASECRET: secretALGOLIASECRET
 secretTLSCRT: secretTLSCRT
 secretTLSKEY: secretTLSKEY
-#secretDockerUser: secretDockerUser
-#secretDockerPass: secretDockerPass
+secretDockerUser: secretDockerUser
+secretDockerPass: secretDockerPass
 
 nameOverride: ""
 fullnameOverride: ""
