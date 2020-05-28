@@ -82,7 +82,7 @@ jobs:
           renderEngine: 'helm'
           releaseName: 'swishdepl'
           helm-version: 'latest'
-          helmChart: './swish/'
+          helmChart: 'swish'
           silent: false
           overrides: |
             secretGCS:${{ secrets.GCS }}
