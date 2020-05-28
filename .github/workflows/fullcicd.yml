@@ -82,17 +82,17 @@ jobs:
           helmChart: 'backend/swish'
           silent: false
           overrides: |
-            secretGCS:${{ secrets.GCS }}
-            secretDEVMUXID:${{ secrets.DEVMUXID }}
-            secretDEVMUXSECRET:${{ secrets.DEVMUXSECRET }}
-            secretPRODMUXID:${{ secrets.PRODMUXID }}
-            secretPRODMUXSECRET:${{ secrets.PRODMUXSECRET }}
-            secretALGOLIAID:${{ secrets.ALGOLIAID }}
-            secretALGOLIASECRET:${{ secrets.ALGOLIASECRET }}
-            secretTLSCRT:${{ secrets.TLSCRT }}
-            secretTLSKEY:${{ secrets.TLSKEY }}
-            secretDockerUser:${{ secrets.DOCKERUSER }}
-            secretDockerPass:${{ secrets.DOCKERPASS }}
+            secretGCS:"${{ secrets.GCS }}"
+            secretDEVMUXID:"${{ secrets.DEVMUXID }}"
+            secretDEVMUXSECRET:"${{ secrets.DEVMUXSECRET }}"
+            secretPRODMUXID:"${{ secrets.PRODMUXID }}"
+            secretPRODMUXSECRET:"${{ secrets.PRODMUXSECRET }}"
+            secretALGOLIAID:"${{ secrets.ALGOLIAID }}"
+            secretALGOLIASECRET:"${{ secrets.ALGOLIASECRET }}"
+            secretTLSCRT:"${{ secrets.TLSCRT }}"
+            secretTLSKEY:"${{ secrets.TLSKEY }}"
+            secretDockerUser:"${{ secrets.DOCKERUSER }}"
+            secretDockerPass:"${{ secrets.DOCKERPASS }}"
         id: bake
       - name: Checkpoint
         run: |
