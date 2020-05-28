@@ -6,14 +6,17 @@ on:
 
 # Environment variables available to all jobs and steps in this workflow
 env:
-  GKE_PROJECT: ${{ secrets.GKE_PROJECT }}
-  GKE_EMAIL: ${{ secrets.GKE_EMAIL }}
-  GITHUB_SHA: ${{ github.sha }}
+  # GCP Vars
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  # Deploy vars
   GKE_ZONE: us-central1-a
   GKE_CLUSTER: swish-dev
+  DEPLOYMENT_NAME: swishdepl
+  # Publish vars
+  GITHUB_SHA: ${{ github.sha }}
   IMAGE: swish-app
+  PROJECT_ID: meteor-247517
   REGISTRY_HOSTNAME: gcr.io
-  DEPLOYMENT_NAME: swish
 
 jobs:
   test-build-publish-backend:
@@ -25,12 +28,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
-      with:
-        version: '270.0.0'
-        service_account_email: ${{ secrets.GKE_EMAIL }}
-        service_account_key: ${{ secrets.GKE_KEY }}
-    - uses: actions/setup-node@v1
+    - name: Use Node v10.x
+      uses: actions/setup-node@v1
       with:
         node-version: 10.x
     - name: Cache Dependencies
@@ -50,11 +49,6 @@ jobs:
       run: npm run test:coverage
     - name: Build App
       run: npm run build
-    - name: Setup gcloud
-      run: |
-        # Set up docker to authenticate
-        # via gcloud command-line tool.
-        gcloud auth configure-docker
     - name: Build Image and Publish
       uses: docker/build-push-action@v1
       with:
@@ -74,7 +68,32 @@ jobs:
       steps: 
       - name: Checkout
         uses: actions/checkout@v2
+      - name: Inject Secrets
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: 'swish/values.yaml'
+        env: 
+          secretGCSData: ${{ secrets.GCS }}
+          secretDEVMUXID: ${{ secrets.DEVMUXID }}
+          secretDEVMUXSECRET: ${{ secrets.DEVMUXSECRET }}
+          secretPRODMUXID: ${{ secrets.PRODMUXID }}
+          secretPRODMUXSECRET: ${{ secrets.PRODMUXSECRET }}
+          secretALGOLIAID: ${{ secrets.ALGOLIAID }}
+          secretALGOLIASECRET: ${{ secrets.ALGOLIASECRET }}
+          secretTLSCRT: ${{ secrets.TLSCRT }}
+          secretTLSKEY: ${{ secrets.TLSKEY }}
+          secretDockerUser: ${{ secrets.DOCKERUSER }}
+          secretDockerPass: ${{ secrets.DOCKERPASS }}
+      - name: Setup gcloud
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '270.0.0'
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+      - name: Checkpoint
+        run: |
+          helm template $DEPLOYMENT_NAME swish
       #- name: Deploy
       #  run: |
-      #    gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $GKE_PROJECT
+      #    gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $GCP_PROJECT_ID
       #    kubectl get services -o wide
