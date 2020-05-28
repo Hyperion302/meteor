@@ -12,6 +12,17 @@ env:
   GKE_ZONE: us-central1-a
   GKE_CLUSTER: swish-dev
   DEPLOYMENT_NAME: swishdepl
+  SECRET_GCS: ${{ secrets.GCS }}
+  SECRET_DEVMUXID: ${{ secrets.DEVMUXID }}
+  SECRET_DEVMUXSECRET: ${{ secrets.DEVMUXSECRET }}
+  SECRET_PRODMUXID: ${{ secrets.PRODMUXID }}
+  SECRET_PRODMUXSECRET: ${{ secrets.PRODMUXSECRET }}
+  SECRET_ALGOLIAID: ${{ secrets.ALGOLIAID }}
+  SECRET_ALGOLIASECRET: ${{ secrets.ALGOLIASECRET }}
+  SECRET_TLSCRT: ${{ secrets.TLSCRT }}
+  SECRET_TLSKEY: ${{ secrets.TLSKEY }}
+  SECRET_DockerUser: ${{ secrets.DOCKERUSER }}
+  SECRET_DockerPass: ${{ secrets.DOCKERPASS }}
   # Publish vars
   GITHUB_SHA: ${{ github.sha }}
   IMAGE: swish-app
@@ -68,28 +79,32 @@ jobs:
       steps: 
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Inject Secrets
-        uses: microsoft/variable-substitution@v1
-        with:
-          files: 'swish/values.yaml'
-        env: 
-          secretGCSData: ${{ secrets.GCS }}
-          secretDEVMUXID: ${{ secrets.DEVMUXID }}
-          secretDEVMUXSECRET: ${{ secrets.DEVMUXSECRET }}
-          secretPRODMUXID: ${{ secrets.PRODMUXID }}
-          secretPRODMUXSECRET: ${{ secrets.PRODMUXSECRET }}
-          secretALGOLIAID: ${{ secrets.ALGOLIAID }}
-          secretALGOLIASECRET: ${{ secrets.ALGOLIASECRET }}
-          secretTLSCRT: ${{ secrets.TLSCRT }}
-          secretTLSKEY: ${{ secrets.TLSKEY }}
-          secretDockerUser: ${{ secrets.DOCKERUSER }}
-          secretDockerPass: ${{ secrets.DOCKERPASS }}
       - name: Setup gcloud
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
           version: '270.0.0'
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
+      - name: Configure kubectl with gcloud
+        run: |
+          gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $GCP_PROJECT_ID
+      - name: Bake In Secrets
+        uses: azure/k8s-bake@v1
+        with:
+          renderEngine: 'helm'
+          helmChart: './swish/'
+          overrides: |
+            secretGCS:${{ secrets.GCS }}
+            secretDEVMUXID:${{ secrets.DEVMUXID }}
+            secretDEVMUXSECRET:${{ secrets.DEVMUXSECRET }}
+            secretPRODMUXID:${{ secrets.PRODMUXID }}
+            secretPRODMUXSECRET:${{ secrets.PRODMUXSECRET }}
+            secretALGOLIAID:${{ secrets.ALGOLIAID }}
+            secretALGOLIASECRET:${{ secrets.ALGOLIASECRET }}
+            secretTLSCRT:${{ secrets.TLSCRT }}
+            secretTLSKEY:${{ secrets.TLSKEY }}
+            secretDockerUser:${{ secrets.DOCKERUSER }}
+            secretDockerPass:${{ secrets.DOCKERPASS }}
       - name: Checkpoint
         run: |
           helm template $DEPLOYMENT_NAME swish
