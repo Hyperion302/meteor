@@ -61,6 +61,9 @@ jobs:
       name: Deploy Backend
       runs-on: ubuntu-latest
       needs: test-build-publish-backend
+      defaults:
+        run:
+          working-directory: backend
       steps: 
       - name: Checkout
         uses: actions/checkout@v2
@@ -73,32 +76,36 @@ jobs:
       - name: Configure kubectl with gcloud
         run: |
           gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $GCP_PROJECT_ID
-      - name: Bake In Secrets
-        uses: azure/k8s-bake@v1
+      - name: Install Helm
+        uses: azure/setup-helm@v1
         with:
-          renderEngine: 'helm'
-          releaseName: 'swishdepl'
-          helm-version: 'latest'
-          helmChart: 'backend/swish'
-          silent: false
-          overrides: |
-            secretGCS:"${{ secrets.GCS }}"
-            secretDEVMUXID:"${{ secrets.DEVMUXID }}"
-            secretDEVMUXSECRET:"${{ secrets.DEVMUXSECRET }}"
-            secretPRODMUXID:"${{ secrets.PRODMUXID }}"
-            secretPRODMUXSECRET:"${{ secrets.PRODMUXSECRET }}"
-            secretALGOLIAID:"${{ secrets.ALGOLIAID }}"
-            secretALGOLIASECRET:"${{ secrets.ALGOLIASECRET }}"
-            secretTLSCRT:"${{ secrets.TLSCRT }}"
-            secretTLSKEY:"${{ secrets.TLSKEY }}"
-            secretDockerUser:"${{ secrets.DOCKERUSER }}"
-            secretDockerPass:"${{ secrets.DOCKERPASS }}"
-        id: bake
-      - name: Checkpoint
+          version: 'v3.1.2' # default is latest stable
+      - name: Bake In Secrets
         run: |
-          ls -al $MANIFEST_BUNDLE_PATH
+          helm template $RELEASE_NAME swish \
+          --set secretGCS=$SECR_GCP \
+          --set secretDEVMUXID=$SECR_DEVMUXID \
+          --set secretDEVMUXSECRET=$SECR_DEVMUXSECRET \
+          --set secretPRODMUXID=$SECR_PRODMUXID \
+          --set secretPRODMUXSECRET=$SECR_PRODMUXSECRET \
+          --set secretALGOLIAID=$SECR_ALGOLIAID \
+          --set secretALGOLIASECRET=$SECR_ALGOLIASECRET \
+          --set secretTLSCRT=$SECR_TLSCRT \
+          --set secretTLSKEY=$SECR_TLSKEY \
+          --set secretDockerUser=$SECR_DockerUser \
+          --set secretDockerPass=$Secr_DockerPass
         env:
-          MANIFEST_BUNDLE_PATH: ${{ steps.bake.outputs.manifestsBundle }}
+          SECR_GCP: ${{ secrets.GCP }}
+          SECR_DEVMUXID: ${{ secrets.DEVMUXID }}
+          SECR_DEVMUXSECRET: ${{ secrets.DEVMUXSECRET }}
+          SECR_PRODMUXID: ${{ secrets.PRODMUXID }}
+          SECR_PRODMUXSECRET: ${{ secrets.PRODMUXSECRET }}
+          SECR_ALGOLIAID: ${{ secrets.ALGOLIAID }}
+          SECR_ALGOLIASECRET: ${{ secrets.ALGOLIASECRET }}
+          SECR_TLSCRT: ${{ secrets.TLSCRT }}
+          SECR_TLSKEY: ${{ secrets.TLSKEY }}
+          SECR_DockerUser: ${{ secrets.DOCKERUSER }}
+          SECR_DockerPass: ${{ secrets.DOCKERPASS }}
       #- name: Deploy
       #  run: |
       #    gcloud container clusters get-credentials $GKE_CLUSTER --zone $GKE_ZONE --project $GCP_PROJECT_ID
