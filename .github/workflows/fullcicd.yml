@@ -61,9 +61,6 @@ jobs:
       name: Deploy Backend
       runs-on: ubuntu-latest
       needs: test-build-publish-backend
-      defaults:
-        run:
-          working-directory: backend
       steps: 
       - name: Checkout
         uses: actions/checkout@v2
@@ -82,7 +79,7 @@ jobs:
           renderEngine: 'helm'
           releaseName: 'swishdepl'
           helm-version: 'latest'
-          helmChart: 'swish'
+          helmChart: 'backend/swish'
           silent: false
           overrides: |
             secretGCS:${{ secrets.GCS }}
