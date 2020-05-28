@@ -5,7 +5,7 @@ dockerTag: latest
 dockerPullPolicy: Always
 
 # Secrets
-secretGCS: secretGCSData
+secretGCP: secretGCPData
 secretDEVMUXID: secretDEVMUXID
 secretDEVMUXSECRET: secretDEVMUXSECRET
 secretPRODMUXID: secretPRODMUXID
