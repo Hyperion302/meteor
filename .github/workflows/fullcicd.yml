@@ -39,9 +39,6 @@ jobs:
           version: '270.0.0'
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_KEY }}
-      - name: Configure docker with gcloud
-        run: |
-          gcloud --quiet auth configure-docker
       - name: Cache Dependencies
         uses: actions/cache@v2
         env:
@@ -74,6 +71,9 @@ jobs:
       - name: Publish Image to GH
         run: |
           docker push "$GH_HOSTNAME/$GH_REPO_REF/$IMAGE:$GITHUB_SHA"
+      - name: Configure docker with gcloud
+        run: |
+          gcloud --quiet auth configure-docker
       - name: Publish Image to GCR
         run: |
           docker push "$GCR_HOSTNAME/$GCP_PROJECT_ID/$IMAGE:$GITHUB_SHA"
