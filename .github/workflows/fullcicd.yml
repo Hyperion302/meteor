@@ -104,18 +104,18 @@ jobs:
           helmChart: 'backend/swish'
           releaseName: swishdepl
           overrides: |
-            secretGCP: ${{ secrets.GCP }}
-            secretDEVMUXID: ${{ secrets.DEVMUXID }}
-            secretDEVMUXSECRET: ${{ secrets.DEVMUXSECRET }}
-            secretPRODMUXID: ${{ secrets.PRODMUXID }}
-            secretPRODMUXSECRET: ${{ secrets.PRODMUXSECRET }}
-            secretALGOLIAID: ${{ secrets.ALGOLIAID }}
-            secretALGOLIASECRET: ${{ secrets.ALGOLIASECRET }}
-            secretTLSCRT: ${{ secrets.TLSCRT }}
-            secretTLSKEY: ${{ secrets.TLSKEY }}
-            dockerTag: ${{ github.sha }}
-            dockerImage: ${{ secrets.GCP_PROJECT_ID }}/swish-app
-            dockerRepo: gcr.io
+            secretGCP:${{ secrets.GCP }}
+            secretDEVMUXID:${{ secrets.DEVMUXID }}
+            secretDEVMUXSECRET:${{ secrets.DEVMUXSECRET }}
+            secretPRODMUXID:${{ secrets.PRODMUXID }}
+            secretPRODMUXSECRET:${{ secrets.PRODMUXSECRET }}
+            secretALGOLIAID:${{ secrets.ALGOLIAID }}
+            secretALGOLIASECRET:${{ secrets.ALGOLIASECRET }}
+            secretTLSCRT:${{ secrets.TLSCRT }}
+            secretTLSKEY:${{ secrets.TLSKEY }}
+            dockerTag:${{ github.sha }}
+            dockerImage:${{ secrets.GCP_PROJECT_ID }}/swish-app
+            dockerRepo:gcr.io
         id: bake
       - name: Deploy
         run: |
