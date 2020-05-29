@@ -24,6 +24,8 @@ spec:
       containers:
         - name: {{ printf "%s-%s" .Chart.Name "main" | trunc 63 }}
           image: "{{ .Values.dockerRepo }}/{{ .Values.dockerImage }}:{{ .Values.dockerTag }}"
+          imagePullSecrets:
+            - name: {{ tpl "imgpull-secret-{{ include \"swish.fullname\" . }}" . | trunc 63}}
           imagePullPolicy: {{ .Values.dockerPullPolicy }}
           livenessProbe:
             httpGet:

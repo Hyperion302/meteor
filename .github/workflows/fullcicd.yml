@@ -100,6 +100,5 @@ jobs:
       - name: Deploy
         run: |
           kubectl apply -f $MANIFESTS
-          kubectl rollout status deployment main-service --timeout=10m
         env:
           MANIFESTS: ${{ steps.bake.outputs.manifestsBundle }}
