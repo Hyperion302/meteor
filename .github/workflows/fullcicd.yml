@@ -56,7 +56,7 @@ jobs:
           path: backend
           registry: docker.pkg.github.com
           repository: hyperion302/swish/swish-app
-          tag_with_sha: true
+          tags: ${{ github.sha }}
   deploy-backend:
     name: Deploy Backend
     runs-on: ubuntu-latest
@@ -95,11 +95,15 @@ jobs:
             secretTLSKEY: ${{ secrets.TLSKEY }}
             secretDockerUser: ${{ secrets.DOCKERUSER }}
             secretDockerPass: ${{ secrets.DOCKERPASS }}
+            dockerTag: ${{ github.sha }}
         id: bake
       - name: Deploy
         run: |
           kubectl apply -f $MANIFESTS
-          kubectl rollout status
-          kubectl get services -o wide
+          if ! kubectl rollout status; then
+            kubectl rollout undo
+            kubectl rollout status
+            exit 1
+          fi
         env:
           MANIFESTS: ${{ steps.bake.outputs.manifestsBundle }}
