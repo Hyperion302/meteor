@@ -100,9 +100,9 @@ jobs:
       - name: Deploy
         run: |
           kubectl apply -f $MANIFESTS
-          if ! kubectl rollout status; then
-            kubectl rollout undo
-            kubectl rollout status
+          if ! kubectl rollout status deployment main-service; then
+            kubectl rollout undo deployment main-service
+            kubectl rollout status deployment main-service
             exit 1
           fi
         env:

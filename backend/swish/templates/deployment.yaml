@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ tpl "deployment-{{ include \"swish.fullname\" . }}" . | trunc 63}}
+  name: main-service
   labels:
     {{- include "swish.labels" . | nindent 4 }}
 spec:
