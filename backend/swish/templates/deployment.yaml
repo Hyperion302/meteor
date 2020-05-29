@@ -14,6 +14,7 @@ spec:
     metadata:
       labels:
         {{- include "swish.selectorLabels" . | nindent 8 }}
+        service: main
     spec:
       serviceAccountName: {{ tpl "service-account-{{ include \"swish.fullname\" . }}" . | trunc 63}}
       volumes:
