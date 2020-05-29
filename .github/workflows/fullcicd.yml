@@ -65,16 +65,18 @@ jobs:
           -t "$GCR_HOSTNAME/$GCP_PROJECT_ID/$IMAGE:$GITHUB_SHA" \
           -t "$GH_HOSTNAME/$GH_REPO_REF/$IMAGE:$GITHUB_SHA" \
           .
+      - name: Login to GH docker server
+        uses: azure/docker-login@v1
+        with:
+          login-server: docker.pkg.github.com # default: index.docker.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish Image to GH
         run: |
-          echo $GH_TOKEN | docker login -u $GH_USER --password-stdin
           docker push "$GH_HOSTNAME/$GH_REPO_REF/$IMAGE:$GITHUB_SHA"
       - name: Publish Image to GCR
         run: |
           docker push "$GCR_HOSTNAME/$GCP_PROJECT_ID/$IMAGE:$GITHUB_SHA"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_USER: ${{ github.actor }}
   deploy-backend:
     name: Deploy Backend
     runs-on: ubuntu-latest
