@@ -4,7 +4,7 @@ metadata:
   name: {{ tpl "deployment-{{ include \"swish.fullname\" . }}" . | trunc 63}}
   labels:
     {{- include "swish.labels" . | nindent 4 }}
-specs:
+spec:
   replicas: 1
   selector:
     matchLabels:
