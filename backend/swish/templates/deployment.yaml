@@ -40,9 +40,9 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           envFrom:
             - secretRef:
-              name: {{ tpl "app-secrets-{{ include \"swish.fullname\" . }}" . | trunc 63 }}
+                name: {{ tpl "app-secrets-{{ include \"swish.fullname\" . }}" . | trunc 63 }}
             - configMapRef:
-              name: {{ tpl "config-{{ include \"swish.fullname\" . }}" . | trunc 63 }}
+                name: {{ tpl "config-{{ include \"swish.fullname\" . }}" . | trunc 63 }}
           volumeMounts:
             - name: gcs-key
               mountPath: /var/secrets/google
