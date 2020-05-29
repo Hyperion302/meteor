@@ -102,4 +102,4 @@ jobs:
           kubectl rollout status
           kubectl get services -o wide
         env:
-          MANFIESTS: ${{ steps.bake.outputs.manifestsBundle }}
+          MANIFESTS: ${{ steps.bake.outputs.manifestsBundle }}
