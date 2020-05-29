@@ -100,10 +100,6 @@ jobs:
       - name: Deploy
         run: |
           kubectl apply -f $MANIFESTS
-          if ! kubectl rollout status deployment main-service --timeout=1m; then
-            kubectl rollout undo deployment main-service
-            kubectl rollout status deployment main-service --timeout=1m
-            exit 1
-          fi
+          kubectl rollout status deployment main-service --timeout=10m
         env:
           MANIFESTS: ${{ steps.bake.outputs.manifestsBundle }}
