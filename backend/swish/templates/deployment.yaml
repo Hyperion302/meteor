@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: main-service
+  name: {{ tpl "main-service-{{ include \"swish.fullname\" . }}" . | trunc 63}}
   labels:
     {{- include "swish.labels" . | nindent 4 }}
 spec:
@@ -17,6 +17,8 @@ spec:
         service: main
     spec:
       serviceAccountName: {{ tpl "service-account-{{ include \"swish.fullname\" . }}" . | trunc 63}}
+      imagePullSecrets:
+        - name: {{ tpl "imgpull-secret-{{ include \"swish.fullname\" . }}" . | trunc 63}}
       volumes:
         - name: gcs-key
           secret:
@@ -24,8 +26,6 @@ spec:
       containers:
         - name: {{ printf "%s-%s" .Chart.Name "main" | trunc 63 }}
           image: "{{ .Values.dockerRepo }}/{{ .Values.dockerImage }}:{{ .Values.dockerTag }}"
-          imagePullSecrets:
-            - name: {{ tpl "imgpull-secret-{{ include \"swish.fullname\" . }}" . | trunc 63}}
           imagePullPolicy: {{ .Values.dockerPullPolicy }}
           livenessProbe:
             httpGet:
