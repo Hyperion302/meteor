@@ -15,7 +15,9 @@ env:
   # Publish vars
   GITHUB_SHA: ${{ github.sha }}
   IMAGE: swish-app
-  REGISTRY_HOSTNAME: docker.pkg.github.com
+  GH_HOSTNAME: docker.pkg.github.com
+  GH_REPO_REF: hyperion302/swish
+  GCR_HOSTNAME: gcr.io
 
 jobs:
   test-build-publish-backend:
@@ -31,6 +33,15 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 10.x
+      - name: Setup gcloud
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '270.0.0'
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+      - name: Configure docker with gcloud
+        run: |
+          gcloud --quiet auth configure-docker
       - name: Cache Dependencies
         uses: actions/cache@v2
         env:
@@ -48,15 +59,22 @@ jobs:
         run: npm run test:coverage
       - name: Build App
         run: npm run build
-      - name: Build Image and Publish
-        uses: docker/build-push-action@v1
-        with:
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-          path: backend
-          registry: docker.pkg.github.com
-          repository: hyperion302/swish/swish-app
-          tags: ${{ github.sha }}
+      - name: Build Image
+        run: |
+          docker build \
+          -t "$GCR_HOSTNAME/$GCP_PROJECT_ID/$IMAGE:$GITHUB_SHA" \
+          -t "$GH_HOSTNAME/$GH_REPO_REF/$IMAGE:$GITHUB_SHA" \
+          .
+      - name: Publish Image to GH
+        run: |
+          echo $GH_TOKEN | docker login -u $GH_USER --password-stdin
+          docker push "$GH_HOSTNAME/$GH_REPO_REF/$IMAGE:$GITHUB_SHA"
+      - name: Publish Image to GCR
+        run: |
+          docker push "$GCR_HOSTNAME/$GCP_PROJECT_ID/$IMAGE:$GITHUB_SHA"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_USER: ${{ github.actor }}
   deploy-backend:
     name: Deploy Backend
     runs-on: ubuntu-latest
@@ -93,9 +111,9 @@ jobs:
             secretALGOLIASECRET: ${{ secrets.ALGOLIASECRET }}
             secretTLSCRT: ${{ secrets.TLSCRT }}
             secretTLSKEY: ${{ secrets.TLSKEY }}
-            secretDockerUser: ${{ secrets.DOCKERUSER }}
-            secretDockerPass: ${{ secrets.DOCKERPASS }}
             dockerTag: ${{ github.sha }}
+            dockerImage: ${{ secrets.GCP_PROJECT_ID }}/swish-app
+            dockerRepo: gcr.io
         id: bake
       - name: Deploy
         run: |
