@@ -1,3 +1,0 @@
-You have installed the Swish backend as {{ .Release.Name }}
-
-Please ensure you have deployed both the image-pull-secret Secret and external-service-secret Secret before attempting to use this chart.

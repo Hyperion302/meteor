@@ -17,8 +17,6 @@ spec:
         service: main
     spec:
       serviceAccountName: {{ tpl "service-account-{{ include \"swish.fullname\" . }}" . | trunc 63}}
-      #imagePullSecrets:
-      #  - name: {{ tpl "imgpull-secret-{{ include \"swish.fullname\" . }}" . | trunc 63}}
       volumes:
         - name: gcs-key
           secret:
