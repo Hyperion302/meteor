@@ -24,7 +24,7 @@ export async function uploadIcon(
     context: IServiceInvocationContext,
     id: tID,
     imageStream: NodeJS.ReadableStream,
-): Promise<void> {
+): Promise<{ rawSize: number }> {
     // Authorization Check
     const channel = await getChannel(context, id);
     // Channel icons can only be uploaded by the owner
@@ -34,7 +34,11 @@ export async function uploadIcon(
             'upload icon to channel',
         );
     }
-
+    // Setup size tracker
+    let rawSize = 0;
+    imageStream.on('data', (data) => {
+      rawSize += data.length;
+    });
     // Setup storage writestreams
     const path_128 = `channelIcons/${id}_128.png`;
     const path_64 = `channelIcons/${id}_64.png`;
@@ -90,4 +94,6 @@ export async function uploadIcon(
     await storageObject_128.makePublic();
     await storageObject_64.makePublic();
     await storageObject_32.makePublic();
+
+    return { rawSize }
 }
