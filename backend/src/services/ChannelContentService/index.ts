@@ -88,7 +88,10 @@ export async function uploadIcon(
     // Wait for upload to finish
     const promises = [
         new Promise((resolve, reject) => {
-            storageWritestream_128.on('error', reject);
+            storageWritestream_128.on('error', (e) => {
+              console.error(e);
+              reject(e);
+            });
             storageWritestream_128.on('finish', resolve);
         }),
         new Promise((resolve, reject) => {
