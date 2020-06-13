@@ -224,7 +224,7 @@ app.post('/channel/:id/uploadIcon', (req, res, next) => {
     channelContentService
       .uploadIcon(req.context, req.params.id, file)
       .then(() => {
-        res.writeHead(200);
+        res.writeHead(204);
         res.end();
       })
       .catch((e) => {
