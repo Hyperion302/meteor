@@ -24,7 +24,7 @@ export async function uploadIcon(
     context: IServiceInvocationContext,
     id: tID,
     imageStream: NodeJS.ReadableStream,
-): Promise<{ rawSize: number, writtenSize: number }> {
+): Promise<{ rawSize: number, size128: number, size64: number, size32: number }> {
     // Authorization Check
     const channel = await getChannel(context, id);
     // Channel icons can only be uploaded by the owner
@@ -74,24 +74,23 @@ export async function uploadIcon(
     pipeline_32.pipe(storageWritestream_32);
 
     // Count written data
-    let writtenSize = 0;
+    let size128 = 0;
+    let size64 = 0;
+    let size32 = 0;
     pipeline_128.on('data', (data) => {
-      writtenSize += data.length;
+      size128 += data.length;
     });
     pipeline_64.on('data', (data) => {
-      writtenSize += data.length;
+      size64 += data.length;
     })
     pipeline_32.on('data', (data) => {
-      writtenSize += data.length;
+      size32 += data.length;
     })
 
     // Wait for upload to finish
     const promises = [
         new Promise((resolve, reject) => {
-            storageWritestream_128.on('error', (e) => {
-              console.error(e);
-              reject(e);
-            });
+            storageWritestream_128.on('error', reject);
             storageWritestream_128.on('finish', resolve);
         }),
         new Promise((resolve, reject) => {
@@ -110,5 +109,5 @@ export async function uploadIcon(
     await storageObject_64.makePublic();
     await storageObject_32.makePublic();
 
-    return { rawSize, writtenSize }
+    return { rawSize, size128, size64, size32 }
 }

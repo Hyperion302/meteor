@@ -223,8 +223,8 @@ app.post('/channel/:id/uploadIcon', (req, res, next) => {
   busboyInstance.on('file', (fieldname, file, filename, encoding, mimetype) => {
     channelContentService
       .uploadIcon(req.context, req.params.id, file)
-      .then(({ rawSize, writtenSize }) => {
-        console.info(`${req.context.auth.userID} uploaded a ${rawSize} byte icon for ${req.params.id}, writing ${writtenSize} bytes to GCS`)
+      .then(({ rawSize, size128, size64, size32 }) => {
+        console.info(`${req.context.auth.userID} uploaded a ${rawSize} byte icon for ${req.params.id}, writing ${size128}, ${size64}, ${size32} bytes to GCS`)
         res.writeHead(204);
         res.end();
       })
