@@ -122,7 +122,7 @@ app.post('/video/:id/upload', (req, res, next) => {
     videoContentService
       .uploadVideo(req.context, req.params.id, file, mimetype)
       .then(() => {
-        res.writeHead(200);
+        res.writeHead(204);
         res.end();
       })
       .catch((e) => {
