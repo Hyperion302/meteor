@@ -224,7 +224,7 @@ app.post('/channel/:id/uploadIcon', (req, res, next) => {
     channelContentService
       .uploadIcon(req.context, req.params.id, file)
       .then(({ rawSize, size128, size64, size32 }) => {
-        console.info(`${req.context.auth.userID} uploaded a ${rawSize} byte icon for ${req.params.id}, writing ${size128}, ${size64}, ${size32} bytes to GCS`)
+        // console.info(`${req.context.auth.userID} uploaded a ${rawSize} byte icon for ${req.params.id}, writing ${size128}, ${size64}, ${size32} bytes to GCS`)
         res.writeHead(204);
         res.end();
       })
