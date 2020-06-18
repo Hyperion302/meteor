@@ -13,6 +13,9 @@ import {
 } from '../../errors';
 import { toNamespaced, toGlobal } from '../../utils';
 
+// Predefined constants
+const MAX_VIDEOS: number = 1000;
+
 /**
  * Get a single video record
  * @param context Invocation context
@@ -176,6 +179,14 @@ export async function createVideo(
         content: null,
         uploadDate: 0,
     };
+
+    // Check # of videos
+    const existingVideos = await queryVideo(context, {
+      channel: channelData.id
+    });
+    if(existingVideos.length >= MAX_VIDEOS) {
+      throw new AuthorizationError('VideoData', `create more than ${MAX_VIDEOS} on a channel`)
+    }
 
     // Add to DB
     const videoDoc = firestoreInstance.doc(

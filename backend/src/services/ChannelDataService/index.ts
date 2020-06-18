@@ -11,6 +11,9 @@ import * as search from '../SearchService';
 import { firestoreInstance, appConfig } from '../../sharedInstances';
 import { toGlobal, toNamespaced } from '../../utils';
 
+// Predefined constants
+const MAX_CHANNELS: number = 10;
+
 /**
  * Retrieves a single channel record
  * @param id ID of channel to retrieve
@@ -105,6 +108,14 @@ export async function createChannel(
         owner: context.auth.userID,
         name,
     };
+
+    // Check # of channels
+    const existingChannels = await queryChannel(context, {
+      owner: context.auth.userID
+    });
+    if(existingChannels.length >= MAX_CHANNELS) {
+      throw new AuthorizationError('ChannelData', `create more than ${MAX_CHANNELS} channels`);
+    }
 
     // Add to search index
     await search.addChannel(context, channelData);
