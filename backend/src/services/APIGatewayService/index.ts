@@ -18,6 +18,10 @@ import {
 } from '../../errors';
 import authMiddleware from './auth';
 
+// Predefined constants
+const MAX_VIDEO_SIZE: number = 1 * Math.pow(10, 9) // 1 GB
+const MAX_CHANNEL_ICON_SIZE: number = 4 * Math.pow(10, 6); // 4 MB
+
 const app = express();
 
 // CORS
@@ -115,6 +119,7 @@ app.post('/video/:id/upload', (req, res, next) => {
     headers: req.headers,
     limits: {
       files: 1,
+      fileSize: MAX_VIDEO_SIZE
     },
   });
   busboyInstance.on('file', (fieldname, file, filename, encoding, mimetype) => {
@@ -218,6 +223,7 @@ app.post('/channel/:id/uploadIcon', (req, res, next) => {
     headers: req.headers,
     limits: {
       files: 1,
+      fileSize: MAX_CHANNEL_ICON_SIZE,
     },
   });
   busboyInstance.on('file', (fieldname, file, filename, encoding, mimetype) => {
