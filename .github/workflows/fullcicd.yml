@@ -111,8 +111,8 @@ jobs:
           docker build \
           -t "$GCR_HOSTNAME/$GCP_PROJECT_ID/$SSR_IMAGE:$GITHUB_SHA" \
           -t "$GH_HOSTNAME/$GH_REPO_REF/$SSR_IMAGE:$GITHUB_SHA" \
+          --cache-from="$GH_HOSTNAME/$GH_REPO_REF/$SSR_IMAGE" \
           .
-          --cache-from="$GH_HOSTNAME/$GH_REPO_REF/$SSR_IMAGE"
       - name: Publish Image to GH
         run: |
           docker push "$GH_HOSTNAME/$GH_REPO_REF/$SSR_IMAGE:$GITHUB_SHA"
