@@ -1,4 +1,8 @@
-<template> </template>
+<template>
+  <span>
+    Loading...
+  </span>
+</template>
 
 <script>
 /* This page is intentionally left blank so the auth middleware

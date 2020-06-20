@@ -4,11 +4,8 @@ module.exports = {
     browser: true,
     node: true
   },
-  parserOptions: {
-    parser: 'babel-eslint'
-  },
   extends: [
-    '@nuxtjs',
+    '@nuxtjs/eslint-config-typescript',
     'prettier',
     'prettier/vue',
     'plugin:prettier/recommended',
@@ -19,6 +16,5 @@ module.exports = {
   ],
   // add your custom rules here
   rules: {
-    "indent": ["error", 4]
   }
 }
