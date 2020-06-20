@@ -9,6 +9,18 @@ metadata:
 spec:
   tls:
     - secretName: {{ tpl "tls-secret-{{ include \"swish.fullname\" . }}" . | trunc 63}}
-  backend:
-    serviceName: {{ tpl "service-{{ include \"swish.fullname\" . }}" . | trunc 63}}
-    servicePort: 8080
+  rules:
+    - host: api.swish.tv
+      http:
+        paths:
+          - path: /*
+            backend:
+              serviceName: {{ tpl "main-service-{{ include \"swish.fullname\" . }}" . | trunc 63}}
+              servicePort: 8080
+    - host: swish.tv
+      http:
+        paths:
+          - path: /*
+            backend:
+              serviceName: {{ tpl "ssr-service-{{ include \"swish.fullname\" . }}" . | trunc 63}}
+              servicePort: 8080

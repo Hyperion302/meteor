@@ -1,9 +1,3 @@
-# Image Repository
-dockerRepo: docker.pkg.github.com
-dockerImage: hyperion302/swish/swish-app
-dockerTag: latest
-dockerPullPolicy: Always
-
 # Secrets
 secretGCP: secretGCPData
 secretDEVMUXID: secretDEVMUXID
@@ -32,7 +26,23 @@ swishDBProd: prod_
 
 gcsStaticIPName: swish-backend-ip
 
-resources: {}
+# Services
+main:
+  # Image repo
+  dockerRepo: docker.pkg.github.com
+  dockerImage: hyperion302/swish/swish-app
+  dockerTag: latest
+  dockerPullPolicy: Always
+  # Resources
+  resources: {}
+ssr:
+  # Image repo
+  dockerRepo: docker.pkg.github.com
+  dockerImage: hyperion302/swish/swish-app
+  dockerTag: latest
+  dockerPullPolicy: Always
+  # Resources
+  resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following

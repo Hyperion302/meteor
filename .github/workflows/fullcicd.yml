@@ -14,14 +14,15 @@ env:
   RELEASE_NAME: swishdepl
   # Publish vars
   GITHUB_SHA: ${{ github.sha }}
-  IMAGE: swish-app
+  MAIN_IMAGE: swish-main
+  SSR_IMAGE: swish-ssr
   GH_HOSTNAME: docker.pkg.github.com
   GH_REPO_REF: hyperion302/swish
   GCR_HOSTNAME: gcr.io
 
 jobs:
-  test-build-publish-backend:
-    name: Test, Build, and Publish the Backend
+  test-build-publish-main:
+    name: Test, Build, and Publish the Main Service
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -70,17 +71,61 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Publish Image to GH
         run: |
-          docker push "$GH_HOSTNAME/$GH_REPO_REF/$IMAGE:$GITHUB_SHA"
+          docker push "$GH_HOSTNAME/$GH_REPO_REF/$MAIN_IMAGE:$GITHUB_SHA"
       - name: Configure docker with gcloud
         run: |
           gcloud --quiet auth configure-docker
       - name: Publish Image to GCR
         run: |
-          docker push "$GCR_HOSTNAME/$GCP_PROJECT_ID/$IMAGE:$GITHUB_SHA"
-  deploy-backend:
-    name: Deploy Backend
+          docker push "$GCR_HOSTNAME/$GCP_PROJECT_ID/$MAIN_IMAGE:$GITHUB_SHA"
+  build-publish-ssr:
+    name: Buidl and Publish the SSR Service
     runs-on: ubuntu-latest
-    needs: test-build-publish-backend
+    defaults:
+      run:
+        working-directory: web/swish
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Use Node v10.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10.x
+      - name: Setup gcloud
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '270.0.0'
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+      - name: Login to GH docker server
+        uses: azure/docker-login@v1
+        with:
+          login-server: docker.pkg.github.com # default: index.docker.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pull last build from GH
+        run: |
+          docker pull "$GH_HOSTNAME/$GH_REPO_REF/$SSR_IMAGE" || true
+      - name: Build image using cache
+        run: |
+          docker build \
+          -t "$GCR_HOSTNAME/$GCP_PROJECT_ID/$IMAGE:$GITHUB_SHA" \
+          -t "$GH_HOSTNAME/$GH_REPO_REF/$IMAGE:$GITHUB_SHA" \
+          .
+          --cache-from="$GH_HOSTNAME/$GH_REPO_REF/$SSR_IMAGE"
+      - name: Publish Image to GH
+        run: |
+          docker push "$GH_HOSTNAME/$GH_REPO_REF/$SSR_IMAGE:$GITHUB_SHA"
+      - name: Configure docker with gcloud
+        run: |
+          gcloud --quiet auth configure-docker
+      - name: Publish Image to GCR
+        run: |
+          docker push "$GCR_HOSTNAME/$GCP_PROJECT_ID/$SSR_IMAGE:$GITHUB_SHA"
+  deploy:
+    name: Deploy to Produciton
+    runs-on: ubuntu-latest
+    needs: test-build-publish-main
     defaults:
       run:
         working-directory: backend
@@ -113,9 +158,12 @@ jobs:
             secretALGOLIASECRET:${{ secrets.ALGOLIASECRET }}
             secretTLSCRT:${{ secrets.TLSCRT }}
             secretTLSKEY:${{ secrets.TLSKEY }}
-            dockerTag:${{ github.sha }}
-            dockerImage:${{ secrets.GCP_PROJECT_ID }}/swish-app
-            dockerRepo:gcr.io
+            main.dockerTag:${{ github.sha }}
+            main.dockerImage:${{ secrets.GCP_PROJECT_ID }}/swish-main
+            main.dockerRepo:gcr.io
+            ssr.dockerTag:${{ github.sha }}
+            ssr.dockerImage:${{ secrets.GCP_PROJECT_ID }}/swish-ssr
+            ssr.dockerRepo:gcr.io
         id: bake
       - name: Deploy
         run: |

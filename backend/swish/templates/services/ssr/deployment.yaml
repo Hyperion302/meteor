@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ tpl "ssr-service-{{ include \"swish.fullname\" . }}" . | trunc 63}}
+  labels:
+    {{- include "swish.labels" . | nindent 4 }}
+    service: ssr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "swish.selectorLabels" . | nindent 6 }}
+      service: ssr
+  template:
+    metadata:
+      labels:
+        {{- include "swish.selectorLabels" . | nindent 8 }}
+        service: ssr
+    spec:
+      serviceAccountName: {{ tpl "service-account-{{ include \"swish.fullname\" . }}" . | trunc 63}}
+      containers:
+        - name: {{ printf "%s-%s" .Chart.Name "ssr" | trunc 63 }}
+          image: "{{ .Values.ssr.dockerRepo }}/{{ .Values.ssr.dockerImage }}:{{ .Values.ssr.dockerTag }}"
+          imagePullPolicy: {{ .Values.ssr.dockerPullPolicy }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.ssr.resources | nindent 12 }}
