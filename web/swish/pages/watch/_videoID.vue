@@ -2,17 +2,7 @@
   <span>
     <main class="watchPage">
       <div class="player">
-        <video
-          id="player"
-          class="video-js vjs-fill vjs-big-play-centered"
-          controls
-          preload="auto"
-          data-setup="{}"
-        >
-          <source
-            :src="`https://stream.mux.com/${video.content.playbackID}.m3u8`"
-            type="application/x-mpegURL"
-          />
+        <video ref="player" class="video-js vjs-fill vjs-big-play-centered">
           <p class="vjs-no-js">
             Sorry, Swish can't be used on your browser. Try upgrading to a more
             modern browser.
@@ -35,8 +25,10 @@
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator';
+import videojs, { VideoJsPlayer } from 'video.js';
 import PlayerChannelTile from '~/components/PlayerChannelTile.vue';
 import { getVideo } from '~/services/video';
+import { IVideo } from '~/models/video';
 
 @Component({
   components: {
@@ -45,10 +37,39 @@ import { getVideo } from '~/services/video';
   layout: 'signedIn',
 })
 export default class WatchPage extends Vue {
+  video?: IVideo;
+  player?: VideoJsPlayer;
   async asyncData({ params }: { params: any }) {
     return {
       video: await getVideo(params.videoID),
     };
+  }
+
+  mounted() {
+    this.player = videojs(this.$refs.player, {
+      controls: true,
+      autoplay: true,
+      sources: [
+        {
+          src: this.videoURL,
+          type: 'application/x-mpegURL',
+        },
+      ],
+    });
+  }
+
+  get videoURL(): string {
+    if (this.video && this.video.content) {
+      return `https://stream.mux.com/${this.video.content.playbackID}.m3u8`;
+    } else {
+      return '';
+    }
+  }
+
+  beforeDestroy() {
+    if (this.player) {
+      this.player.dispose();
+    }
   }
 }
 </script>

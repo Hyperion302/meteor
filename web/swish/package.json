@@ -19,9 +19,11 @@
     "@nuxtjs/axios": "^5.3.6",
     "@nuxtjs/dotenv": "^1.4.0",
     "@types/algoliasearch": "^3.34.10",
+    "@types/video.js": "^7.3.9",
     "algoliasearch": "^4.3.0",
     "nuxt": "^2.0.0",
     "nuxt-property-decorator": "^2.7.2",
+    "video.js": "^7.8.2",
     "vue-autosuggest": "^2.1.2",
     "vue-gtag": "^1.6.5",
     "vue-instantsearch": "^3.0.3"
