@@ -19,7 +19,6 @@
         </div>
       </div>
     </main>
-    <script src="https://vjs.zencdn.net/7.8.2/video.js"></script>
   </span>
 </template>
 
