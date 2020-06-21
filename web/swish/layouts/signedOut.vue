@@ -36,6 +36,8 @@ html
 body
   margin: 0;
 .masthead
+  z-index: 1
+  background: #FFFFFF;
   position: absolute;
   width: 100%;
   height: 60px;

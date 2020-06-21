@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <div>
     <div class="masthead">
       <nuxt-link tag="a" class="logo" to="/">
         Swish
@@ -15,7 +15,7 @@
       </call-to-action>
     </div>
     <nuxt />
-  </span>
+  </div>
 </template>
 
 <script lang="ts">
@@ -36,6 +36,8 @@ html
 body
   margin: 0;
 .masthead
+  z-index: 1
+  background: #FFFFFF;
   position: absolute;
   width: 100%;
   height: 60px;
