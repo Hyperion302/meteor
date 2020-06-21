@@ -60,7 +60,6 @@ export default class SearchResult extends Vue {
   align-items: center;
   &:hover
     cursor: pointer
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.25);
   .infoBox
     margin: 0 48px;
     color: black;
