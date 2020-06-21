@@ -79,7 +79,6 @@
           divided between the creators you watch based on how much you watch
           them.
         </p>
-        <h1>So, what does this mean?</h1>
         <div class="columns">
           <div class="column">
             <h2>Support the creators you love even more</h2>
@@ -96,7 +95,7 @@
             </p>
           </div>
           <div class="column">
-            <h2>Become the customer, not the product</h2>
+            <h2>Be the customer, not the product</h2>
             <p>
               Start being treated as a customer, not a product. Your voice
               matters, and decisions are made with only you and your opinions in
@@ -187,6 +186,8 @@ export default class HomePage extends Vue {
       margin: 10 0;
   .about
     width: 60%
+    @media only screen and (max-width: 600px)
+      width: 90%
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -214,7 +215,8 @@ export default class HomePage extends Vue {
     flex-direction: column;
     height: 100%;
     #autosuggestID
-      width: 400px;
+      width: 100%;
+      margin: 0 12px;
       input
         border: 1px solid #dddddd;
         border-radius: 4px;
