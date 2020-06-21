@@ -30,12 +30,18 @@ import { IVideo } from '~/models/video';
 })
 export default class ChannelPage extends Vue {
   iconExists: boolean = true;
-  channel?: IChannel;
-  video?: IVideo;
+  channel!: IChannel;
+  video!: IVideo;
   async asyncData({ params }: { params: any }) {
     return {
       channel: await getChannel(params.channelID),
       videos: await queryVideos(params.channelID),
+    };
+  }
+
+  head() {
+    return {
+      title: `${this.channel.name} - Swish`,
     };
   }
 
