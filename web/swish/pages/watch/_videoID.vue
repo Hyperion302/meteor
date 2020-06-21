@@ -12,7 +12,7 @@
       <div class="info">
         <h1>{{ video.title }}</h1>
         <div class="descriptionChannelBox">
-          <player-channel-tile class="channelTile" :channel="video.channel" />
+          <player-channel-tile class="channel" :channel="video.channel" />
           <p class="description">
             {{ video.description }}
           </p>
@@ -96,7 +96,7 @@ export default class WatchPage extends Vue {
     .descriptionChannelBox
       display: flex;
       width: 100%
-      .channelTile
+      .channel
         min-width: 200px;
       .description
         margin: 0 12px;
