@@ -181,6 +181,8 @@ export default class HomePage extends Vue {
     h1
       text-align: center;
       font-size: 6em;
+      @media only screen and (max-width: 600px)
+        font-size: 4em;
       font-weight: bold;
       margin: 10 0;
   .about
@@ -193,11 +195,17 @@ export default class HomePage extends Vue {
       width: 100%;
       justify-content: space-between;
       display: flex;
+      flex-wrap: wrap;
       .column
         width: 32%;
         h2
           width: 100%;
           text-align: center;
+      @media only screen and (max-width: 600px)
+        display: block;
+        .column
+          margin: 0 auto;
+          width: 100%;
   .searchWrapper
     margin: 0;
     display: flex;
