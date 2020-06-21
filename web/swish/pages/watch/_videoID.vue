@@ -36,8 +36,8 @@ import { IVideo } from '~/models/video';
   layout: 'signedIn',
 })
 export default class WatchPage extends Vue {
-  video?: IVideo;
-  player?: VideoJsPlayer;
+  video!: IVideo;
+  player!: VideoJsPlayer;
   async asyncData({ params }: { params: any }) {
     return {
       video: await getVideo(params.videoID),
@@ -57,8 +57,21 @@ export default class WatchPage extends Vue {
     });
   }
 
+  head() {
+    return {
+      title: this.video.title,
+      meta: [
+        {
+          hid: 'description',
+          name: 'description',
+          content: this.video.description,
+        },
+      ],
+    };
+  }
+
   get videoURL(): string {
-    if (this.video && this.video.content) {
+    if (this.video.content) {
       return `https://stream.mux.com/${this.video.content.playbackID}.m3u8`;
     } else {
       return '';
