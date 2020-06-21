@@ -89,10 +89,11 @@ export default class WatchPage extends Vue {
 <style lang="sass">
 .watchPage
   .player
-    height: 500px;
+    padding: 60px 0 0 0;
+    height: 80vh;
     width: 100vw;
   .info
-    padding: 0 24px;
+    margin: 48px 24px;
     .descriptionChannelBox
       display: flex;
       width: 100%
