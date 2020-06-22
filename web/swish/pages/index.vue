@@ -208,7 +208,7 @@ export default class HomePage extends Vue {
           margin: 0 auto;
           width: 100%;
   .searchWrapper
-    margin: 0;
+    margin: 0 12px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -216,7 +216,7 @@ export default class HomePage extends Vue {
     height: 100%;
     #autosuggestID
       width: 100%;
-      margin: 0 12px;
+      max-width: 400px;
       input
         border: 1px solid #dddddd;
         border-radius: 4px;

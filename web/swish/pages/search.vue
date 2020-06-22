@@ -18,7 +18,11 @@
           />
         </template>
       </ais-search-box>
-      <ais-infinite-hits>
+      <ais-infinite-hits
+        :class-names="{
+          'ais-InfiniteHits': 'searchResults',
+        }"
+      >
         <div slot-scope="{ items, refinePrevious, refineNext }">
           <div v-for="item in items" :key="item.objectID">
             <search-result
@@ -78,10 +82,14 @@ export default class SearchPage extends Vue {
 
 <style lang="sass">
 .searchPage
+  padding: 60px 0 0 0;
   height: 100vh;
-  padding: 96px;
+  overflow-x: hidden;
   .searchBox
+    margin: 0 12px;
     input
+      width: 100%;
+      box-sizing: border-box;
       border: 1px solid #dddddd;
       border-radius: 4px;
       font-size: 24px;
@@ -89,4 +97,7 @@ export default class SearchPage extends Vue {
       @supports (-webkit-appearance: none) or (-moz-appearance: none)
         -webkit-appearance: none;
         -moz-appearance: none;
+  .searchResults
+    width: 100%;
+    margin: 0 12px;
 </style>
