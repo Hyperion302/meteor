@@ -2,30 +2,30 @@ import { ObjectWritableMock } from 'stream-mock';
 
 // Mock appConfig
 export const mockConfig = jest.fn(() => {
-    return {
-        environment: 'dev',
-        searchIndex: 'dev_swish',
-        bucket: 'dev-swish',
-        dbPrefix: 'dev',
-        muxSubscription: 'dev-swish-api',
-    };
+  return {
+    environment: 'dev',
+    searchIndex: 'dev_swish',
+    bucket: 'dev-swish',
+    dbPrefix: 'dev',
+    muxSubscription: 'dev-swish-api',
+  };
 });
 export class MockedAppConfig {
-    get environment() {
-        return mockConfig().environment;
-    }
-    get searchIndex() {
-        return mockConfig().searchIndex;
-    }
-    get bucket() {
-        return mockConfig().bucket;
-    }
-    get dbPrefix() {
-        return mockConfig().dbPrefix;
-    }
-    get muxSubscription() {
-        return mockConfig().muxSubscription;
-    }
+  get environment() {
+    return mockConfig().environment;
+  }
+  get searchIndex() {
+    return mockConfig().searchIndex;
+  }
+  get bucket() {
+    return mockConfig().bucket;
+  }
+  get dbPrefix() {
+    return mockConfig().dbPrefix;
+  }
+  get muxSubscription() {
+    return mockConfig().muxSubscription;
+  }
 }
 export const appConfig = new MockedAppConfig();
 
@@ -44,49 +44,49 @@ export const mockExists = jest.fn(() => true);
 export const mockData = jest.fn();
 
 export class MockedFirestore {
-    get exists() {
-        return mockExists();
-    }
-    public data = mockData;
-    public delete = mockDelete;
-    public docs = this;
-    public map = mockMap;
-    doc() {
-        mockDoc(...arguments);
-        return this;
-    }
-    collection() {
-        mockCollection(...arguments);
-        return this;
-    }
-    get() {
-        mockGet(...arguments);
-        return new Promise((resolve) => {
-            process.nextTick(() => {
-                resolve(this);
-            });
-        });
-    }
-    set() {
-        mockSet(...arguments);
-        return new Promise((resolve) => {
-            process.nextTick(() => {
-                resolve();
-            });
-        });
-    }
-    update() {
-        mockUpdate(...arguments);
-        return new Promise((resolve) => {
-            process.nextTick(() => {
-                resolve();
-            });
-        });
-    }
-    where() {
-        mockWhere(...arguments);
-        return this;
-    }
+  get exists() {
+    return mockExists();
+  }
+  public data = mockData;
+  public delete = mockDelete;
+  public docs = this;
+  public map = mockMap;
+  doc() {
+    mockDoc(...arguments);
+    return this;
+  }
+  collection() {
+    mockCollection(...arguments);
+    return this;
+  }
+  get() {
+    mockGet(...arguments);
+    return new Promise((resolve) => {
+      process.nextTick(() => {
+        resolve(this);
+      });
+    });
+  }
+  set() {
+    mockSet(...arguments);
+    return new Promise((resolve) => {
+      process.nextTick(() => {
+        resolve();
+      });
+    });
+  }
+  update() {
+    mockUpdate(...arguments);
+    return new Promise((resolve) => {
+      process.nextTick(() => {
+        resolve();
+      });
+    });
+  }
+  where() {
+    mockWhere(...arguments);
+    return this;
+  }
 }
 
 export const firestoreInstance = new MockedFirestore();
@@ -100,26 +100,26 @@ export const mockMakePublic = jest.fn();
 export const mockedWriteStream = new ObjectWritableMock();
 
 export class MockedStorage {
-    bucket() {
-        mockBucket(...arguments);
-        return this;
-    }
-    file() {
-        mockFile(...arguments);
-        return this;
-    }
-    createWriteStream() {
-        mockCreateWriteStream(...arguments);
-        return mockedWriteStream;
-    }
-    makePublic() {
-        mockMakePublic(...arguments);
-        return new Promise((resolve) => {
-            process.nextTick(() => {
-                resolve(this);
-            });
-        });
-    }
+  bucket() {
+    mockBucket(...arguments);
+    return this;
+  }
+  file() {
+    mockFile(...arguments);
+    return this;
+  }
+  createWriteStream() {
+    mockCreateWriteStream(...arguments);
+    return mockedWriteStream;
+  }
+  makePublic() {
+    mockMakePublic(...arguments);
+    return new Promise((resolve) => {
+      process.nextTick(() => {
+        resolve(this);
+      });
+    });
+  }
 }
 
 export const storageInstance = new MockedStorage();
@@ -129,23 +129,23 @@ export const mockSaveObject = jest.fn();
 export const mockDeleteObject = jest.fn();
 
 export class MockedAlgolia {
-    saveObject() {
-        mockSaveObject(...arguments);
-        return new Promise((resolve) => {
-            process.nextTick(() => {
-                resolve();
-            });
-        });
-    }
+  saveObject() {
+    mockSaveObject(...arguments);
+    return new Promise((resolve) => {
+      process.nextTick(() => {
+        resolve();
+      });
+    });
+  }
 
-    deleteObject() {
-        mockDeleteObject(...arguments);
-        return new Promise((resolve) => {
-            process.nextTick(() => {
-                resolve();
-            });
-        });
-    }
+  deleteObject() {
+    mockDeleteObject(...arguments);
+    return new Promise((resolve) => {
+      process.nextTick(() => {
+        resolve();
+      });
+    });
+  }
 }
 
 export const algoliaClientInstance = {};
@@ -153,9 +153,9 @@ export const algoliaIndexInstance = new MockedAlgolia();
 
 // Mock PubSub
 export class MockPubSubSubscription {
-    on() {}
+  on() {}
 }
 export const pubsubSubscriptionID =
-    process.env.MUXEVENTSUBSCRIPTIONID || 'swish-api';
+  process.env.MUXEVENTSUBSCRIPTIONID || 'swish-api';
 export const pubsubClient = {};
 export const pubsubSubscription = new MockPubSubSubscription();

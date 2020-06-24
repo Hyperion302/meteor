@@ -4,30 +4,30 @@ import { tID } from '../../definitions';
  * Describes a video content record.  Holds Mux ids required for playback and/or asset manipulation.
  */
 export interface IVideoContent {
-    id: tID;
-    assetID: string;
-    playbackID: string;
+  id: tID;
+  assetID: string;
+  playbackID: string;
 }
 
 export interface IMuxAssetReadyEvent {
-    type: 'ready';
-    videoID: tID; // Passthrough value
-    contentID: tID; // Passthrough value
-    assetID: string;
-    playbackID: string;
-    environment: {
-        name: string;
-        id: string;
-    };
+  type: 'ready';
+  videoID: tID; // Passthrough value
+  contentID: tID; // Passthrough value
+  assetID: string;
+  playbackID: string;
+  environment: {
+    name: string;
+    id: string;
+  };
 }
 
 export interface IMuxAssetDeletedEvent {
-    type: 'deleted';
-    videoID: tID; // Passthrough value
-    contentID: tID; // Passthrough value
-    assetID: string;
-    environment: {
-        name: string;
-        id: string;
-    };
+  type: 'deleted';
+  videoID: tID; // Passthrough value
+  contentID: tID; // Passthrough value
+  assetID: string;
+  environment: {
+    name: string;
+    id: string;
+  };
 }
