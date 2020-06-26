@@ -25,6 +25,7 @@ const testContent: IVideoContent = {
   id: 'b5263a52-1c05-4ab7-813d-65b8866bacfd',
   assetID: 'SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo',
   playbackID: '1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG',
+  duration: 5.2,
 };
 
 const testVideo: IVideo = {
@@ -83,12 +84,13 @@ describe('Video Content Service', () => {
       );
 
       expect(res).toMatchInlineSnapshot(`
-                Object {
-                  "assetID": "SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo",
-                  "id": "b5263a52-1c05-4ab7-813d-65b8866bacfd",
-                  "playbackID": "1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG",
-                }
-            `);
+        Object {
+          "assetID": "SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo",
+          "duration": 5.2,
+          "id": "b5263a52-1c05-4ab7-813d-65b8866bacfd",
+          "playbackID": "1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG",
+        }
+      `);
     });
   });
   describe('uploadVideo', () => {

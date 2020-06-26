@@ -33,6 +33,7 @@ const testVideo: IVideo = {
     id: 'b5263a52-1c05-4ab7-813d-65b8866bacfd',
     assetID: 'SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo',
     playbackID: '1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG',
+    duration: 5.2,
   },
   description: 'Test Video Description',
   title: 'Test Video Name',

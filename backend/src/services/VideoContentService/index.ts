@@ -52,6 +52,7 @@ pubsubSubscription.on('message', async (message: Message) => {
           playbackID: bodyData.data.playback_ids.find(
             (id: any) => id.policy == 'public',
           ).id,
+          duration: bodyData.data.duration,
           videoID: bodyData.data.passthrough.split(':')[0],
           contentID: bodyData.data.passthrough.split(':')[1],
           environment: {
@@ -103,6 +104,7 @@ export async function handleMuxAssetReady(
     id: muxEvent.contentID,
     assetID: muxEvent.assetID,
     playbackID: muxEvent.playbackID,
+    duration: muxEvent.duration,
   };
   const videoContentDoc = firestoreInstance.doc(
     toNamespaced(`content/${muxEvent.contentID}`, appConfig.dbPrefix),
@@ -184,6 +186,7 @@ export async function getVideo(
     id,
     assetID: contentData.assetID,
     playbackID: contentData.playbackID,
+    duration: contentData.duration,
   };
 }
 

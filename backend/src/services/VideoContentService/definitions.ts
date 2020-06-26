@@ -7,12 +7,14 @@ export interface IVideoContent {
   id: tID;
   assetID: string;
   playbackID: string;
+  duration: number;
 }
 
 export interface IMuxAssetReadyEvent {
   type: 'ready';
   videoID: tID; // Passthrough value
   contentID: tID; // Passthrough value
+  duration: number;
   assetID: string;
   playbackID: string;
   environment: {

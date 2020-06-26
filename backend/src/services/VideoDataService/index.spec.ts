@@ -36,6 +36,7 @@ const testContent: IVideoContent = {
   id: 'b5263a52-1c05-4ab7-813d-65b8866bacfd',
   assetID: 'SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo',
   playbackID: '1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG',
+  duration: 5.2,
 };
 
 const mockContext: IServiceInvocationContext = {
@@ -127,24 +128,25 @@ describe('Video Data Service', () => {
         '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
       );
       expect(res).toMatchInlineSnapshot(`
-                Object {
-                  "author": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
-                  "channel": Object {
-                    "id": "716886dd-c107-4bd7-9060-a47b50f81689",
-                    "name": "Test Channel",
-                    "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
-                  },
-                  "content": Object {
-                    "assetID": "SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo",
-                    "id": "b5263a52-1c05-4ab7-813d-65b8866bacfd",
-                    "playbackID": "1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG",
-                  },
-                  "description": "Test Video Description",
-                  "id": "3d1afd2a-04a2-47f9-9c65-e34b6465b83a",
-                  "title": "Test Video Name",
-                  "uploadDate": 1578009691,
-                }
-            `);
+        Object {
+          "author": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
+          "channel": Object {
+            "id": "716886dd-c107-4bd7-9060-a47b50f81689",
+            "name": "Test Channel",
+            "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
+          },
+          "content": Object {
+            "assetID": "SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo",
+            "duration": 5.2,
+            "id": "b5263a52-1c05-4ab7-813d-65b8866bacfd",
+            "playbackID": "1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG",
+          },
+          "description": "Test Video Description",
+          "id": "3d1afd2a-04a2-47f9-9c65-e34b6465b83a",
+          "title": "Test Video Name",
+          "uploadDate": 1578009691,
+        }
+      `);
     });
   });
 
@@ -494,24 +496,25 @@ describe('Video Data Service', () => {
         '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
       );
       expect(searchService.removeVideo.mock.calls[0][1]).toMatchInlineSnapshot(`
-                    Object {
-                      "author": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
-                      "channel": Object {
-                        "id": "716886dd-c107-4bd7-9060-a47b50f81689",
-                        "name": "Test Channel",
-                        "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
-                      },
-                      "content": Object {
-                        "assetID": "SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo",
-                        "id": "b5263a52-1c05-4ab7-813d-65b8866bacfd",
-                        "playbackID": "1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG",
-                      },
-                      "description": "Test Video Description",
-                      "id": "3d1afd2a-04a2-47f9-9c65-e34b6465b83a",
-                      "title": "Test Video Name",
-                      "uploadDate": 1578009691,
-                    }
-                `);
+Object {
+  "author": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
+  "channel": Object {
+    "id": "716886dd-c107-4bd7-9060-a47b50f81689",
+    "name": "Test Channel",
+    "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
+  },
+  "content": Object {
+    "assetID": "SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo",
+    "duration": 5.2,
+    "id": "b5263a52-1c05-4ab7-813d-65b8866bacfd",
+    "playbackID": "1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG",
+  },
+  "description": "Test Video Description",
+  "id": "3d1afd2a-04a2-47f9-9c65-e34b6465b83a",
+  "title": "Test Video Name",
+  "uploadDate": 1578009691,
+}
+`);
     });
 
     it('Deletes the video content', async () => {
