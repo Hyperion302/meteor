@@ -7,7 +7,8 @@ export type tServiceName =
   | 'ChannelData'
   | 'Search'
   | 'VideoContent'
-  | 'VideoData';
+  | 'VideoData'
+  | 'WatchTime';
 
 export type tResourceName = 'channel' | 'video' | 'videoContent';
 

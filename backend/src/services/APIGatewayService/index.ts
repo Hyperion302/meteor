@@ -5,6 +5,7 @@ import * as videoDataService from '../VideoDataService';
 import * as channelDataService from '../ChannelDataService';
 import * as videoContentService from '../VideoContentService';
 import * as channelContentService from '../ChannelContentService';
+import * as watchTimeService from '../WatchTimeService';
 import { IVideoQuery, IVideoUpdate } from '../VideoDataService/definitions';
 import { IError } from '../../definitions';
 import {
@@ -17,6 +18,7 @@ import {
   AuthorizationError,
 } from '../../errors';
 import authMiddleware from './auth';
+import { networkInterfaces } from 'os';
 
 // Predefined constants
 const MAX_VIDEO_SIZE: number = 1 * Math.pow(10, 9); // 1 GB
@@ -135,6 +137,45 @@ app.post('/video/:id/upload', (req, res, next) => {
       });
   });
   req.pipe(busboyInstance);
+});
+app.post('/video/:id/segments', express.json(), async (req, res, next) => {
+  // Sevice request
+  try {
+    console.log(req.body);
+    const t1 = parseFloat(req.body.t1);
+    if (isNaN(t1)) throw new InvalidFieldError('Gateway', 't1');
+    const t2 = parseFloat(req.body.t2);
+    if (isNaN(t2)) throw new InvalidFieldError('Gateway', 't2');
+    const segments = await watchTimeService.createSegments(
+      req.context,
+      req.params.id,
+      req.context.auth.userID,
+      t1,
+      t2,
+    );
+    res.status(201).send(segments);
+  } catch (e) {
+    next(e);
+  }
+});
+app.get('/video/:id/segments', async (req, res, next) => {
+  // Service request
+  try {
+    const segments = await watchTimeService.getSegments(
+      req.context,
+      req.params.id,
+      req.context.auth.userID,
+    );
+    const bc = await watchTimeService.getWatchTime(
+      req.context,
+      req.params.id,
+      req.context.auth.userID,
+    );
+    console.log(bc);
+    res.status(200).send(segments);
+  } catch (e) {
+    next(e);
+  }
 });
 app.put('/video/:id', express.json(), async (req, res, next) => {
   // Service request

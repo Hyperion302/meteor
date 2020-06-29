@@ -43,5 +43,8 @@ export interface IAppConfiguration {
   searchIndex: string;
   bucket: string;
   dbPrefix: string;
+  redisAddress: string;
+  redisPort: number;
+  redisDB: number;
   muxSubscription: string;
 }

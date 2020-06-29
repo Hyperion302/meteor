@@ -4,6 +4,7 @@ import { PubSub } from '@google-cloud/pubsub';
 import algoliasearch from 'algoliasearch';
 import { ClientConfig } from '@google-cloud/pubsub/build/src/pubsub';
 import { IAppConfiguration } from './definitions';
+import redis from 'redis';
 
 const runtimeEnv = process.env.RUNTIMEENV;
 
@@ -22,6 +23,18 @@ export const appConfig: IAppConfiguration = {
     runtimeEnv == 'prod'
       ? process.env.PROD_MUXEVENTSUBSCRIPTION
       : process.env.DEV_MUXEVENTSUBSCRIPTION,
+  redisAddress:
+    runtimeEnv == 'prod'
+      ? process.env.PROD_REDIS_ADDR
+      : process.env.DEV_REDIS_ADDR,
+  redisPort:
+    runtimeEnv == 'prod'
+      ? parseInt(process.env.PROD_REDIS_PORT, 10)
+      : parseInt(process.env.DEV_REDIS_PORT),
+  redisDB:
+    runtimeEnv == 'prod'
+      ? parseInt(process.env.PROD_REDIS_DB, 10)
+      : parseInt(process.env.DEV_REDIS_DB, 10),
 };
 // //#endregion App Configuration
 
@@ -56,3 +69,11 @@ export const pubsubSubscription = pubsubClient.subscription(
   appConfig.muxSubscription,
 );
 // #endregion PubSub
+
+// #region Redis
+export const redisClient = redis.createClient({
+  host: appConfig.redisAddress,
+  port: appConfig.redisPort,
+  db: appConfig.redisDB,
+  detect_buffers: true,
+});

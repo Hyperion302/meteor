@@ -24,6 +24,10 @@ Uploads channel content to the CDN and preprocesses (resizes, transforms, format
 
 Handles search index updating
 
+## WatchTimeService
+
+Tracks watch time on videos
+
 # Interesting or complicated (or both) Flows
 
 ## Uploading a video
