@@ -23,12 +23,12 @@ swishMuxSubscriptionDev: dev-swish-api
 swishMuxSubscriptionProd: prod-swish-api
 swishDBDev: dev_
 swishDBProd: prod_
-swishRedisAddrProd: 10.226.77.43
+swishRedisAddrProd: "10.226.77.43"
 swishRedisAddrDev: localhost
-swishRedisPortProd: 6379
-swishRedisPortDev: 6379
-swishRedisDBProd: 0
-swishRedisDBDev: 0
+swishRedisPortProd: "6379"
+swishRedisPortDev: "6379"
+swishRedisDBProd: "0"
+swishRedisDBDev: "0"
 
 gcsStaticIPName: swish-backend-ip
 
