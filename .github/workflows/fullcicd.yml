@@ -148,7 +148,7 @@ jobs:
         with:
           renderEngine: 'helm'
           helm-version: 'v3.1.2'
-          helmChart: 'backend/swish'
+          helmChart: 'kubernetes/swish'
           releaseName: swishdepl
           overrides: |
             secretGCP:${{ secrets.GCP }}
