@@ -3,10 +3,16 @@ import { IWatchTimeSegment } from './definitions';
 import { redisClient } from '../../sharedInstances';
 import { promisify } from 'util';
 import { getVideo } from '../VideoDataService';
-import { InvalidFieldError, InternalError } from '../../errors';
+import {
+  InvalidFieldError,
+  InternalError,
+  AuthorizationError,
+} from '../../errors';
+
+// Used to keep the the unique segment finder fast
+const MAX_SEGMENTS_PER_FRAG = 10;
 
 const getAsync = promisify(redisClient.get).bind(redisClient);
-const bitcountAsync = promisify(redisClient.bitcount).bind(redisClient);
 
 /**
  * Get all of a user's segments for a video
@@ -20,7 +26,7 @@ export async function getSegments(
   video: tID,
   user: tID,
 ): Promise<IWatchTimeSegment[]> {
-  const bitfield = await getAsync(Buffer.from(`${video}:${user}`));
+  const bitfield = await getAsync(Buffer.from(`${video}:${user}:segments`));
   if (bitfield == null) {
     return [];
   }
@@ -29,7 +35,6 @@ export async function getSegments(
   for (const pair of bitfield.entries()) {
     const byte = pair[1];
     const offset = pair[0] * 8;
-    console.log(byte.toString(2));
     // Loop over every bit in the bitfield
     for (let i = 0; i < 8; i++) {
       const bitCheck = 1 << i;
@@ -63,7 +68,7 @@ export async function createSegments(
   t1: number,
   t2: number,
 ): Promise<IWatchTimeSegment[]> {
-  // Get total duration of the video to check bounds
+  // Get total duration of the video to check bounds (cached)
   // This follows the GET - WATCH - MULTI - EXEC pattern
   // GET
   let duration = await getAsync(`${video}:duration`);
@@ -110,20 +115,37 @@ export async function createSegments(
   // Generate segment(s) from the fragment
   const startTime = Math.floor(t1);
   const endTime = Math.ceil(t2);
-  const segments: IWatchTimeSegment[] = [];
+  const segmentIndices: number[] = [];
   for (let i = startTime; i < endTime; i++) {
-    segments.push({
-      index: i,
-    });
+    segmentIndices.push(i);
   }
 
-  // Write segments to bitfield
-  // Since it's unlikely that a client will request the setting of more than a few segments,
-  // it's safe to atomically set all bits using individual commands
+  // Check segment count
+  if (segmentIndices.length > 10) {
+    throw new AuthorizationError(
+      'WatchTime',
+      `create more than ${MAX_SEGMENTS_PER_FRAG} segments per fragment`,
+    );
+  }
+
+  // Find unique segments
+  const existingSegments = await getSegments(context, video, user);
+  const existingIndices = existingSegments.map(
+    (segment: IWatchTimeSegment) => segment.index,
+  );
+  const uniqueSegmentIndices = segmentIndices.filter(
+    (segIndex: number) => !existingIndices.includes(segIndex),
+  );
+
   const multi = redisClient.multi();
-  segments.forEach((segment) => {
-    multi.setbit(`${video}:${user}`, segment.index, '1');
+  // Write segments to bitfield
+  uniqueSegmentIndices.forEach((segmentIndex) => {
+    multi.setbit(`${video}:${user}:segments`, segmentIndex, '1');
   });
+  // Increment deduplicated video specific counter
+  multi.incrby(`${video}:watchtimeUnique`, uniqueSegmentIndices.length);
+  // Increment user specific counter
+  multi.incrbyfloat(`${video}:${user}:watchtime`, t2 - t1);
   await new Promise((resolve, reject) => {
     multi.exec((err, reply) => {
       if (err) reject(err);
@@ -131,7 +153,14 @@ export async function createSegments(
     });
   });
 
-  return segments;
+  // Return new indices
+  return uniqueSegmentIndices.map(
+    (segmentIndex: number): IWatchTimeSegment => {
+      return {
+        index: segmentIndex,
+      };
+    },
+  );
 }
 
 /**
@@ -144,7 +173,7 @@ export async function getTotalWatchTime(
   context: IServiceInvocationContext,
   video: tID,
 ): Promise<number> {
-  return 0;
+  return await getAsync(`${video}:watchtimeUnique`);
 }
 
 /**
@@ -159,9 +188,5 @@ export async function getWatchTime(
   video: tID,
   user: tID,
 ): Promise<number> {
-  const bc = await bitcountAsync(`${video}:${user}`);
-  if (bc == null) {
-    return 0;
-  }
-  return bc;
+  return await getAsync(`${video}:${user}:watchtime`);
 }

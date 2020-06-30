@@ -166,12 +166,6 @@ app.get('/video/:id/segments', async (req, res, next) => {
       req.params.id,
       req.context.auth.userID,
     );
-    const bc = await watchTimeService.getWatchTime(
-      req.context,
-      req.params.id,
-      req.context.auth.userID,
-    );
-    console.log(bc);
     res.status(200).send(segments);
   } catch (e) {
     next(e);

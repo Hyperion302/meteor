@@ -1,16 +1,21 @@
 # WatchTimeService
 
-The WatchTimeService handles the high volume watchtime segment requests. It creates, aggregates, and checks watchtime for other services and clients.
+The WatchTimeService handles the high volume watchtime segment requests. It creates, aggregates, and checks watchtime for other services and clients. It tracks both deduplicated watch time and duplicated watch time.
 
 ## getSegments
 
-Will get all a user's segments for a video
+Will get all a user's unique segments for a video
 
-## createSegments
+## processFragment
 
-Given a client generate fragment of watch time, will create and record segments
+Given a client fragment of watch time, will create segments and record watch time
 
-## getTotalWatchTime
+1. Checks fragment validity
+2. Generates segments
+3. Counts number of unique segments
+4. Writes segments to bitfield and increments both watch time counters
+
+## getVideoWatchTime
 
 Aggregates watch time for an entire video
 
@@ -36,5 +41,7 @@ This approach creates buckets of user id's in videos. Each bucket is a hash. Wit
 
 The final schema of the DB comes to:
 
-`video:duration => number`
-`video:user => bitfield`
+`[video]:duration => number` Cached duration of the video (to save on DB queries)
+`[video]:[user]:segments => bitfield` Deduplicated (guranteed unique) watchtime segments
+`[video]:watchtimeUnique => number` Video watch time (dedpulicated seconds)
+`[video]:[user]:watchtime => number` Accumulated watch time (duplicated seconds)
