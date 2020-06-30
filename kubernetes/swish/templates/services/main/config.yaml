@@ -12,3 +12,9 @@ data:
   PROD_DBPREFIX: {{ .Values.swishDBProd }}
   DEV_MUXEVENTSUBSCRIPTION: {{ .Values.swishMuxSubscriptionDev }}
   PROD_MUXEVENTSUBSCRIPTION: {{ .Values.swishMuxSubscriptionProd }}
+  PROD_REDIS_ADDR: {{ .Values.swishRedisAddrProd }}
+  DEV_REDIS_ADDR: {{ .Values.swishRedisAddrDev }}
+  PROD_REDIS_PORT: {{ .Values.swishRedisPortProd }}
+  DEV_REDIS_PORT: {{ .Values.swishRedisPortDev }}
+  PROD_REDIS_DB: {{ .Values.swishRedisDBProd }}
+  DEV_REDIS_DB: {{ .Values.swishRedisDBDev }}
