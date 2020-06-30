@@ -141,7 +141,6 @@ app.post('/video/:id/upload', (req, res, next) => {
 app.post('/video/:id/segments', express.json(), async (req, res, next) => {
   // Sevice request
   try {
-    console.log(req.body);
     const t1 = parseFloat(req.body.t1);
     if (isNaN(t1)) throw new InvalidFieldError('Gateway', 't1');
     const t2 = parseFloat(req.body.t2);
