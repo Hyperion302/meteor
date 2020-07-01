@@ -17,6 +17,16 @@ const getAsync = promisify(redisClient.get).bind(redisClient);
 const existsAsync = promisify(redisClient.exists).bind(redisClient);
 
 /**
+ * Modified rounding function that can round to any decimal place
+ * @param x Number to round
+ * @param n Decimal to round to.  Negative values specify decimal places greater than or equal to 1.
+ */
+function roundToN(x: number, n: number): number {
+  const scaleFac = Math.pow(10, n);
+  return Math.round(x * scaleFac) / scaleFac;
+}
+
+/**
  * Get all of a user's segments for a video
  * @param context Invocation context
  * @param video ID of video to get segments for
@@ -147,7 +157,7 @@ export async function createSegments(
   // Increment deduplicated video specific counter
   multi.incrby(`${video}:watchtimeUnique`, uniqueSegmentIndices.length);
   // Increment user specific counter
-  multi.incrbyfloat(`${video}:${user}:watchtime`, t2 - t1);
+  multi.incrbyfloat(`${video}:${user}:watchtime`, roundToN(t2 - t1, 3));
   await new Promise((resolve, reject) => {
     multi.exec((err, reply) => {
       if (err) reject(err);
