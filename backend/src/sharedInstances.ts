@@ -71,9 +71,16 @@ export const pubsubSubscription = pubsubClient.subscription(
 // #endregion PubSub
 
 // #region Redis
+console.log(appConfig);
+console.log(
+  `Connecting to redis://${appConfig.redisAddress}:${appConfig.redisPort}/${appConfig.redisDB}`,
+);
 export const redisClient = redis.createClient({
   host: appConfig.redisAddress,
   port: appConfig.redisPort,
   db: appConfig.redisDB,
   detect_buffers: true,
+});
+redisClient.on('error', (error) => {
+  console.error(error);
 });
