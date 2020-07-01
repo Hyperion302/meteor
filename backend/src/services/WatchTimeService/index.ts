@@ -33,6 +33,7 @@ export async function getSegments(
   const segments: IWatchTimeSegment[] = [];
   // Loop over every byte in the bitfield
   for (const pair of bitfield.entries()) {
+    console.log(pair.toString(2));
     const byte = pair[1];
     const offset = pair[0] * 8;
     // Loop over every bit in the bitfield
