@@ -27,6 +27,7 @@ export async function getSegments(
   user: tID,
 ): Promise<IWatchTimeSegment[]> {
   const bitfield = await getAsync(Buffer.from(`${video}:${user}:segments`));
+  console.log(bitfield);
   if (bitfield == null) {
     return [];
   }

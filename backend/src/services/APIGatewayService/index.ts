@@ -165,6 +165,7 @@ app.get('/video/:id/segments', async (req, res, next) => {
       req.params.id,
       req.context.auth.userID,
     );
+    console.log(segments);
     res.status(200).send(segments);
   } catch (e) {
     next(e);
