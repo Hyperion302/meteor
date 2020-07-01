@@ -7,12 +7,14 @@ import {
   InvalidFieldError,
   InternalError,
   AuthorizationError,
+  ResourceNotFoundError,
 } from '../../errors';
 
 // Used to keep the the unique segment finder fast
 const MAX_SEGMENTS_PER_FRAG = 10;
 
 const getAsync = promisify(redisClient.get).bind(redisClient);
+const existsAsync = promisify(redisClient.exists).bind(redisClient);
 
 /**
  * Get all of a user's segments for a video
@@ -27,14 +29,12 @@ export async function getSegments(
   user: tID,
 ): Promise<IWatchTimeSegment[]> {
   const bitfield = await getAsync(Buffer.from(`${video}:${user}:segments`));
-  console.log(bitfield);
   if (bitfield == null) {
     return [];
   }
   const segments: IWatchTimeSegment[] = [];
   // Loop over every byte in the bitfield
   for (const pair of bitfield.entries()) {
-    console.log(pair.toString(2));
     const byte = pair[1];
     const offset = pair[0] * 8;
     // Loop over every bit in the bitfield
