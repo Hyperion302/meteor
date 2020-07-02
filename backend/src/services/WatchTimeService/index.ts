@@ -15,7 +15,10 @@ import { updateWatchtime } from '../SearchService';
 const MAX_SEGMENTS_PER_FRAG = 10;
 
 const getAsync = promisify(redisClient.get).bind(redisClient);
-const existsAsync = promisify(redisClient.exists).bind(redisClient);
+const hgetAsync = promisify(redisClient.hget).bind(redisClient);
+const delAsync = promisify(redisClient.del).bind(redisClient);
+const scanAsync = promisify(redisClient.scan).bind(redisClient);
+const setAsync = promisify(redisClient.set).bind(redisClient);
 
 /**
  * Modified rounding function that can round to any decimal place
@@ -84,12 +87,12 @@ export async function createSegments(
   // Get total duration of the video to check bounds (cached)
   // This follows the GET - WATCH - MULTI - EXEC pattern
   // GET
-  let duration = await getAsync(`${video}:duration`);
+  let duration = await hgetAsync(video, 'duration');
   if (duration == null) {
     // If video duration has not been cached yet, record its duration
     await new Promise((resolve, reject) => {
       // WATCH
-      redisClient.watch(`${video}:duration`, function(watchError) {
+      redisClient.watch(video, (watchError) => {
         if (watchError) reject(watchError);
         // Request duration from content service
         getVideo(context, video)
@@ -99,7 +102,7 @@ export async function createSegments(
               // MULTI
               .multi()
               // SET
-              .set(`${videoObj.id}:duration`, duration)
+              .hset(videoObj.id, 'duration', duration)
               // EXEC
               .exec((err, reply) => {
                 if (err) reject(err);
@@ -150,22 +153,32 @@ export async function createSegments(
     (segIndex: number) => !existingIndices.includes(segIndex),
   );
 
+  // Check deletion flag
+  const flaggedForDeletion = await getAsync(`${video}:deleted`);
+  if (flaggedForDeletion) {
+    throw new ResourceNotFoundError('WatchTime', 'video', video);
+  }
+
   const multi = redisClient.multi();
-  // Increment deduplicated video specific counter
-  multi.incrby(`${video}:watchtimeUnique`, uniqueSegmentIndices.length);
-  // Increment user specific counter
-  multi.incrbyfloat(`${video}:${user}:watchtime`, roundToN(t2 - t1, 3));
-  // Write segments to bitfield last since their reply indices aren't important
-  uniqueSegmentIndices.forEach((segmentIndex) => {
-    multi.setbit(`${video}:${user}:segments`, segmentIndex, '1');
-  });
+  // WATCH wrapper for the deletion flag
   const { newVideoWatchtime, newUserWatchtime } = await new Promise(
     (resolve, reject) => {
-      multi.exec((err, reply) => {
-        if (err) reject(err);
-        resolve({
-          newVideoWatchtime: reply[0],
-          newUserWatchtime: reply[1],
+      multi.watch(`${video}:deleted`, (watchError) => {
+        if (watchError) reject(watchError);
+        // Increment deduplicated video specific counter
+        multi.hincrby(video, 'watchtimeUnique', uniqueSegmentIndices.length);
+        // Increment user specific counter
+        multi.incrbyfloat(`${video}:${user}:watchtime`, roundToN(t2 - t1, 3));
+        // Write segments to bitfield last since their reply indices aren't important
+        uniqueSegmentIndices.forEach((segmentIndex) => {
+          multi.setbit(`${video}:${user}:segments`, segmentIndex, '1');
+        });
+        multi.exec((err, reply) => {
+          if (err) reject(err);
+          resolve({
+            newVideoWatchtime: reply[0],
+            newUserWatchtime: reply[1],
+          });
         });
       });
     },
@@ -202,7 +215,7 @@ export async function getTotalWatchTime(
   context: IServiceInvocationContext,
   video: tID,
 ): Promise<number> {
-  return await getAsync(`${video}:watchtimeUnique`);
+  return await hgetAsync(video, 'watchtimeUnique');
 }
 
 /**
@@ -218,4 +231,45 @@ export async function getWatchTime(
   user: tID,
 ): Promise<number> {
   return await getAsync(`${video}:${user}:watchtime`);
+}
+
+export async function clearUserOnVideo(
+  context: IServiceInvocationContext,
+  video: tID,
+  user: tID,
+) {
+  await delAsync(`${video}:${user}:segments`, `${video}:${user}:watchtime`);
+}
+
+export async function clearVideo(
+  context: IServiceInvocationContext,
+  video: tID,
+) {
+  // Make sure the video isn't already being deleted
+  const deletedFlag = await getAsync(`${video}:deleted`);
+  if (deletedFlag) {
+    throw new ResourceNotFoundError('WatchTime', 'video', video);
+  }
+  // Flag the video as deleted
+  await setAsync(`${video}:deleted`, 1);
+  // Now we can proceed to queue a deletion for all video keys
+  const multi = redisClient.multi();
+  let cursor = 0;
+  do {
+    const scanVal = await scanAsync(cursor);
+    cursor = scanVal[0];
+    const keys = scanVal[1];
+    keys.forEach((key: string) => {
+      if (key.startsWith(video)) {
+        multi.del(key);
+      }
+    });
+  } while (cursor != 0);
+  // Exec
+  await new Promise((resolve, reject) => {
+    multi.exec((err, reply) => {
+      if (err) reject(err);
+      resolve(reply);
+    });
+  });
 }

@@ -13,16 +13,28 @@ Given a client fragment of watch time, will create segments and record watch tim
 1. Checks fragment validity
 2. Generates segments
 3. Counts number of unique segments
-4. Writes segments to bitfield and increments both watch time counters
-5. Updates the search index if needed
+4. Ensures video is not flagged for deletion
+5. Writes segments to bitfield and increments both watch time counters
+6. Updates the search index if needed
 
-## getVideoWatchTime
+## getTotalWatchtime
 
 Aggregates watch time for an entire video
 
 ## getWatchTime
 
 Returns watch time for a single user on a video
+
+## clearUserOnVideo
+
+Deletes a user's watch time information on a specific video. _This does not subtract from the video's total watch time_
+
+## clearVideo
+
+Deletes an entire videos' watch time information.
+
+1. Flags a video for deletion
+2. Uses SCAN to iterate to delete all the video's keys
 
 ## A note on segment schema
 
@@ -42,7 +54,8 @@ This approach creates buckets of user id's in videos. Each bucket is a hash. Wit
 
 The final schema of the DB comes to:
 
-`[video]:duration => number` Cached duration of the video (to save on DB queries)
+`[video] { duration => number }` Cached duration of the video (to save on DB queries)
+`[video] { watchtimeUnique => number }` Video watch time (dedpulicated seconds)
+`[video]:deleted => string` Deletion flag (not in hash so it can be watched seperately)
 `[video]:[user]:segments => bitfield` Deduplicated (guranteed unique) watchtime segments
-`[video]:watchtimeUnique => number` Video watch time (dedpulicated seconds)
 `[video]:[user]:watchtime => number` Accumulated watch time (duplicated seconds)
