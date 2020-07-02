@@ -1,4 +1,4 @@
-import { tID } from '../../definitions';
+import { tID } from '@/definitions';
 
 /**
  * Describes a video content record.  Holds Mux ids required for playback and/or asset manipulation.

@@ -1,6 +1,6 @@
 import { IVideoContent } from '../VideoContentService/definitions';
-import { tID } from '../../definitions';
-import { IChannel } from '../ChannelDataService/definitions';
+import { tID } from '@/definitions';
+import { IChannel } from '@services/ChannelDataService/definitions';
 
 /**
  * A fully retrieved video including the "joined" fields such as channel and content

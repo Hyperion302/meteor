@@ -1,11 +1,11 @@
 import * as SearchService from './';
-import { IChannel } from '../ChannelDataService/definitions';
-import { IVideo } from '../VideoDataService/definitions';
-import { IServiceInvocationContext } from '../../definitions';
+import { IChannel } from '@services/ChannelDataService/definitions';
+import { IVideo } from '@services/VideoDataService/definitions';
+import { IServiceInvocationContext } from '@/definitions';
 
-const sharedInstances = require('../../sharedInstances');
+const sharedInstances = require('@/sharedInstances');
 
-jest.mock('../../sharedInstances');
+jest.mock('@/sharedInstances');
 
 const mockContext: IServiceInvocationContext = {
   auth: {
@@ -59,14 +59,15 @@ describe('Search Service', () => {
 
       expect(sharedInstances.mockSaveObject.mock.calls[0][0])
         .toMatchInlineSnapshot(`
-                Object {
-                  "description": "Test Video Description",
-                  "objectID": "3d1afd2a-04a2-47f9-9c65-e34b6465b83a",
-                  "title": "Test Video Name",
-                  "type": "video",
-                  "uploadDate": 1578009691,
-                }
-            `);
+        Object {
+          "description": "Test Video Description",
+          "objectID": "3d1afd2a-04a2-47f9-9c65-e34b6465b83a",
+          "title": "Test Video Name",
+          "type": "video",
+          "uploadDate": 1578009691,
+          "watchtime": 0,
+        }
+      `);
     });
   });
   describe('updateVideo', () => {
@@ -75,14 +76,15 @@ describe('Search Service', () => {
 
       expect(sharedInstances.mockSaveObject.mock.calls[0][0])
         .toMatchInlineSnapshot(`
-                Object {
-                  "description": "Test Video Description",
-                  "objectID": "3d1afd2a-04a2-47f9-9c65-e34b6465b83a",
-                  "title": "Test Video Name",
-                  "type": "video",
-                  "uploadDate": 1578009691,
-                }
-            `);
+        Object {
+          "description": "Test Video Description",
+          "objectID": "3d1afd2a-04a2-47f9-9c65-e34b6465b83a",
+          "title": "Test Video Name",
+          "type": "video",
+          "uploadDate": 1578009691,
+          "watchtime": 0,
+        }
+      `);
     });
   });
   describe('removeVideo', () => {

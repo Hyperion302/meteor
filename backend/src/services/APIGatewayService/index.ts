@@ -1,22 +1,21 @@
 import express from 'express';
 import busboy from 'busboy';
 import cors, { CorsOptions } from 'cors';
-import * as videoDataService from '../VideoDataService';
-import * as channelDataService from '../ChannelDataService';
-import * as videoContentService from '../VideoContentService';
-import * as channelContentService from '../ChannelContentService';
-import * as watchTimeService from '../WatchTimeService';
-import { IVideoQuery, IVideoUpdate } from '../VideoDataService/definitions';
-import { IError } from '../../definitions';
+import * as videoDataService from '@services/VideoDataService';
+import * as channelDataService from '@services/ChannelDataService';
+import * as videoContentService from '@services/VideoContentService';
+import * as channelContentService from '@services/ChannelContentService';
+import * as watchTimeService from '@services/WatchTimeService';
+import {
+  IVideoQuery,
+  IVideoUpdate,
+} from '@services/VideoDataService/definitions';
+import { IError } from '@/definitions';
 import {
   IChannelQuery,
   IChannelUpdate,
-} from '../ChannelDataService/definitions';
-import {
-  GenericError,
-  InvalidFieldError,
-  AuthorizationError,
-} from '../../errors';
+} from '@services/ChannelDataService/definitions';
+import { GenericError, InvalidFieldError, AuthorizationError } from '@/errors';
 import authMiddleware from './auth';
 import { networkInterfaces } from 'os';
 

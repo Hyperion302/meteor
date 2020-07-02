@@ -1,4 +1,4 @@
-import { tID } from '../../definitions';
+import { tID } from '@/definitions';
 
 export interface IVideoSearchObject {
   objectID: tID;

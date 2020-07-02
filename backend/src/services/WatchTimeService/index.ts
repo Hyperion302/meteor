@@ -1,15 +1,15 @@
-import { tID, IServiceInvocationContext } from '../../definitions';
+import { tID, IServiceInvocationContext } from '@/definitions';
 import { IWatchTimeSegment } from './definitions';
-import { redisClient } from '../../sharedInstances';
+import { redisClient } from '@/sharedInstances';
 import { promisify } from 'util';
-import { getVideo } from '../VideoDataService';
+import { getVideo } from '@services/VideoDataService';
 import {
   InvalidFieldError,
   InternalError,
   AuthorizationError,
   ResourceNotFoundError,
-} from '../../errors';
-import { updateWatchtime } from '../SearchService';
+} from '@/errors';
+import { updateWatchtime } from '@services/SearchService';
 
 // Used to keep the the unique segment finder fast
 const MAX_SEGMENTS_PER_FRAG = 10;

@@ -1,9 +1,9 @@
-import { IVideo } from '../VideoDataService/definitions';
-import { IChannel } from '../ChannelDataService/definitions';
-import { tID, IServiceInvocationContext, IError } from '../../definitions';
-import { algoliaIndexInstance } from '../../sharedInstances';
+import { IVideo } from '@services/VideoDataService/definitions';
+import { IChannel } from '@services/ChannelDataService/definitions';
+import { tID, IServiceInvocationContext, IError } from '@/definitions';
+import { algoliaIndexInstance } from '@/sharedInstances';
 import { IVideoSearchObject, IChannelSearchObject } from './definitions';
-import { AuthorizationError } from '../../errors';
+import { AuthorizationError } from '@/errors';
 
 function algoliaFromVideo(video: IVideo): IVideoSearchObject {
   return {

@@ -1,19 +1,19 @@
 import * as videoDataService from './';
 import 'jest-extended';
 import { IVideoUpdate, IVideo, IVideoSchema, IVideoQuery } from './definitions';
-import { IChannel } from '../ChannelDataService/definitions';
-import { IVideoContent } from '../VideoContentService/definitions';
-import { IServiceInvocationContext } from '../../definitions';
-const sharedInstances = require('../../sharedInstances');
-const channelDataService = require('../ChannelDataService');
-const videoContentService = require('../VideoContentService');
-const searchService = require('../SearchService');
+import { IChannel } from '@services/ChannelDataService/definitions';
+import { IVideoContent } from '@services/VideoContentService/definitions';
+import { IServiceInvocationContext } from '@/definitions';
+const sharedInstances = require('@/sharedInstances');
+const channelDataService = require('@services/ChannelDataService');
+const videoContentService = require('@services/VideoContentService');
+const searchService = require('@services/SearchService');
 const uuid = require('uuid/v4');
 
-jest.mock('../../sharedInstances');
-jest.mock('../ChannelDataService');
-jest.mock('../VideoContentService');
-jest.mock('../SearchService');
+jest.mock('@/sharedInstances');
+jest.mock('@services/ChannelDataService');
+jest.mock('@services/VideoContentService');
+jest.mock('@services/SearchService');
 jest.mock('uuid/v4');
 
 const testVideo: IVideoSchema = {

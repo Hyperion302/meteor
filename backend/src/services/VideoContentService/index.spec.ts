@@ -1,16 +1,16 @@
 import * as videoContentService from './';
 import { IVideoContent } from './definitions';
 import { ObjectReadableMock, ObjectWritableMock } from 'stream-mock';
-import { IServiceInvocationContext } from '../../definitions';
+import { IServiceInvocationContext } from '@/definitions';
 import moxios from 'moxios';
-import { IVideo } from '../VideoDataService/definitions';
+import { IVideo } from '@services/VideoDataService/definitions';
 
 const uuid = require('uuid/v4');
-const sharedInstances = require('../../sharedInstances');
-const VideoDataService = require('../VideoDataService');
+const sharedInstances = require('@/sharedInstances');
+const VideoDataService = require('@services/VideoDataService');
 
-jest.mock('../../sharedInstances');
-jest.mock('../VideoDataService');
+jest.mock('@/sharedInstances');
+jest.mock('@services/VideoDataService');
 jest.mock('uuid/v4');
 
 const mockContext: IServiceInvocationContext = {

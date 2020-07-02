@@ -1,13 +1,13 @@
 import * as ChannelDataService from './';
 import { IChannel, IChannelQuery, IChannelUpdate } from './definitions';
-import { IServiceInvocationContext } from '../../definitions';
+import { IServiceInvocationContext } from '@/definitions';
 
-const sharedInstances = require('../../sharedInstances');
-const searchService = require('../SearchService');
+const sharedInstances = require('@/sharedInstances');
+const searchService = require('@services/SearchService');
 const uuid = require('uuid/v4');
 
-jest.mock('../../sharedInstances');
-jest.mock('../SearchService');
+jest.mock('@/sharedInstances');
+jest.mock('@services/SearchService');
 jest.mock('uuid/v4');
 
 const testChannel: IChannel = {

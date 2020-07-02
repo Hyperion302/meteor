@@ -3,11 +3,11 @@ import {
   firestoreInstance,
   storageInstance,
   appConfig,
-} from '../../sharedInstances';
-import { tID, IServiceInvocationContext } from '../../definitions';
-import { AuthorizationError } from '../../errors';
+} from '@/sharedInstances';
+import { tID, IServiceInvocationContext } from '@/definitions';
+import { AuthorizationError } from '@/errors';
 import { CreateWriteStreamOptions } from '@google-cloud/storage';
-import { getChannel } from '../ChannelDataService';
+import { getChannel } from '@services/ChannelDataService';
 
 const sharpPipeline = sharp().png();
 const pipeline_128 = sharpPipeline.clone().resize(128, 128);

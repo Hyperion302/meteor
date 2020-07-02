@@ -1,15 +1,15 @@
-import { tID, IServiceInvocationContext } from '../../definitions';
+import { tID, IServiceInvocationContext } from '@/definitions';
 import {
   ResourceNotFoundError,
   InvalidQueryError,
   InternalError,
   AuthorizationError,
-} from '../../errors';
+} from '@/errors';
 import uuid from 'uuid/v4';
 import { IChannel, IChannelQuery, IChannelUpdate } from './definitions';
-import * as search from '../SearchService';
-import { firestoreInstance, appConfig } from '../../sharedInstances';
-import { toGlobal, toNamespaced } from '../../utils';
+import * as search from '@services/SearchService';
+import { firestoreInstance, appConfig } from '@/sharedInstances';
+import { toGlobal, toNamespaced } from '@/utils';
 
 // Predefined constants
 const MAX_CHANNELS: number = 10;

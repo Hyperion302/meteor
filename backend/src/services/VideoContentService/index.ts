@@ -1,23 +1,23 @@
-import { tID, IError, IServiceInvocationContext } from '../../definitions';
+import { tID, IError, IServiceInvocationContext } from '@/definitions';
 import {
   firestoreInstance,
   storageInstance,
   pubsubSubscription,
   appConfig,
-} from '../../sharedInstances';
+} from '@/sharedInstances';
 import {
   IVideoContent,
   IMuxAssetDeletedEvent,
   IMuxAssetReadyEvent,
 } from './definitions';
-import * as VideoDataService from '../VideoDataService';
-import * as SearchService from '../SearchService';
+import * as VideoDataService from '@services/VideoDataService';
+import * as SearchService from '@services/SearchService';
 import axios from 'axios';
-import { ResourceNotFoundError, AuthorizationError } from '../../errors';
+import { ResourceNotFoundError, AuthorizationError } from '@/errors';
 import { Message } from '@google-cloud/pubsub';
 import uuid from 'uuid/v4';
-import { toNamespaced } from '../../utils';
-import { IVideo } from '../VideoDataService/definitions';
+import { toNamespaced } from '@/utils';
+import { IVideo } from '@services/VideoDataService/definitions';
 
 // Auth Token
 const username =

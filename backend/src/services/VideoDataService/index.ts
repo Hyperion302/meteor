@@ -1,17 +1,17 @@
-import { tID, IError, IServiceInvocationContext } from '../../definitions';
+import { tID, IError, IServiceInvocationContext } from '@/definitions';
 import { IVideo, IVideoQuery, IVideoSchema, IVideoUpdate } from './definitions';
 import uuid from 'uuid/v4';
-import { firestoreInstance, appConfig } from '../../sharedInstances';
-import * as channelDataService from '../ChannelDataService';
-import * as videoContentService from '../VideoContentService';
-import * as searchService from '../SearchService';
+import { firestoreInstance, appConfig } from '@/sharedInstances';
+import * as channelDataService from '@services/ChannelDataService';
+import * as videoContentService from '@services/VideoContentService';
+import * as searchService from '@services/SearchService';
 import {
   AuthorizationError,
   ResourceNotFoundError,
   InvalidQueryError,
   InternalError,
-} from '../../errors';
-import { toNamespaced, toGlobal } from '../../utils';
+} from '@/errors';
+import { toNamespaced, toGlobal } from '@/utils';
 
 // Predefined constants
 const MAX_VIDEOS: number = 1000;

@@ -4,12 +4,11 @@ import {
   ObjectWritableMock,
   ObjectReadableMock,
 } from 'stream-mock';
-import { SharpInstance } from '../../../__mocks__/sharp';
-import { IServiceInvocationContext } from '../../definitions';
-import { IChannel } from '../ChannelDataService/definitions';
+import { IServiceInvocationContext } from '@/definitions';
+import { IChannel } from '@services/ChannelDataService/definitions';
 
-const sharedInstances = require('../../sharedInstances');
-const ChannelDataService = require('../ChannelDataService');
+const sharedInstances = require('@/sharedInstances');
+const ChannelDataService = require('@services/ChannelDataService');
 const sharp = require('sharp');
 
 const mockContext: IServiceInvocationContext = {
@@ -26,8 +25,8 @@ const testChannel: IChannel = {
   owner: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
 };
 
-jest.mock('../../sharedInstances');
-jest.mock('../ChannelDataService');
+jest.mock('@/sharedInstances');
+jest.mock('@services/ChannelDataService');
 
 function mockImplementations() {
   // Mock channel

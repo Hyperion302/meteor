@@ -1,4 +1,4 @@
-import { IJWTToken, IServiceInvocationContext } from '../../definitions';
+import { IJWTToken, IServiceInvocationContext } from '@/definitions';
 
 declare global {
   namespace Express {
