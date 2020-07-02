@@ -11,6 +11,8 @@ function algoliaFromVideo(video: IVideo): IVideoSearchObject {
     title: video.title,
     description: video.description,
     uploadDate: video.uploadDate,
+    // Assume 0 watch time when converting from video schema
+    watchtime: 0,
     type: 'video',
   };
 }
@@ -60,6 +62,22 @@ export async function updateVideo(
     throw new AuthorizationError('Search', 'update video in search index');
   }
   await algoliaIndexInstance.saveObject(algoliaFromVideo(video));
+}
+/**
+ * Updates the watchtime of a video in the search index
+ * @param context Invocation context
+ * @param videoID ID of the video to update
+ * @param watchtime New watchtime in seconds
+ */
+export async function updateWatchtime(
+  context: IServiceInvocationContext,
+  videoID: tID,
+  watchtime: number,
+) {
+  await algoliaIndexInstance.partialUpdateObject({
+    objectID: videoID,
+    watchtime,
+  });
 }
 /**
  * Removes a video from the search index

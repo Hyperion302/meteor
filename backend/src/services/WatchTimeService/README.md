@@ -14,6 +14,7 @@ Given a client fragment of watch time, will create segments and record watch tim
 2. Generates segments
 3. Counts number of unique segments
 4. Writes segments to bitfield and increments both watch time counters
+5. Updates the search index if needed
 
 ## getVideoWatchTime
 

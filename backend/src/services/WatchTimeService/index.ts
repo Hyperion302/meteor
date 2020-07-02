@@ -9,6 +9,7 @@ import {
   AuthorizationError,
   ResourceNotFoundError,
 } from '../../errors';
+import { updateWatchtime } from '../SearchService';
 
 // Used to keep the the unique segment finder fast
 const MAX_SEGMENTS_PER_FRAG = 10;
@@ -150,21 +151,37 @@ export async function createSegments(
   );
 
   const multi = redisClient.multi();
-  // Write segments to bitfield
-  uniqueSegmentIndices.forEach((segmentIndex) => {
-    multi.setbit(`${video}:${user}:segments`, segmentIndex, '1');
-  });
   // Increment deduplicated video specific counter
   multi.incrby(`${video}:watchtimeUnique`, uniqueSegmentIndices.length);
   // Increment user specific counter
   multi.incrbyfloat(`${video}:${user}:watchtime`, roundToN(t2 - t1, 3));
-  await new Promise((resolve, reject) => {
-    multi.exec((err, reply) => {
-      if (err) reject(err);
-      resolve(reply);
-    });
+  // Write segments to bitfield last since their reply indices aren't important
+  uniqueSegmentIndices.forEach((segmentIndex) => {
+    multi.setbit(`${video}:${user}:segments`, segmentIndex, '1');
   });
+  const { newVideoWatchtime, newUserWatchtime } = await new Promise(
+    (resolve, reject) => {
+      multi.exec((err, reply) => {
+        if (err) reject(err);
+        resolve({
+          newVideoWatchtime: reply[0],
+          newUserWatchtime: reply[1],
+        });
+      });
+    },
+  );
 
+  // Update the search index if the video watch time has changed by at least a minute
+  // This part could possibly be implemented in a better way
+  // I use normalization to see if the watch time crosses the minute boundary.
+  const oldVideoWatchtime = newVideoWatchtime - uniqueSegmentIndices.length;
+  const normOffset = Math.floor(oldVideoWatchtime / 60);
+  const normOldWt = oldVideoWatchtime / 60 - normOffset;
+  const normNewWt = newVideoWatchtime / 60 - normOffset;
+  if (normOldWt < 1 && normNewWt >= 1) {
+    // Crossed the minute boundary, update search index
+    await updateWatchtime(context, video, newVideoWatchtime);
+  }
   // Return new indices
   return uniqueSegmentIndices.map(
     (segmentIndex: number): IWatchTimeSegment => {

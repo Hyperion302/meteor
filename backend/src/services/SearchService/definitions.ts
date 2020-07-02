@@ -6,6 +6,7 @@ export interface IVideoSearchObject {
   title: string;
   description: string;
   uploadDate: number;
+  watchtime: number;
 }
 
 export interface IChannelSearchObject {
