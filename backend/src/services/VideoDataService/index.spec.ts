@@ -14,12 +14,14 @@ const sharedInstances = require('@/sharedInstances');
 const channelDataService = require('@services/ChannelDataService');
 const videoContentService = require('@services/VideoContentService');
 const searchService = require('@services/SearchService');
+const watchtimeService = require('@services/WatchTimeService');
 const uuid = require('uuid/v4');
 
 jest.mock('@/sharedInstances');
 jest.mock('@services/ChannelDataService');
 jest.mock('@services/VideoContentService');
 jest.mock('@services/SearchService');
+jest.mock('@services/WatchTimeService');
 jest.mock('uuid/v4');
 
 function mockImplementations() {
