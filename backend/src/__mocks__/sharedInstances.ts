@@ -1,4 +1,5 @@
 import { ObjectWritableMock } from 'stream-mock';
+import { Callback } from 'redis';
 
 // Mock appConfig
 export const mockConfig = jest.fn(() => {
@@ -159,3 +160,127 @@ export const pubsubSubscriptionID =
   process.env.MUXEVENTSUBSCRIPTIONID || 'swish-api';
 export const pubsubClient = {};
 export const pubsubSubscription = new MockPubSubSubscription();
+
+// Mock Redis
+export const mockRedisGet = jest.fn((key: string) => {
+  return { reply: 'OK', err: null };
+});
+export const mockRedisHget = jest.fn((key: string, field: string) => {
+  return { reply: 'OK', err: null };
+});
+export const mockRedisHset = jest.fn(
+  (key: string, field: string, value: string) => {
+    return { reply: 0, err: null };
+  },
+);
+export const mockRedisHincrby = jest.fn(
+  (key: string, field: string, increment: number) => {
+    return { reply: 'OK', err: null };
+  },
+);
+export const mockRedisIncrbyfloat = jest.fn(
+  (key: string, increment: number) => {
+    return { reply: 'OK', err: null };
+  },
+);
+export const mockRedisSetbit = jest.fn(
+  (key: string, offset: number, bit: string) => {
+    return { reply: 0, err: null };
+  },
+);
+export const mockRedisDel = jest.fn((key: string) => {
+  return { reply: 'OK', err: null };
+});
+export const mockRedisScan = jest.fn((cursor: string) => {
+  return { reply: null, err: null };
+});
+export const mockRedisSet = jest.fn((key: string, value: string) => {
+  return { reply: 'OK', err: null };
+});
+export const mockRedisWatch = jest.fn((key: string | string[]) => {
+  return { err: null };
+});
+export const mockRedisMulti = jest.fn();
+export const mockRedisExec = jest.fn(() => {
+  return { reply: null, err: null };
+});
+export class MockedRedis {
+  // For these functions I lock the arguments since util.promisify is very dependent on them
+  get(key: string, cb?: Callback<string>) {
+    const { reply, err } = mockRedisGet(key);
+    process.nextTick(() => {
+      if (cb) cb(err, reply);
+    });
+  }
+  hget(key: string, field: string, cb?: Callback<string>) {
+    const { reply, err } = mockRedisHget(key, field);
+    process.nextTick(() => {
+      if (cb) cb(err, reply);
+    });
+  }
+  hset(key: string, field: string, value: string, cb?: Callback<number>) {
+    const { reply, err } = mockRedisHset(key, field, value);
+    process.nextTick(() => {
+      if (cb) cb(err, reply);
+    });
+  }
+  hincrby(
+    key: string,
+    field: string,
+    increment: number,
+    cb?: Callback<string>,
+  ) {
+    const { reply, err } = mockRedisHincrby(key, field, increment);
+    process.nextTick(() => {
+      if (cb) cb(err, reply);
+    });
+  }
+  incrbyfloat(key: string, increment: number, cb?: Callback<string>) {
+    const { reply, err } = mockRedisIncrbyfloat(key, increment);
+    process.nextTick(() => {
+      if (cb) cb(err, reply);
+    });
+  }
+  setbit(key: string, offset: number, value: string, cb?: Callback<number>) {
+    const { reply, err } = mockRedisSetbit(key, offset, value);
+    process.nextTick(() => {
+      if (cb) cb(err, reply);
+    });
+  }
+  del(key: string, cb?: Callback<string>) {
+    const { reply, err } = mockRedisDel(key);
+    process.nextTick(() => {
+      if (cb) cb(err, reply);
+    });
+  }
+  scan(cursor: string, cb?: Callback<[string[]]>) {
+    const { reply, err } = mockRedisScan(cursor);
+    process.nextTick(() => {
+      if (cb) cb(err, reply);
+    });
+  }
+  set(key: string, value: string, cb?: Callback<'OK'>) {
+    const { err } = mockRedisSet(key, value);
+    process.nextTick(() => {
+      if (cb) cb(err, 'OK');
+    });
+  }
+  watch(key: string | string[], cb?: Callback<'OK'>) {
+    const { err } = mockRedisWatch(key);
+    process.nextTick(() => {
+      cb(err, 'OK');
+    });
+  }
+  multi() {
+    mockRedisMulti();
+    return this;
+  }
+  exec(cb: Callback<any[]>) {
+    const { err, reply } = mockRedisExec();
+    process.nextTick(() => {
+      cb(err, reply);
+    });
+  }
+}
+
+export const redisClient = new MockedRedis();
