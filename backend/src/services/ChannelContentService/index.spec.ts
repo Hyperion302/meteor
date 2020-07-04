@@ -6,31 +6,18 @@ import {
 } from 'stream-mock';
 import { IServiceInvocationContext } from '@/definitions';
 import { IChannel } from '@services/ChannelDataService/definitions';
+import { fakeChannel, fakeContext } from '@/sharedTestData';
 
 const sharedInstances = require('@/sharedInstances');
 const ChannelDataService = require('@services/ChannelDataService');
 const sharp = require('sharp');
-
-const mockContext: IServiceInvocationContext = {
-  auth: {
-    elevated: false,
-    userID: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
-    token: null, // None of the services should be using this
-  },
-};
-
-const testChannel: IChannel = {
-  id: '716886dd-c107-4bd7-9060-a47b50f81689',
-  name: 'Test Channel',
-  owner: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
-};
 
 jest.mock('@/sharedInstances');
 jest.mock('@services/ChannelDataService');
 
 function mockImplementations() {
   // Mock channel
-  ChannelDataService.getChannel.mockImplementation(() => testChannel);
+  ChannelDataService.getChannel.mockImplementation(() => fakeChannel);
 }
 
 beforeAll(() => {
@@ -51,8 +38,8 @@ describe('Channel Content Service', () => {
     it('Passes (Compressed Test)', async () => {
       const testInput = new ObjectReadableMock(['a', 'b', 'c', 'd', 'e']);
       await ChannelContentService.uploadIcon(
-        mockContext,
-        testChannel.id,
+        fakeContext,
+        fakeChannel.id,
         testInput,
       );
 
@@ -76,15 +63,15 @@ describe('Channel Content Service', () => {
 
       expect(sharedInstances.mockFile).toHaveBeenNthCalledWith(
         1,
-        `channelIcons/${testChannel.id}_128.png`,
+        `channelIcons/${fakeChannel.id}_128.png`,
       );
       expect(sharedInstances.mockFile).toHaveBeenNthCalledWith(
         2,
-        `channelIcons/${testChannel.id}_64.png`,
+        `channelIcons/${fakeChannel.id}_64.png`,
       );
       expect(sharedInstances.mockFile).toHaveBeenNthCalledWith(
         3,
-        `channelIcons/${testChannel.id}_32.png`,
+        `channelIcons/${fakeChannel.id}_32.png`,
       );
 
       // Creates proper write streams

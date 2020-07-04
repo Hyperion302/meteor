@@ -4,6 +4,7 @@ import { ObjectReadableMock, ObjectWritableMock } from 'stream-mock';
 import { IServiceInvocationContext } from '@/definitions';
 import moxios from 'moxios';
 import { IVideo } from '@services/VideoDataService/definitions';
+import { fakeContext, fakeContent, fakeVideo } from '@/sharedTestData';
 
 const uuid = require('uuid/v4');
 const sharedInstances = require('@/sharedInstances');
@@ -13,41 +14,12 @@ jest.mock('@/sharedInstances');
 jest.mock('@services/VideoDataService');
 jest.mock('uuid/v4');
 
-const mockContext: IServiceInvocationContext = {
-  auth: {
-    elevated: false,
-    userID: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
-    token: null, // None of the services should be using this
-  },
-};
-
-const testContent: IVideoContent = {
-  id: 'b5263a52-1c05-4ab7-813d-65b8866bacfd',
-  assetID: 'SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo',
-  playbackID: '1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG',
-  duration: 5.2,
-};
-
-const testVideo: IVideo = {
-  id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-  author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
-  channel: {
-    id: '716886dd-c107-4bd7-9060-a47b50f81689',
-    name: 'Test Channel',
-    owner: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
-  },
-  content: testContent,
-  description: 'Test Video Description',
-  title: 'Test Video Name',
-  uploadDate: 1578009691,
-};
-
 function mockImplementations() {
   // Mock firestore document
-  sharedInstances.mockData.mockImplementation(() => testContent);
+  sharedInstances.mockData.mockImplementation(() => fakeContent);
 
   // Mock video
-  VideoDataService.getVideo.mockImplementation(() => testVideo);
+  VideoDataService.getVideo.mockImplementation(() => fakeVideo);
 
   // Mock UUID
   uuid.mockImplementation(() => {
@@ -66,21 +38,21 @@ beforeEach(() => {
 describe('Video Content Service', () => {
   describe('getVideo', () => {
     it('Requests the correct content record', async () => {
-      await videoContentService.getVideo(mockContext, testContent.id);
+      await videoContentService.getVideo(fakeContext, fakeContent.id);
 
       expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
-        `${sharedInstances.mockConfig().dbPrefix}content/${testContent.id}`,
+        `${sharedInstances.mockConfig().dbPrefix}content/${fakeContent.id}`,
       );
     });
     it('Checks to see if the content record exists', async () => {
-      await videoContentService.getVideo(mockContext, testContent.id);
+      await videoContentService.getVideo(fakeContext, fakeContent.id);
 
       expect(sharedInstances.mockExists).toHaveBeenCalled();
     });
     it('Responds with the correct content data', async () => {
       const res = await videoContentService.getVideo(
-        mockContext,
-        testContent.id,
+        fakeContext,
+        fakeContent.id,
       );
 
       expect(res).toMatchInlineSnapshot(`
@@ -115,7 +87,7 @@ describe('Video Content Service', () => {
     it('References the correct bucket', async () => {
       const testInput = new ObjectReadableMock([0, 1, 2, 3, 4]);
       await videoContentService.uploadVideo(
-        mockContext,
+        fakeContext,
         testID,
         testInput,
         testMime,
@@ -128,20 +100,20 @@ describe('Video Content Service', () => {
     it('References the correct file path', async () => {
       const testInput = new ObjectReadableMock([0, 1, 2, 3, 4]);
       await videoContentService.uploadVideo(
-        mockContext,
+        fakeContext,
         testID,
         testInput,
         testMime,
       );
 
       expect(sharedInstances.mockFile).toBeCalledWith(
-        `masters/${mockContext.auth.userID}/${testID}`,
+        `masters/${fakeContext.auth.userID}/${testID}`,
       );
     });
     it('Creates a writestream with the correct parameters', async () => {
       const testInput = new ObjectReadableMock([0, 1, 2, 3, 4]);
       await videoContentService.uploadVideo(
-        mockContext,
+        fakeContext,
         testID,
         testInput,
         testMime,
@@ -156,7 +128,7 @@ describe('Video Content Service', () => {
     it('Makes the uploaded file public', async () => {
       const testInput = new ObjectReadableMock([0, 1, 2, 3, 4]);
       await videoContentService.uploadVideo(
-        mockContext,
+        fakeContext,
         testID,
         testInput,
         testMime,
@@ -167,7 +139,7 @@ describe('Video Content Service', () => {
     it('Sends transcoding request to Mux', (done) => {
       const testInput = new ObjectReadableMock([0, 1, 2, 3, 4]);
       videoContentService
-        .uploadVideo(mockContext, testID, testInput, testMime)
+        .uploadVideo(fakeContext, testID, testInput, testMime)
         .then(() => {
           moxios.wait(() => {
             const request = moxios.requests.mostRecent();
@@ -194,19 +166,19 @@ describe('Video Content Service', () => {
       moxios.uninstall();
     });
     it('Checks if the content record exists', async () => {
-      await videoContentService.deleteVideo(mockContext, testContent.id);
+      await videoContentService.deleteVideo(fakeContext, fakeContent.id);
 
       expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
-        `${sharedInstances.mockConfig().dbPrefix}content/${testContent.id}`,
+        `${sharedInstances.mockConfig().dbPrefix}content/${fakeContent.id}`,
       );
       expect(sharedInstances.mockExists).toHaveBeenCalled();
     });
     it('Deletes the Mux asset', (done) => {
-      videoContentService.deleteVideo(mockContext, testContent.id).then(() => {
+      videoContentService.deleteVideo(fakeContext, fakeContent.id).then(() => {
         moxios.wait(() => {
           const request = moxios.requests.mostRecent();
           expect(request.url).toEqual(
-            `https://api.mux.com/video/v1/assets/${testContent.assetID}`,
+            `https://api.mux.com/video/v1/assets/${fakeContent.assetID}`,
           );
           done();
         });
