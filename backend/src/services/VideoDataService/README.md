@@ -12,10 +12,10 @@ The VideoDataService serves basic fields for videos and assembles related fields
 
 Query fields:
 
--   author - show videos by author
--   channel - show videos by channel
--   before - show videos before date
--   after - show videos after date
+- author - show videos by author
+- channel - show videos by channel
+- before - show videos before date
+- after - show videos after date
 
 _If ID is specified, all others are ignored. If ID is not specified, one other parameter must be specified_
 
@@ -40,4 +40,5 @@ _Videos can only be deleted by their author or the channel owner_
 
 1. Calls [SearchService](../SearchService/README.md)/deleteVideo to delete from search index
 2. Calls [VideoContentService](../VideoContentService)/deleteVideo to delete transcoding entry
-3. Deletes video from DB
+3. Calls [WatchTimeService](../WatchTimeService)/clearVideo to delete watchtime history
+4. Deletes video from DB

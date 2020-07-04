@@ -5,6 +5,7 @@ import { firestoreInstance, appConfig } from '@/sharedInstances';
 import * as channelDataService from '@services/ChannelDataService';
 import * as videoContentService from '@services/VideoContentService';
 import * as searchService from '@services/SearchService';
+import * as watchtimeService from '@services/WatchTimeService';
 import {
   AuthorizationError,
   ResourceNotFoundError,
@@ -272,6 +273,9 @@ export async function deleteVideo(context: IServiceInvocationContext, id: tID) {
   // Delete content if it exists
   if (videoData.content) {
     await videoContentService.deleteVideo(context, videoData.content.id);
+
+    // Also delete watchtime data
+    await watchtimeService.clearVideo(context, videoData.id);
   }
 
   // Delete from firestore
