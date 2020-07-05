@@ -10,14 +10,12 @@ import {
   IVideoQuery,
   IVideoUpdate,
 } from '@services/VideoDataService/definitions';
-import { IError } from '@/definitions';
 import {
   IChannelQuery,
   IChannelUpdate,
 } from '@services/ChannelDataService/definitions';
 import { GenericError, InvalidFieldError, AuthorizationError } from '@/errors';
 import authMiddleware from './auth';
-import { networkInterfaces } from 'os';
 
 // Predefined constants
 const MAX_VIDEO_SIZE: number = 1 * Math.pow(10, 9); // 1 GB
@@ -165,6 +163,35 @@ app.get('/video/:id/segments', async (req, res, next) => {
       req.context.auth.userID,
     );
     res.status(200).send(segments);
+  } catch (e) {
+    next(e);
+  }
+});
+app.get('/video/:id/watchtime', async (req, res, next) => {
+  // Service request
+  try {
+    const wt = await watchTimeService.getTotalWatchTime(
+      req.context,
+      req.params.id,
+    );
+    res.status(200).send({ wt });
+  } catch (e) {
+    next(e);
+  }
+});
+app.get('/video/:id/watchtime/:user', async (req, res, next) => {
+  // Service request
+  try {
+    // Make sure you're only requesting your own watch time
+    if (req.context.auth.userID !== req.params.user) {
+      throw new AuthorizationError('Gateway', 'access foreign watch time');
+    }
+    const wt = await watchTimeService.getWatchTime(
+      req.context,
+      req.params.id,
+      req.params.user,
+    );
+    res.status(200).send({ wt });
   } catch (e) {
     next(e);
   }
