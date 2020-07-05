@@ -8,7 +8,7 @@ export class ResourceNotFoundError extends GenericError {
     resourceID: string,
   ) {
     super(service, `Resource ${resource}:${resourceID} not found`);
-    this.name == this.constructor.name;
+    this.name = this.constructor.name;
     this.status = 404;
     Error.captureStackTrace(this, this.constructor);
   }
