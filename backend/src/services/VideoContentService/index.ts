@@ -21,11 +21,11 @@ import { IVideo } from '@services/VideoDataService/definitions';
 
 // Auth Token
 const username =
-  appConfig.environment == 'prod'
+  appConfig.environment === 'prod'
     ? process.env.PROD_MUXID
     : process.env.DEV_MUXID;
 const password =
-  appConfig.environment == 'prod'
+  appConfig.environment === 'prod'
     ? process.env.PROD_MUXSECRET
     : process.env.DEV_MUXSECRET;
 const authToken = Buffer.from(
@@ -50,7 +50,7 @@ pubsubSubscription.on('message', async (message: Message) => {
           type: 'ready',
           assetID: bodyData.object.id,
           playbackID: bodyData.data.playback_ids.find(
-            (id: any) => id.policy == 'public',
+            (id: any) => id.policy === 'public',
           ).id,
           duration: bodyData.data.duration,
           videoID: bodyData.data.passthrough.split(':')[0],
@@ -78,12 +78,12 @@ pubsubSubscription.on('message', async (message: Message) => {
     }
   } catch (e) {
     // Log the error since there is no point in throwing
-    console.error(e);
+    console.error(e); // tslint:disable-line:no-console
   }
 });
 pubsubSubscription.on('error', (error) => {
   // Log the error since there is no point in throwing
-  console.error(`Received PubSub error: ${error}`);
+  console.error(`Received PubSub error: ${error}`); // tslint:disable-line:no-console
 });
 // #endregion Pubsub handler registration
 
@@ -223,7 +223,7 @@ export async function uploadVideo(
   const video = await VideoDataService.getVideo(context, id);
   // Authorization Check
   // Video can only be uploaded by author
-  if (context.auth.userID != video.author) {
+  if (context.auth.userID !== video.author) {
     throw new AuthorizationError('VideoContent', 'upload video data');
   }
 

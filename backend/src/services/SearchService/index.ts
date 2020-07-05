@@ -38,7 +38,7 @@ export async function addVideo(
   // Authorization check
   // Videos can only be created on channels owned by the author
   // (Author in this case can be assumed to be the caller, since the video is being added to the index)
-  if (!context.auth.elevated && context.auth.userID != video.channel.owner) {
+  if (!context.auth.elevated && context.auth.userID !== video.channel.owner) {
     throw new AuthorizationError('Search', 'add video to search index');
   }
   await algoliaIndexInstance.saveObject(algoliaFromVideo(video));
@@ -56,8 +56,8 @@ export async function updateVideo(
   // Videos can only be updated by the author or the channel owner
   if (
     !context.auth.elevated &&
-    context.auth.userID != video.channel.owner &&
-    context.auth.userID != video.author
+    context.auth.userID !== video.channel.owner &&
+    context.auth.userID !== video.author
   ) {
     throw new AuthorizationError('Search', 'update video in search index');
   }
@@ -92,8 +92,8 @@ export async function removeVideo(
   // Videos can only be removed by the author or the channel owner
   if (
     !context.auth.elevated &&
-    context.auth.userID != video.channel.owner &&
-    context.auth.userID != video.author
+    context.auth.userID !== video.channel.owner &&
+    context.auth.userID !== video.author
   ) {
     throw new AuthorizationError('Search', 'remove video from search index');
   }
@@ -125,7 +125,7 @@ export async function updateChannel(
 ) {
   // Authorization check
   // Channels can only be updated by the owner
-  if (!context.auth.elevated && context.auth.userID != channel.owner) {
+  if (!context.auth.elevated && context.auth.userID !== channel.owner) {
     throw new AuthorizationError('Search', 'update channel in search index');
   }
   await algoliaIndexInstance.saveObject(algoliaFromChannel(channel));
@@ -141,7 +141,7 @@ export async function removeChannel(
 ) {
   // Authorization check
   // Channels can only be removed by the owner
-  if (!context.auth.elevated && context.auth.userID != channel.owner) {
+  if (!context.auth.elevated && context.auth.userID !== channel.owner) {
     throw new AuthorizationError('Search', 'remove channel from search index');
   }
   await algoliaIndexInstance.deleteObject(channel.id);

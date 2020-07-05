@@ -3,6 +3,7 @@ import { tID } from './definitions';
 export function toNamespaced(path: string, namespacePrefix: string): string {
   // Detect an expected preexsting prefix
   if (path.startsWith(namespacePrefix)) {
+    // tslint:disable-next-line:no-console
     console.warn(
       `WARNING: Tried to namespace an already namespaced path ${path}`,
     );
@@ -10,6 +11,7 @@ export function toNamespaced(path: string, namespacePrefix: string): string {
   }
   // Detect an *unexpected* prefix.  We're operating on the wrong database
   else if (path.startsWith('dev') || path.startsWith('prod')) {
+    // tslint:disable-next-line:no-console
     console.warn(
       `WARNING: Tried to namespace a path already namespaced with an *out of scope* prefix: ${path}`,
     );
@@ -22,6 +24,7 @@ export function toNamespaced(path: string, namespacePrefix: string): string {
 export function toGlobal(path: string, namespacePrefix: string): tID {
   // Detect a missing prefix
   if (!path.startsWith(namespacePrefix)) {
+    // tslint:disable-next-line:no-console
     console.warn(
       `WARNING: Tried to remove namespace from a path without a namespace ${path}`,
     );
@@ -32,6 +35,7 @@ export function toGlobal(path: string, namespacePrefix: string): tID {
     !path.startsWith(namespacePrefix) &&
     (path.startsWith('dev') || path.startsWith('prod'))
   ) {
+    // tslint:disable-next-line:no-console
     console.warn(
       `WARNING: Detected a path namespaced with an *out of scope* prefix: ${path}, prefix will not be removed`,
     );

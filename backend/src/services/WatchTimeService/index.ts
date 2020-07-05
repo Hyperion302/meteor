@@ -53,7 +53,8 @@ export async function getSegments(
     const offset = pair[0] * 8;
     // Loop over every bit in the bitfield
     for (let i = 0; i < 8; i++) {
-      const bitCheck = 1 << i;
+      const bitCheck = 1 << i; // tslint:disable-line:no-bitwise
+      // tslint:disable-next-line:no-bitwise
       if (byte & bitCheck) {
         // Subtraction from 7 required since we're iterating backwards from
         // Index 7
@@ -266,7 +267,7 @@ export async function clearVideo(
         multi.del(key);
       }
     });
-  } while (cursor != 0);
+  } while (cursor !== 0);
   // Exec
   await new Promise((resolve, reject) => {
     multi.exec((err, reply) => {

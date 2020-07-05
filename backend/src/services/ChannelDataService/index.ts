@@ -150,7 +150,7 @@ export async function updateChannel(
 
   // Authorization Check
   // Channels can only be updated by the owner
-  if (context.auth.userID != oldChannel.owner) {
+  if (context.auth.userID !== oldChannel.owner) {
     throw new AuthorizationError('ChannelData', 'update channel');
   }
 
@@ -181,7 +181,7 @@ export async function deleteChannel(
 
   // Authorization Check
   // Channels can only be deleted by the owner
-  if (context.auth.userID != channelData.owner) {
+  if (context.auth.userID !== channelData.owner) {
     throw new AuthorizationError('ChannelData', 'delete channel');
   }
 

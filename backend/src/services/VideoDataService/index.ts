@@ -87,14 +87,14 @@ export async function queryVideo(
     fsQuery = (fsQuery ? fsQuery : collection).where(
       'uploadDate',
       '>',
-      parseInt(query.after),
+      parseInt(query.after, 10),
     );
   }
   if (query.before) {
     fsQuery = (fsQuery ? fsQuery : collection).where(
       'uploadDate',
       '<',
-      parseInt(query.before),
+      parseInt(query.before, 10),
     );
   }
   if (query.author) {
@@ -164,7 +164,7 @@ export async function createVideo(
   // Authorization check
 
   // Videos can only be created on channels owned by the author
-  if (channelData.owner != context.auth.userID) {
+  if (channelData.owner !== context.auth.userID) {
     throw new AuthorizationError(
       'VideoData',
       'create video in requested channel',
@@ -229,8 +229,8 @@ export async function updateVideo(
 
   // Videos can only be updated by their author or the channel owner
   if (
-    oldVideo.author != context.auth.userID &&
-    oldVideo.channel.owner != context.auth.userID
+    oldVideo.author !== context.auth.userID &&
+    oldVideo.channel.owner !== context.auth.userID
   ) {
     throw new AuthorizationError('VideoData', 'update video');
   }
@@ -261,8 +261,8 @@ export async function deleteVideo(context: IServiceInvocationContext, id: tID) {
 
   // Videos can only be deleted by their author or the channel owner
   if (
-    videoData.author != context.auth.userID &&
-    videoData.channel.owner != context.auth.userID
+    videoData.author !== context.auth.userID &&
+    videoData.channel.owner !== context.auth.userID
   ) {
     throw new AuthorizationError('VideoData', 'delete video');
   }

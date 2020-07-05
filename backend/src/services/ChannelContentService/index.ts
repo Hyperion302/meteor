@@ -10,9 +10,9 @@ import { CreateWriteStreamOptions } from '@google-cloud/storage';
 import { getChannel } from '@services/ChannelDataService';
 
 const sharpPipeline = sharp().png();
-const pipeline_128 = sharpPipeline.clone().resize(128, 128);
-const pipeline_64 = sharpPipeline.clone().resize(64, 64);
-const pipeline_32 = sharpPipeline.clone().resize(32, 32);
+const pipeline128 = sharpPipeline.clone().resize(128, 128);
+const pipeline64 = sharpPipeline.clone().resize(64, 64);
+const pipeline32 = sharpPipeline.clone().resize(32, 32);
 
 /**
  * Formats and saves a channel icon
@@ -33,7 +33,7 @@ export async function uploadIcon(
   // Authorization Check
   const channel = await getChannel(context, id);
   // Channel icons can only be uploaded by the owner
-  if (context.auth.userID != channel.owner) {
+  if (context.auth.userID !== channel.owner) {
     throw new AuthorizationError('ChannelContent', 'upload icon to channel');
   }
   // Setup size tracker
@@ -42,74 +42,70 @@ export async function uploadIcon(
     rawSize += data.length;
   });
   // Setup storage writestreams
-  const path_128 = `channelIcons/${id}_128.png`;
-  const path_64 = `channelIcons/${id}_64.png`;
-  const path_32 = `channelIcons/${id}_32.png`;
-  const storageObject_128 = storageInstance
+  const path128 = `channelIcons/${id}_128.png`;
+  const path64 = `channelIcons/${id}_64.png`;
+  const path32 = `channelIcons/${id}_32.png`;
+  const storageObject128 = storageInstance
     .bucket(appConfig.bucket)
-    .file(path_128);
-  const storageObject_64 = storageInstance
-    .bucket(appConfig.bucket)
-    .file(path_64);
-  const storageObject_32 = storageInstance
-    .bucket(appConfig.bucket)
-    .file(path_32);
+    .file(path128);
+  const storageObject64 = storageInstance.bucket(appConfig.bucket).file(path64);
+  const storageObject32 = storageInstance.bucket(appConfig.bucket).file(path32);
   const storageMetadata: CreateWriteStreamOptions = {
     metadata: {
       contentType: 'image/png',
     },
   };
-  const storageWritestream_128 = storageObject_128.createWriteStream(
+  const storageWriteStream128 = storageObject128.createWriteStream(
     storageMetadata,
   );
-  const storageWritestream_64 = storageObject_64.createWriteStream(
+  const storageWriteStream64 = storageObject64.createWriteStream(
     storageMetadata,
   );
-  const storageWritestream_32 = storageObject_32.createWriteStream(
+  const storageWriteStream32 = storageObject32.createWriteStream(
     storageMetadata,
   );
 
   // Pipe pipelines
   imageStream.pipe(sharpPipeline);
-  pipeline_128.pipe(storageWritestream_128);
-  pipeline_64.pipe(storageWritestream_64);
-  pipeline_32.pipe(storageWritestream_32);
+  pipeline128.pipe(storageWriteStream128);
+  pipeline64.pipe(storageWriteStream64);
+  pipeline32.pipe(storageWriteStream32);
 
   // Count written data
   let size128 = 0;
   let size64 = 0;
   let size32 = 0;
-  pipeline_128.on('data', (data) => {
+  pipeline128.on('data', (data) => {
     size128 += data.length;
   });
-  pipeline_64.on('data', (data) => {
+  pipeline64.on('data', (data) => {
     size64 += data.length;
   });
-  pipeline_32.on('data', (data) => {
+  pipeline32.on('data', (data) => {
     size32 += data.length;
   });
 
   // Wait for upload to finish
   const promises = [
     new Promise((resolve, reject) => {
-      storageWritestream_128.on('error', reject);
-      storageWritestream_128.on('finish', resolve);
+      storageWriteStream128.on('error', reject);
+      storageWriteStream128.on('finish', resolve);
     }),
     new Promise((resolve, reject) => {
-      storageWritestream_64.on('error', reject);
-      storageWritestream_64.on('finish', resolve);
+      storageWriteStream64.on('error', reject);
+      storageWriteStream64.on('finish', resolve);
     }),
     new Promise((resolve, reject) => {
-      storageWritestream_32.on('error', reject);
-      storageWritestream_32.on('finish', resolve);
+      storageWriteStream32.on('error', reject);
+      storageWriteStream32.on('finish', resolve);
     }),
   ];
   await Promise.all(promises);
 
   // Make public
-  await storageObject_128.makePublic();
-  await storageObject_64.makePublic();
-  await storageObject_32.makePublic();
+  await storageObject128.makePublic();
+  await storageObject64.makePublic();
+  await storageObject32.makePublic();
 
   return { rawSize, size128, size64, size32 };
 }
