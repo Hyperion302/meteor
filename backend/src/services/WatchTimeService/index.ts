@@ -154,7 +154,9 @@ export async function createSegments(
   );
 
   // Check deletion flag
-  const flaggedForDeletion = await getAsync(`${video}:deleted`);
+  const flaggedForDeletion = (await getAsync(`${video}:deleted`))
+    ? true
+    : false;
   if (flaggedForDeletion) {
     throw new ResourceNotFoundError('WatchTime', 'video', video);
   }
@@ -163,7 +165,7 @@ export async function createSegments(
   // WATCH wrapper for the deletion flag
   const { newVideoWatchtime, newUserWatchtime } = await new Promise(
     (resolve, reject) => {
-      multi.watch(`${video}:deleted`, (watchError) => {
+      redisClient.watch(`${video}:deleted`, (watchError) => {
         if (watchError) reject(watchError);
         // Increment deduplicated video specific counter
         multi.hincrby(video, 'watchtimeUnique', uniqueSegmentIndices.length);
