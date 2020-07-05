@@ -1,4 +1,13 @@
 {
-    "defaultSeverity": "warn",
-    "extends": ["tslint:recommended"]
+  "defaultSeverity": "warn",
+  "extends": ["tslint:recommended"],
+  "linterOptions": {
+    "exclude": [
+      "dist/**/*",
+      "node_modules/**/*",
+      "**/__mocks__/**/*",
+      "**/*.spec.ts",
+      "src/sharedInstances.ts"
+    ]
+  }
 }
