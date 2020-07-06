@@ -257,7 +257,7 @@ export async function clearVideo(
   await setAsync(`${video}:deleted`, 1);
   // Now we can proceed to queue a deletion for all video keys
   const multi = redisClient.multi();
-  let cursor = 0;
+  let cursor = '0';
   do {
     const scanVal = await scanAsync(cursor);
     cursor = scanVal[0];
@@ -267,7 +267,7 @@ export async function clearVideo(
         multi.del(key);
       }
     });
-  } while (cursor !== 0);
+  } while (cursor !== '0');
   // Exec
   await new Promise((resolve, reject) => {
     multi.exec((err, reply) => {
