@@ -93,7 +93,6 @@ export default class WatchPage extends Vue {
     height: 80vh;
     @media only screen and (max-width: 600px)
       height: 40vh;
-    width: 100vw;
   .info
     margin: 48px 24px;
     .descriptionChannelBox
