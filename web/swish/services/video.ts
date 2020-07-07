@@ -6,7 +6,12 @@ import {
   PlatformError,
 } from '~/models/error';
 import { $axios } from '~/services/api';
-import { IVideo, IVideoUpdate } from '~/models/video';
+import {
+  IVideo,
+  IVideoUpdate,
+  IVideoFragment,
+  IVideoSegment,
+} from '~/models/video';
 
 export async function uploadVideo(id: string, video: File): Promise<void> {
   if (process.server) {
@@ -91,6 +96,7 @@ export async function getVideo(id: string): Promise<IVideo> {
       id: data.content.id,
       playbackID: data.content.playbackID,
       assetID: data.content.assetID,
+      duration: data.content.duration,
     },
   };
 }
@@ -128,6 +134,46 @@ export async function queryVideos(channel: string): Promise<IVideo[]> {
     };
   });
 }
+export async function getWatchtime(id: string): Promise<number> {
+  const { data, status } = await $axios.get(
+    `https://api.swish.tv/video/${id}/watchtime`,
+  );
+  switch (status) {
+    case 400:
+      throw new InvalidInputError();
+    case 404:
+      throw new ResourceNotFoundError('video', id);
+    case 403:
+      throw new AuthorizationError();
+    case 500:
+      throw new ServerError();
+  }
+  return data.wt !== null ? data.wt : 0;
+}
+export async function submitFragment(
+  id: string,
+  frag: IVideoFragment,
+): Promise<IVideoSegment[]> {
+  const { data, status } = await $axios.post(
+    `https://api.swish.tv/video/${id}/segments`,
+    frag,
+  );
+  switch (status) {
+    case 400:
+      throw new InvalidInputError();
+    case 404:
+      throw new ResourceNotFoundError('video', id);
+    case 403:
+      throw new AuthorizationError();
+    case 500:
+      throw new ServerError();
+  }
+  return data.map((segment: any) => {
+    return {
+      index: segment.index,
+    };
+  });
+}
 export async function updateVideo(
   id: string,
   update: IVideoUpdate,
@@ -161,6 +207,7 @@ export async function updateVideo(
       id: data.content.id,
       playbackID: data.content.playbackID,
       assetID: data.content.assetID,
+      duration: data.content.duration,
     },
   };
 }
