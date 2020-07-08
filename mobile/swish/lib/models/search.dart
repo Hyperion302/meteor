@@ -11,6 +11,7 @@ class AlgoliaVideo extends AlgoliaObject {
   String title;
   String description;
   int uploadDate;
+  double watchtime;
 
   AlgoliaVideo({this.id, this.title, this.description, this.uploadDate})
       : super(type: 'video');
@@ -21,6 +22,7 @@ class AlgoliaVideo extends AlgoliaObject {
     title = json['title'];
     description = json['description'];
     uploadDate = json['uploadDate'];
+    watchtime = json['watchtime'];
   }
 }
 

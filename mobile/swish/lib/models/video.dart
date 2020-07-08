@@ -3,10 +3,12 @@ import 'channel.dart';
 class Content {
   final String assetID;
   final String playbackID;
+  final double duration;
 
   Content.fromJSON(Map<String, dynamic> json)
       : assetID = json['assetID'],
-        playbackID = json['playbackID'];
+        playbackID = json['playbackID'],
+        duration = json['duration'];
 }
 
 class Video {

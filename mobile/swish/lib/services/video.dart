@@ -30,6 +30,25 @@ class VideoService {
     return Video.fromJSON(jsonVideo);
   }
 
+  static Future<int> getWatchtime({@required String id}) async {
+    // Get my token
+    var token = await AuthService.token;
+
+    // Craft my URI
+    var uri = Uri.https(baseURL, '/video/$id/watchtime');
+
+    // Make my request
+    var response = await http.get(uri, headers: {
+      HttpHeaders.authorizationHeader: 'Bearer $token',
+    });
+
+    Map<String, dynamic> jsonResponse = json.decode(response.body);
+
+    var wt = int.parse(jsonResponse['wt'].toString());
+
+    return wt;
+  }
+
   static Future<void> deleteVideo({@required String id}) async {}
 
   static Future<Video> updateVideo({String name, String description}) async {}

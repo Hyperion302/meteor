@@ -47,7 +47,7 @@ class SwishSmallVideoTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(video.title),
-                    Text(formatTimestamp(video.uploadDate),
+                    Text(formatAge(video.uploadDate),
                         style: TextStyle(
                           color: Colors.black38,
                         )),

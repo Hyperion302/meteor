@@ -48,7 +48,7 @@ class SwishLargeVideoTile extends StatelessWidget {
           ListTile(
             title: Text(video.title),
             subtitle: Text(
-                '${showChannelName ? video.channel.name + ' ' : ''}${showAge && this.showChannelName ? '•' : ''}${showAge ? ' ' + formatTimestamp(video.uploadDate) : ''}'),
+                '${showChannelName ? video.channel.name + ' ' : ''}${showAge && this.showChannelName ? '•' : ''}${showAge ? ' ' + formatAge(video.uploadDate) : ''}'),
             onTap: onTap,
           ),
         ],

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:swish/atomic_widgets/channel_tile.dart';
 import 'package:swish/models/video.dart';
+import 'package:swish/services/video.dart';
+import 'package:swish/utils.dart';
 import 'package:video_player/video_player.dart';
 
 import '../routes.dart';
@@ -23,6 +25,7 @@ class _SwishPlayerScreenState extends State<SwishPlayerScreen> {
   bool _seeking = false;
   bool _paused = true;
   bool _hudUp = false;
+  Future<int> _watchtime;
 
   @override
   void initState() {
@@ -33,14 +36,15 @@ class _SwishPlayerScreenState extends State<SwishPlayerScreen> {
         // Display first frame...
       });
     });
-    Duration interval = Duration(milliseconds: 10);
-    _playbackUpdateStream = Stream<Duration>.periodic(interval, (int period) {
+    Duration playbackUpdateInterval = Duration(milliseconds: 10);
+    _playbackUpdateStream = Stream<Duration>.periodic(playbackUpdateInterval, (int period) {
       // Poll player
       if (_playerController.value.initialized) {
         return _playerController.value.position;
       }
       return Duration();
     }).asBroadcastStream();
+    _watchtime = VideoService.getWatchtime(id: widget.video.id);
     super.initState();
   }
 
@@ -59,16 +63,6 @@ class _SwishPlayerScreenState extends State<SwishPlayerScreen> {
                   Navigator.pop(context, false);
                 },
               ),
-              Flexible(
-                child: Text(
-                  widget.video.title,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 32.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
             ],
           ),
           buildPlayer(),
@@ -76,6 +70,10 @@ class _SwishPlayerScreenState extends State<SwishPlayerScreen> {
         ],
       )),
     );
+  }
+
+  int evc(int duration, int wt) {
+    return (wt / duration).round();
   }
 
   Widget buildVideoInfo() {
@@ -87,33 +85,41 @@ class _SwishPlayerScreenState extends State<SwishPlayerScreen> {
           children: <Widget>[
             Container(
               margin: EdgeInsets.symmetric(
-                vertical: 20.0,
+                vertical: 24.0,
               ),
               child: Column(
                 children: <Widget>[
                   Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'Description',
+                      widget.video.title,
                       style: TextStyle(
-                        fontSize: 20.0,
+                        fontSize: 24.0,
                       ),
                     ),
                   ),
                   Align(
                     alignment: Alignment.centerLeft,
+                    child: FutureBuilder(
+                      future: _watchtime,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          print(snapshot.error);
+                          return Container();
+                        }
+                        if(snapshot.hasData) {
+                          return Text('${formatEVC(snapshot.data, widget.video.content.duration)} · ${formatTimestamp(snapshot.data)} · ${formatAge(widget.video.uploadDate)}');
+                        }
+                        return Text(formatTimestamp(widget.video.uploadDate));
+                      }
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                  Align(
+                    alignment: Alignment.centerLeft,
                     child: Text(widget.video.description),
                   )
                 ],
-              ),
-            ),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Uploaded To',
-                style: TextStyle(
-                  fontSize: 20.0,
-                ),
               ),
             ),
             SwishChannelTile(
