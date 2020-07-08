@@ -49,6 +49,22 @@ class VideoService {
     return wt;
   }
 
+  static Future<void> submitFragment({@required String id, @required double t1, @required double t2}) async {
+    // Get my token
+    var token = await AuthService.token;
+
+    // Craft my URI
+    var uri = Uri.https(baseURL, '/video/$id/segments');
+
+    // Make my request
+    var response = await http.post(uri, body: {
+      't1': t1.toStringAsFixed(2),
+      't2': t2.toStringAsFixed(2),
+    }, headers: {
+      HttpHeaders.authorizationHeader: 'Bearer $token',
+    });
+  }
+
   static Future<void> deleteVideo({@required String id}) async {}
 
   static Future<Video> updateVideo({String name, String description}) async {}

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:swish/atomic_widgets/channel_tile.dart';
 import 'package:swish/models/video.dart';
@@ -20,8 +22,10 @@ class SwishPlayerScreen extends StatefulWidget {
 class _SwishPlayerScreenState extends State<SwishPlayerScreen> {
   VideoPlayerController _playerController;
   Stream<Duration> _playbackUpdateStream;
+  Timer _fragmentTimer;
   double _position = 0.0;
   double _seekingBuffer = 0.0;
+  double _lastPos = 0.0;
   bool _seeking = false;
   bool _paused = true;
   bool _hudUp = false;
@@ -44,6 +48,16 @@ class _SwishPlayerScreenState extends State<SwishPlayerScreen> {
       }
       return Duration();
     }).asBroadcastStream();
+    Duration fragmentInterval = Duration(seconds: 1);
+    _fragmentTimer = Timer.periodic(fragmentInterval, (Timer t) {
+      double t1 = _lastPos;
+      double t2 = _playerController.value.position.inMilliseconds / 1000;
+      _lastPos = t2;
+      if(!_seeking && t1 < t2) {
+        print('t1: $t1 t2: $t2');
+        VideoService.submitFragment(id: widget.video.id, t1: t1, t2: t2);
+      }
+    });
     _watchtime = VideoService.getWatchtime(id: widget.video.id);
     super.initState();
   }
