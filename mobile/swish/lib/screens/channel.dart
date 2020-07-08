@@ -103,19 +103,21 @@ class _SwishChannelScreenState extends State<SwishChannelScreen> {
                               if (snapshot.data.length == 0) {
                                 return Text('This channel has no videos');
                               }
-                              List<Widget> mappedVideos = <Widget>[
-                                ...snapshot.data.map((Video video) {
-                                  return InkWell(
-                                      child: SwishSmallVideoTile(
-                                          video: video,
-                                          trailingAction: Container()),
-                                      onTap: () {
-                                        Navigator.pushNamed(
-                                            context, playerRoute,
-                                            arguments: video);
-                                      });
-                                })
-                              ];
+                              List<Widget> mappedVideos = snapshot.data.map<Widget>((Video video) =>
+                                InkWell(
+                                  child: SwishSmallVideoTile(
+                                    video: video,
+                                    trailingAction: Container()
+                                  ),
+                                  onTap: () {
+                                    Navigator.pushNamed(
+                                      context,
+                                      playerRoute,
+                                      arguments: video
+                                    );
+                                  }
+                                )
+                              ).toList();
                               return Column(
                                 children: mappedVideos,
                               );

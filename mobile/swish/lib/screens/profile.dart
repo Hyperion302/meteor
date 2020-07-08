@@ -91,19 +91,20 @@ class _SwishProfileScreenState extends State<SwishProfileScreen> {
                                 return Text(snapshot.error.toString());
                               }
                               if (snapshot.hasData) {
-                                // Weird but sound way to go from List< Channel > to List< Widget >
-                                List<Widget> mappedChannels = <Widget>[
-                                  ...snapshot.data.map((Channel channel) {
-                                    return SwishChannelTile(
-                                        channel: channel,
-                                        trailingAction: Container(),
-                                        onTap: () {
-                                          Navigator.pushNamed(
-                                              context, channelRoute,
-                                              arguments: channel);
-                                        });
-                                  }).toList()
-                                ];
+                                print(snapshot.data);
+                                List<Widget> mappedChannels = snapshot.data.map<Widget>((Channel channel) =>
+                                  SwishChannelTile(
+                                    channel: channel,
+                                    trailingAction: Container(),
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        channelRoute,
+                                        arguments: channel
+                                      );
+                                    }
+                                  )
+                                ).toList();
                                 return Column(
                                   children: mappedChannels,
                                 );
