@@ -20,7 +20,7 @@
       <call-to-action
         class="cancel"
         :disabled="saving ? 'true' : 'false'"
-        to="/dashboard/"
+        :to="`/dashboard?sel=${channel.id}`"
         border="false"
       >
         Cancel
@@ -80,7 +80,7 @@ export default class ChannelSettingsPage extends Vue {
       if (this.iconValid) {
         await uploadIcon(this.channel.id, this.iconBlob);
       }
-      await this.$router.push('/dashboard');
+      await this.$router.push(`/dashboard?sel=${this.channel.id}`);
     }
   }
 

@@ -18,7 +18,7 @@
       <call-to-action
         class="cancel"
         :disabled="saving ? 'true' : 'false'"
-        :to="`/dashboard/${video.channel.id}`"
+        :to="`/dashboard?sel=${video.channel.id}`"
         border="false"
       >
         Cancel
@@ -96,7 +96,7 @@ export default class VideoSettingsPage extends Vue {
         ...(this.videoDescription && { description: this.videoDescription }),
       };
       await updateVideo(this.video.id, update);
-      await this.$router.push(`/dashboard/${this.video.channel.id}`);
+      await this.$router.push(`/dashboard?sel=${this.video.channel.id}`);
       this.saving = false;
     }
   }
@@ -105,7 +105,7 @@ export default class VideoSettingsPage extends Vue {
     if (this.video) {
       this.saving = true;
       await deleteVideo(this.video.id);
-      await this.$router.push(`/dashboard/${this.video.channel.id}`);
+      await this.$router.push(`/dashboard?sel=${this.video.channel.id}`);
       this.saving = false;
     }
   }

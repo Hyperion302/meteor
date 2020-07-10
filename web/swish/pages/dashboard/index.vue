@@ -1,62 +1,189 @@
 <template>
-  <span>
-    <main class="dashboardPage">
-      <call-to-action
-        class="newChannelButton"
-        to="/dashboard/create"
-        :disabled="channels.length >= 10 ? 'true' : 'false'"
+  <div class="dashboardPage">
+    <div class="sidebar">
+      <div
+        v-for="channel in channels"
+        :key="channel.id"
+        :class="['channelListElement', selected == channel.id ? 'active' : '']"
+        @click="selected = channel.id"
       >
-        New Channel
-      </call-to-action>
-      <div class="channels">
-        <dashboard-channel-tile
-          v-for="channel in channels"
-          :key="channel.id"
-          class="tile"
-          :channel="channel"
-        />
+        {{ channel.name }}
       </div>
-    </main>
-  </span>
+      <nuxt-link
+        tag="div"
+        class="channelListElement newChannel"
+        to="/dashboard/create"
+      >
+        +
+      </nuxt-link>
+      <nuxt-link tag="div" class="channelListElement backToSite" to="/">
+        Back to site
+      </nuxt-link>
+    </div>
+    <div v-if="selected" class="main">
+      <div class="top">
+        <nuxt-link
+          tag="div"
+          class="iconWrapper"
+          :to="`/dashboard/${currentChannel.id}/settings`"
+        >
+          <wrapped-image
+            class="icon"
+            :src="
+              `https://storage.googleapis.com/prod-swish/channelIcons/${currentChannel.id}_128.png`
+            "
+            :size="128"
+          />
+          <div class="iconOverlay">
+            <i class="material-icons">edit</i>
+          </div>
+        </nuxt-link>
+      </div>
+      <div class="videos">
+        <dashboard-video-tile
+          v-for="video in currentChannel.videos"
+          :key="video.id"
+          class="video"
+          :video="video"
+        />
+        <div v-if="currentChannel.videos.length <= 1000" class="uploadVideo">
+          <call-to-action :to="`/dashboard/${currentChannel.id}/upload`">
+            Upload
+          </call-to-action>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator';
 import DashboardChannelTile from '~/components/DashboardChannelTile.vue';
 import CallToAction from '~/components/CallToAction.vue';
+import WrappedImage from '~/components/WrappedImage.vue';
+import DashboardVideoTile from '~/components/DashboardVideoTile.vue';
 import { queryChannels } from '~/services/channel';
+import { IChannel } from '~/models/channel';
+import { queryVideos } from '~/services/video';
+import { IVideo } from '~/models/video';
 
 @Component({
   components: {
     CallToAction,
     DashboardChannelTile,
+    WrappedImage,
+    DashboardVideoTile,
   },
-  layout: 'dashboard',
+  layout: 'default',
 })
 export default class DashboardPage extends Vue {
-  async asyncData({ $auth }: { $axios: any; $auth: any }) {
+  channels: IChannel[] = [];
+  selected!: string;
+  async asyncData({ $auth, query }: { query: any; $auth: any }) {
     const channels = await queryChannels($auth.$state.user.sub);
+    const mappedChannelsPromises = channels.map((channel: IChannel) => {
+      return queryVideos(channel.id).then((videos: IVideo[]) => {
+        return {
+          ...channel,
+          videos,
+        };
+      });
+    });
+    const mappedChannels = await Promise.all(mappedChannelsPromises);
     return {
-      channels,
+      selected: query.sel ? decodeURIComponent(query.sel) : channels[0].id,
+      channels: mappedChannels,
     };
+  }
+
+  get currentChannel() {
+    return this.channels.find((val: IChannel) => val.id === this.selected);
   }
 }
 </script>
 
 <style lang="sass">
 .dashboardPage
-  display: grid;
   height: 100vh;
-  grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: repeat(12, 1fr);
-  .newChannelButton
-    grid-column: 9 / span 2;
-    grid-row: 2 / span 1;
-  .channels
-    grid-column: 2 / span 10;
-    grid-row: 3 / span 9;
-    display: flex;
-    flex-wrap: wrap;
-    .tile
-      margin: 20px;
+  width: 100vw;
+  display: flex;
+  .sidebar
+    font-weight: 100;
+    height: 100%;
+    width: 15%;
+    background-color: #000000;
+    .channelListElement
+      padding: 24px;
+      height: 24px;
+      color: #FFFFFF;
+      &.newChannel
+        text-align: center;
+        font-size: 20px;
+      &.backToSite
+        width: 15vw;
+        position: absolute;
+        bottom: 0;
+      &.active
+        border-left: 5px solid #FFFFFF;
+      &:hover
+        color: #000000;
+        background-color: #FFFFFF;
+        cursor: pointer;
+  .main
+    height: 100%;
+    width: 85%;
+    .top
+      .iconWrapper
+        position: relative;
+        width: 128px;
+        height: 128px;
+        margin: 48px;
+        .icon
+          border-radius: 50%;
+        .iconOverlay
+          opacity: 0;
+          background: rgba(0, 0, 0, 0.5);
+          transition: .2s ease;
+          border-radius: 50%;
+          position: absolute;
+          bottom: 0;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          &:hover
+            opacity: 1;
+            cursor: pointer;
+          i
+            color: #FFFFFF;
+            font-size: 32px;
+    .videos
+      display: flex;
+      flex-wrap: wrap;
+      padding: 0 48px;
+      .video
+        margin: 12px;
+      .uploadVideo
+        width: 256px;
+        height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        .uploadButton
+          width: 96px;
+          height: 48px;
+          background-color: #c9c9c9;
+          text-align: center;
+          border-radius: 6px;
+          font-size: 48px;
+          line-height: 48px;
+          text-decoration: none;
+          font-weight: 100;
+          color: #000000;
+          p
+            margin: 0;
+          &:hover
+            background-color: #9e9e9e;
+            cursor: pointer;
 </style>

@@ -19,7 +19,7 @@
       <call-to-action
         class="cancel"
         :disabled="uploading ? 'true' : 'false'"
-        :to="`/dashboard/${channelID}`"
+        :to="`/dashboard?sel=${channelID}`"
         border="false"
       >
         Cancel
@@ -61,7 +61,7 @@ export default class UploadPage extends Vue {
       this.channelID,
     );
     await uploadVideo(createdVideo.id, this.videoBlob);
-    await this.$router.push(`/dashboard/${this.channelID}`);
+    await this.$router.push(`/dashboard?sel=${this.channelID}`);
     this.uploading = false;
   }
 
