@@ -1,68 +1,92 @@
 <template>
-  <nuxt-link tag="div" class="videoTile" :to="`/watch/${video.id}`">
-    <img
-      v-if="video.content"
+  <nuxt-link tag="div" class="dashboardVideoTile" :to="`/watch/${video.id}`">
+    <wrapped-image
       :src="
-        `https://image.mux.com/${video.content.playbackID}/thumbnail.png?width=128&height=128&smart_crop=true&time=1`
+        `https://image.mux.com/${video.content.playbackID}/thumbnail.png?width=256&height=144&smart_crop=true&time=1`
       "
+      size="256"
+      size-y="144"
     />
-    <h2>{{ video.title }}</h2>
     <nuxt-link
-      v-if="settingsEnabled"
+      v-if="editable"
       tag="i"
-      :to="`/dashboard/${video.channel.id}/${video.id}/settings`"
       class="material-icons"
+      :to="`/dashboard/${video.channel.id}/${video.id}/settings`"
+      >edit</nuxt-link
     >
-      settings
-    </nuxt-link>
+    <p class="title">{{ truncatedTitle }}</p>
+    <p class="info">
+      {{ vc }} view{{ vc !== '1' ? 's' : '' }} · {{ vt }} · {{ ud }}
+    </p>
   </nuxt-link>
 </template>
 
 <script lang="ts">
 import { Component, Vue, Prop } from 'nuxt-property-decorator';
 import { IVideo } from '~/models/video';
+import WrappedImage from '~/components/WrappedImage.vue';
+import { calcEVC, shortenCount, formatDuration, formatDate } from '~/util';
 
-@Component({})
-export default class VideoTile extends Vue {
+@Component({
+  components: {
+    WrappedImage,
+  },
+})
+export default class DashboardVideoTile extends Vue {
   @Prop({ required: true }) readonly video!: IVideo;
-  @Prop({ type: Boolean, default: false }) readonly settingsEnabled!: boolean;
+  @Prop() readonly wt?: number;
+  @Prop({ default: false }) readonly editable!: boolean;
+
+  get truncatedTitle(): string {
+    return this.video.title.length > 52
+      ? this.video.title.substring(0, 49) + '...'
+      : this.video.title;
+  }
+
+  get vc(): string {
+    if (!this.wt) return '0';
+    return shortenCount(calcEVC(this.wt, this.video));
+  }
+
+  get vt(): string {
+    if (!this.wt) return '0 s';
+    return formatDuration(this.wt, true);
+  }
+
+  get ud(): string {
+    return formatDate(this.video.uploadDate);
+  }
 }
 </script>
 
 <style lang="sass">
-.videoTile
-  box-sizing: border-box;
-  width: 250px;
-  height: 250px;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(5, 1fr);
-  border: 1px solid #dddddd;
-  border-radius: 5px;
-  padding: 24px;
-  &:hover
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.25);
-    cursor: pointer;
-  img
-    grid-column: 1 / span 5;
-    grid-row: 1 / span 3;
-    width: 100%;
-    height: 100%;
-    display: inline-block;
-  h2
-    margin: 0;
-    grid-column: 1 / span 3;
-    grid-row: 4 / span 1;
-    font-weight: 200;
-    font-size: 28px;
-    text-overflow: ellipsis;
+.dashboardVideoTile
+  width: 256px;
+  cursor: pointer;
+  position: relative;
+  .title
+    margin: 12px 24px 6px 24px;
+    width: 256px - 24px * 2;
+    overflow-wrap: break-word;
+    font-weight: bold;
+  .info
+    margin: 6px 24px 12px 24px;
+    width: 256px - 24px * 2;
+    color: #9e9e9e;
+  &:hover > i
+    opacity: 1;
   i
-    grid-column: 5 / span 1;
-    grid-row: 4 / span 1;
-    border-radius: 50%;
-    width: 24px;
-    height: 24px;
-    align-self: center;
-    &:hover
-      box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.25);
+    padding: 0;
+    z-index: 1;
+    top: 6px;
+    right: 6px;
+    opacity: 0;
+    position: absolute;
+    background-color: #000000;
+    color: #FFFFFF;
+    border-radius: 2px;
+    font-size: 24px;
+  i:hover
+    color: #000000;
+    background-color: #FFFFFF;
 </style>
