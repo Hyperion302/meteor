@@ -85,6 +85,8 @@ export default class DashboardPage extends Vue {
     // Run query channels to get a list of channels.
     // Run queryVideos on every channel to get a list of videos
     // Run getWatchtime on every video to get wt
+    // FIXME: This should not be done here.  I do this process in other parts of the site.  It should
+    // be abstracted.  Where, I don't know.
     const channels = await queryChannels($auth.$state.user.sub);
     const channelsWithVideos = await Promise.all(
       channels.map((channel: IChannel) => {

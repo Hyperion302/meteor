@@ -1,30 +1,40 @@
 <template>
-  <span>
-    <main class="channelPage">
-      <img class="icon" :src="iconURL" @error="imageLoadError" />
+  <div class="channelPage">
+    <div class="infoBox">
+      <wrapped-image
+        :src="
+          `https://storage.googleapis.com/prod-swish/channelIcons/${channel.id}_128.png`
+        "
+        :size="128"
+      />
       <h1>{{ channel.name }}</h1>
-      <div class="videos">
+    </div>
+    <div class="main">
+      <div class="videosList">
         <video-tile
           v-for="video in videos"
           :key="video.id"
           class="videoTile"
           :video="video"
+          :wt="video.wt"
         />
       </div>
-    </main>
-  </span>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'nuxt-property-decorator';
 import VideoTile from '~/components/VideoTile.vue';
+import WrappedImage from '~/components/WrappedImage.vue';
 import { getChannel } from '~/services/channel';
-import { queryVideos } from '~/services/video';
+import { queryVideos, getWatchtime } from '~/services/video';
 import { IChannel } from '~/models/channel';
 import { IVideo } from '~/models/video';
 @Component({
   components: {
     VideoTile,
+    WrappedImage,
   },
   layout: 'signedIn',
 })
@@ -33,9 +43,21 @@ export default class ChannelPage extends Vue {
   channel!: IChannel;
   video!: IVideo;
   async asyncData({ params }: { params: any }) {
+    // Insert WT into videos
+    const vids = await queryVideos(params.channelID);
+    const vidsWithWT = await Promise.all(
+      vids.map((vid: IVideo) => {
+        return getWatchtime(vid.id).then((wt: number) => {
+          return {
+            ...vid,
+            wt,
+          };
+        });
+      }),
+    );
     return {
       channel: await getChannel(params.channelID),
-      videos: await queryVideos(params.channelID),
+      videos: vidsWithWT,
     };
   }
 
@@ -61,19 +83,20 @@ export default class ChannelPage extends Vue {
 
 <style lang="sass">
 .channelPage
-  display: grid;
-  height: 100vh;
-  grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: repeat(12, 1fr);
-  .icon
-    grid-column: 2 / span 1;
-    grid-row: 2 / span 1;
-  h1
-    grid-column: 4 / span 8;
-    grid-row: 2 / span 1;
-  .videos
-    grid-column: 2 / span 10;
-    grid-row: 4 / span 8;
+  padding: 60px 0 0 0;
+  .infoBox
+    height: 200px;
+    background-color: #000000;
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
+    img
+      margin: 0 24px;
+      border-radius: 50%;
+    h1
+      color: #FFFFFF;
+  .videosList
+    display: flex;
+    margin: 48px;
+    .videoTile
+      margin: 12px;
 </style>
