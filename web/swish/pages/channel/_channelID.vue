@@ -39,7 +39,6 @@ import { IVideo } from '~/models/video';
   layout: 'signedIn',
 })
 export default class ChannelPage extends Vue {
-  iconExists: boolean = true;
   channel!: IChannel;
   video!: IVideo;
   async asyncData({ params }: { params: any }) {
@@ -65,18 +64,6 @@ export default class ChannelPage extends Vue {
     return {
       title: `${this.channel.name} - Swish`,
     };
-  }
-
-  get iconURL(): string {
-    if (this.iconExists && this.channel) {
-      return `https://storage.googleapis.com/prod-swish/channelIcons/${this.channel.id}_128.png`;
-    } else {
-      return 'https://via.placeholder.com/128';
-    }
-  }
-
-  imageLoadError() {
-    this.iconExists = false;
   }
 }
 </script>
