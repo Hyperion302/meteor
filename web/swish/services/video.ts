@@ -130,6 +130,7 @@ export async function queryVideos(channel: string): Promise<IVideo[]> {
         id: video.content.id,
         playbackID: video.content.playbackID,
         assetID: video.content.assetID,
+        duration: video.content.duration,
       },
     };
   });

@@ -40,11 +40,13 @@
         </nuxt-link>
       </div>
       <div class="videos">
-        <dashboard-video-tile
+        <video-tile
           v-for="video in currentChannel.videos"
           :key="video.id"
           class="video"
           :video="video"
+          :wt="video.wt"
+          :editable="true"
         />
         <div v-if="currentChannel.videos.length <= 1000" class="uploadVideo">
           <call-to-action :to="`/dashboard/${currentChannel.id}/upload`">
@@ -61,10 +63,10 @@ import { Component, Vue } from 'nuxt-property-decorator';
 import DashboardChannelTile from '~/components/DashboardChannelTile.vue';
 import CallToAction from '~/components/CallToAction.vue';
 import WrappedImage from '~/components/WrappedImage.vue';
-import DashboardVideoTile from '~/components/DashboardVideoTile.vue';
+import VideoTile from '~/components/VideoTile.vue';
 import { queryChannels } from '~/services/channel';
 import { IChannel } from '~/models/channel';
-import { queryVideos } from '~/services/video';
+import { queryVideos, getWatchtime } from '~/services/video';
 import { IVideo } from '~/models/video';
 
 @Component({
@@ -72,7 +74,7 @@ import { IVideo } from '~/models/video';
     CallToAction,
     DashboardChannelTile,
     WrappedImage,
-    DashboardVideoTile,
+    VideoTile,
   },
   layout: 'default',
 })
@@ -80,19 +82,42 @@ export default class DashboardPage extends Vue {
   channels: IChannel[] = [];
   selected!: string;
   async asyncData({ $auth, query }: { query: any; $auth: any }) {
+    // Run query channels to get a list of channels.
+    // Run queryVideos on every channel to get a list of videos
+    // Run getWatchtime on every video to get wt
     const channels = await queryChannels($auth.$state.user.sub);
-    const mappedChannelsPromises = channels.map((channel: IChannel) => {
-      return queryVideos(channel.id).then((videos: IVideo[]) => {
-        return {
-          ...channel,
-          videos,
-        };
-      });
-    });
-    const mappedChannels = await Promise.all(mappedChannelsPromises);
+    const channelsWithVideos = await Promise.all(
+      channels.map((channel: IChannel) => {
+        return queryVideos(channel.id).then((videos: IVideo[]) => {
+          return {
+            ...channel,
+            videos,
+          };
+        });
+      }),
+    );
+    const channelsWithVidsWithWT = await Promise.all(
+      channelsWithVideos.map((channel: IChannel & { videos: IVideo[] }) => {
+        return Promise.all(
+          channel.videos.map((video: IVideo) => {
+            return getWatchtime(video.id).then((wt: number) => {
+              return {
+                ...video,
+                wt,
+              };
+            });
+          }),
+        ).then((vidsWithWT) => {
+          return {
+            ...channel,
+            videos: vidsWithWT,
+          };
+        });
+      }),
+    );
     return {
       selected: query.sel ? decodeURIComponent(query.sel) : channels[0].id,
-      channels: mappedChannels,
+      channels: channelsWithVidsWithWT,
     };
   }
 
