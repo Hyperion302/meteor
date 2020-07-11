@@ -5,6 +5,7 @@
         v-for="channel in channels"
         :key="channel.id"
         :class="['channelListElement', selected == channel.id ? 'active' : '']"
+        :style="drawerOpen ? {} : { display: 'none' }"
         @click="selected = channel.id"
       >
         {{ channel.name }}
@@ -12,13 +13,22 @@
       <nuxt-link
         tag="div"
         class="channelListElement newChannel"
+        :style="drawerOpen ? {} : { display: 'none' }"
         to="/dashboard/create"
       >
         +
       </nuxt-link>
-      <nuxt-link tag="div" class="channelListElement backToSite" to="/">
+      <nuxt-link
+        tag="div"
+        class="channelListElement backToSite"
+        :style="drawerOpen ? {} : { display: 'none' }"
+        to="/"
+      >
         Back to site
       </nuxt-link>
+      <div class="channelListElement drawer" @click="drawerOpen = !drawerOpen">
+        {{ drawerOpen ? '/\\' : '\\/' }}
+      </div>
     </div>
     <div v-if="selected" class="main">
       <div class="top">
@@ -80,6 +90,7 @@ import { IVideo } from '~/models/video';
 })
 export default class DashboardPage extends Vue {
   channels: IChannel[] = [];
+  drawerOpen: boolean = true;
   selected!: string;
   async asyncData({ $auth, query }: { query: any; $auth: any }) {
     // Run query channels to get a list of channels.
@@ -134,10 +145,15 @@ export default class DashboardPage extends Vue {
   height: 100vh;
   width: 100vw;
   display: flex;
+  @media only screen and (max-width: 600px)
+    display: block;
   .sidebar
     font-weight: 100;
     height: 100%;
     width: 15%;
+    @media only screen and (max-width: 600px)
+      height: auto;
+      width: 100%;
     background-color: #000000;
     .channelListElement
       padding: 24px;
@@ -147,11 +163,21 @@ export default class DashboardPage extends Vue {
         text-align: center;
         font-size: 20px;
       &.backToSite
-        width: 15vw;
+        width: 15%;
         position: absolute;
+        @media only screen and (max-width: 600px)
+          width: 100%;
+          position: static;
         bottom: 0;
       &.active
-        border-left: 5px solid #FFFFFF;
+        @media only screen and (min-width: 601px)
+          border-left: 5px solid #FFFFFF;
+        @media only screen and (max-width: 600px)
+          border-top: 5px solid #FFFFFF;
+      &.drawer
+        text-align: center;
+        @media only screen and (min-width: 601px)
+          display: none;
       &:hover
         color: #000000;
         background-color: #FFFFFF;
