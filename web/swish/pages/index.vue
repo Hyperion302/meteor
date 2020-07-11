@@ -218,10 +218,10 @@ export default class HomePage extends Vue {
       width: 100%;
       max-width: 400px;
       input
-        border: 1px solid #dddddd;
-        border-radius: 4px;
+        border: 1px solid #bbbbbb;
+        border-radius: 2px;
         font-size: 24px;
-        padding: 4px;
+        padding: 6px;
         @supports (-webkit-appearance: none) or (-moz-appearance: none)
           -webkit-appearance: none;
           -moz-appearance: none;
@@ -234,6 +234,7 @@ export default class HomePage extends Vue {
           padding: 5px;
           &:hover
             background-color: #dddddd;
+            cursor: pointer;
           &:before
             padding: 1px 5px;
             float: left;

@@ -82,22 +82,24 @@ export default class SearchPage extends Vue {
 
 <style lang="sass">
 .searchPage
-  padding: 60px 0 0 0;
-  height: 100vh;
+  padding: 72px 0 0 0;
   overflow-x: hidden;
   .searchBox
     margin: 0 12px;
     input
       width: 100%;
+      max-width: 500px;
+      margin: 0 auto;
+      display: block;
       box-sizing: border-box;
-      border: 1px solid #dddddd;
-      border-radius: 4px;
-      font-size: 24px;
-      padding: 4px;
+      border: 1px solid #bbbbbb;
+      border-radius: 2px;
+      font-size: 18px;
+      padding: 6px;
       @supports (-webkit-appearance: none) or (-moz-appearance: none)
         -webkit-appearance: none;
         -moz-appearance: none;
   .searchResults
     width: 100%;
-    margin: 0 12px;
+    padding: 48px;
 </style>

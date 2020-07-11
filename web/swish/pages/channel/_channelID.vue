@@ -83,7 +83,7 @@ export default class ChannelPage extends Vue {
       color: #FFFFFF;
   .videosList
     display: flex;
-    margin: 48px;
+    padding: 48px;
     .videoTile
       margin: 12px;
 </style>
