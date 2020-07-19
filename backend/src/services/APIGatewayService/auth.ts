@@ -11,7 +11,7 @@ const authMiddleware = jwt({
   }),
 
   audience: appConfig.auth.jwt_audience,
-  issuer: appConfig.auth.jwt_issuer,
+  // issuer: appConfig.auth.jwt_issuer,
   algorithms: ['RS256'],
 });
 
