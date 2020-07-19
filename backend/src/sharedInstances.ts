@@ -35,6 +35,11 @@ export const appConfig: IAppConfiguration = {
     runtimeEnv == 'prod'
       ? parseInt(process.env.PROD_REDIS_DB, 10)
       : parseInt(process.env.DEV_REDIS_DB, 10),
+  auth: {
+    jwks_uri: process.env.JWKS_URI,
+    jwt_audience: process.env.JWT_AUDIENCE,
+    jwt_issuer: process.env.JWT_ISSUER,
+  },
 };
 // //#endregion App Configuration
 

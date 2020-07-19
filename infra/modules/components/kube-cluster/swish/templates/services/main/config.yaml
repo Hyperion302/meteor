@@ -18,3 +18,6 @@ data:
   DEV_REDIS_PORT: "{{ .Values.swishRedisPortDev }}"
   PROD_REDIS_DB: "{{ .Values.swishRedisDBProd }}"
   DEV_REDIS_DB: "{{ .Values.swishRedisDBDev }}"
+  JWKS_URI: "{{ .Values.swishAuthJWKSURI }}"
+  JWT_AUDIENCE: "{{ .Values.swishAuthJWTAudience }}"
+  JWT_ISSUER: "{{ .Values.swishAuthJWTIssuer }}"

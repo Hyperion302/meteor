@@ -29,6 +29,9 @@ swishRedisPortProd: 6379
 swishRedisPortDev: 6379
 swishRedisDBProd: 0
 swishRedisDBDev: 0
+swishAuthJWKSURI: "https://dev-swish.auth0.com/.well-known/jwks.json"
+swishAuthJWTAudience: backend
+swishAuthJWTIssuer: "https://dev-swish.auth0.com/"
 
 gcsStaticIPName: swish-backend-ip
 

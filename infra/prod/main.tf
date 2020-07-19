@@ -101,5 +101,8 @@ module "cluster" {
   tls_cert           = module.edge.certificate_pem
   tls_key            = module.edge.certificate_key
   prod_redis_address = module.watchtime_store.redis_host
+  auth_jwks_uri      = module.auth.jwks_uri
+  auth_jwt_audience  = module.auth.jwt_audience
+  auth_jwt_issuer    = module.auth.jwt_issuer
 }
 

@@ -47,4 +47,9 @@ export interface IAppConfiguration {
   redisPort: number;
   redisDB: number;
   muxSubscription: string;
+  auth: {
+    jwks_uri: string;
+    jwt_audience: string;
+    jwt_issuer: string;
+  };
 }

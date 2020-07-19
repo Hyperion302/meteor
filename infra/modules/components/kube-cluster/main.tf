@@ -134,7 +134,19 @@ resource "helm_release" "release" {
     value = var.dev_redis_address
   }
   set {
-    name = "gcsStaticIPName"
+    name  = "gcsStaticIPName"
     value = google_compute_global_address.external_address.name
+  }
+  set {
+    name  = "swishAuthJWKSURI"
+    value = var.auth_jwks_uri
+  }
+  set {
+    name  = "swishAuthJWTAudience"
+    value = var.auth_jwt_audience
+  }
+  set {
+    name  = "swishAuthJWTIssuer"
+    value = var.auth_jwt_issuer
   }
 }

@@ -76,6 +76,6 @@ resource "auth0_connection" "db_connection" {
 #
 resource "auth0_client_grant" "m_to_m_grant" {
   client_id = auth0_client.m_to_m_client.id
-  audience  = local.audience
+  audience  = auth0_resource_server.api_resource_server.identifier
   scope     = []
 }

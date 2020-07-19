@@ -112,3 +112,15 @@ variable "dev_redis_address" {
   type        = string
   default     = "localhost"
 }
+variable "auth_jwks_uri" {
+  description = "JWKS URI for JWT checking"
+  type        = string
+}
+variable "auth_jwt_audience" {
+  description = "Audience for JWT checking"
+  type        = string
+}
+variable "auth_jwt_issuer" {
+  description = "Issuer for JWT checking"
+  type        = string
+}

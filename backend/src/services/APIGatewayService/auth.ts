@@ -1,16 +1,17 @@
 import jwt from 'express-jwt';
 import jwksRsa from 'jwks-rsa';
+import { appConfig } from '@/sharedInstances';
 
 const authMiddleware = jwt({
   secret: jwksRsa.expressJwtSecret({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: `https://dev-swish.auth0.com/.well-known/jwks.json`,
+    jwksUri: appConfig.auth.jwks_uri,
   }),
 
-  audience: 'backend',
-  issuer: `https://dev-swish.auth0.com/`,
+  audience: appConfig.auth.jwt_audience,
+  issuer: appConfig.auth.jwt_issuer,
   algorithms: ['RS256'],
 });
 
