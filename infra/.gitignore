@@ -1,0 +1,7 @@
+.terraform
+*.tfstate
+credentials.json
+*.backup
+*.key
+*.pem
+*.tfvars
