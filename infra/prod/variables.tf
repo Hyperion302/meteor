@@ -16,6 +16,12 @@ variable "gcp_credentials_path" {
   type        = string
 }
 
+# Github Setup
+#variable "github_token" {
+#  description = "Github Token"
+#  type        = string
+#}
+#
 # Auth0 Setup
 variable "auth0_domain" {
   description = "Auth0 tenant domain"

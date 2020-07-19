@@ -31,6 +31,9 @@ resource "auth0_client" "mobile_client" {
   oidc_conformant = true
   callbacks       = [ "com.jtstechnic.swish://${var.domain}/ios/com.jtstechnic.swish/callback" ]
   grant_types     = [ "implicit", "authorization_code", "refresh_token" ]
+  jwt_configuration {
+    alg = "RS256"
+  }
 }
 # Test Machine (M to M)
 resource "auth0_client" "m_to_m_client" {
@@ -39,6 +42,9 @@ resource "auth0_client" "m_to_m_client" {
   is_first_party  = true
   oidc_conformant = true
   grant_types     = [ "client_credentials" ]
+  jwt_configuration {
+    alg = "RS256"
+  }
 }
 # Web (Reg Web)
 resource "auth0_client" "web_client" {
@@ -52,6 +58,9 @@ resource "auth0_client" "web_client" {
   allowed_origins            = [ "https://swish.tv" ]
   web_origins                = [ "http://swish.local:8080", "https://swish.tv" ]
   grant_types                = [ "implicit", "authorization_code", "refresh_token" ]
+  jwt_configuration {
+    alg = "RS256"
+  }
 }
 
 #

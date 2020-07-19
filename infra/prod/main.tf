@@ -5,6 +5,12 @@ provider "google" {
   credentials = file(var.gcp_credentials_path)
 }
 
+# TODO: Once Swish is on a Github Organization
+#provider "github" {
+#  token      = var.github_token
+#  organization = "Swish-Media"
+#}
+
 terraform {
   backend "gcs" {
     bucket      = "swish-tf-states"
@@ -74,6 +80,11 @@ module "event_pipeline" {
   webhook_secret           = var.mux_webhook_secret
 }
 
+# Cluster
+#data "github_branch" "master" {
+#  repository = "hyperion302/swish"
+#  branch     = "master"
+#}
 module "cluster" {
   source = "../modules/components/kube-cluster"
 
@@ -95,9 +106,9 @@ module "cluster" {
   algolia_id         = var.algolia_id
   algolia_secret     = var.algolia_secret
   main_docker_image  = "${var.gcp_project_id}/swish-main"
-  main_docker_tag    = var.main_docker_tag
+  main_docker_tag    = var.main_docker_tag # data.github_branch.master.sha
   ssr_docker_image   = "${var.gcp_project_id}/swish-ssr"
-  ssr_docker_tag     = var.ssr_docker_tag
+  ssr_docker_tag     = var.ssr_docker_tag # data.github_branch.master.sha
   tls_cert           = module.edge.certificate_pem
   tls_key            = module.edge.certificate_key
   prod_redis_address = module.watchtime_store.redis_host

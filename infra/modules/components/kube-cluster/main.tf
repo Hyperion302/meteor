@@ -26,7 +26,7 @@ resource "google_container_node_pool" "primary" {
   name = "primary-pool"
   location = var.cluster_location
   cluster = google_container_cluster.primary.name
-  node_count = 1
+  node_count = 2
 
   node_config {
     disk_size_gb = 75
