@@ -69,9 +69,9 @@ export default {
   auth: {
     strategies: {
       auth0: {
-        domain: 'dev-swish.auth0.com',
-        client_id: '03LUhiCTm8NX313vX4j63D4pcBSF5z3z',
-        audience: 'backend',
+        domain: 'swish-auth.us.auth0.com',
+        client_id: 'WwKd8ypZghFm8tS9ngzMYff9qFpjBJtg',
+        audience: 'https://api.swish.tv',
       },
     },
     redirect: {

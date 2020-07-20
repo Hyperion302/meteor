@@ -4,7 +4,6 @@ export function calcEVC(wt: number, video: IVideo): number {
   if (!video.content) {
     return 0;
   }
-  console.log(video.content);
   return Math.round(wt / video.content.duration);
 }
 
