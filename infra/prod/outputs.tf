@@ -10,3 +10,7 @@ output "domain" {
   value       = module.edge.domain
   description = "Root DNS entry"
 }
+output "db_connection" {
+  value       = module.database.connection_name
+  description = "Connection name for the connection proxy"
+}

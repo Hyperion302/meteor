@@ -87,8 +87,18 @@ variable "cdn_bucket_name" {
 }
 
 # Watchtime
-variable "instance_name" {
+variable "redis_instance_name" {
   description = "Name of the Redis instance"
+  type        = string
+}
+
+# Database
+variable "sql_instance_tier" {
+  description = "Instance tier of the SQL instance"
+  type        = string
+}
+variable "sql_instance_size" {
+  description = "Instance size"
   type        = string
 }
 

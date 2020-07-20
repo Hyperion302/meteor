@@ -63,10 +63,21 @@ module "cdn" {
 module "watchtime_store" {
   source = "../modules/data/redis"
 
-  redis_instance_name        = var.instance_name
+  redis_instance_name        = var.redis_instance_name
   redis_instance_size        = 1
   redis_instance_network     = module.network.vpc_id
   redis_instance_region_zone = var.gcp_region_zone
+}
+
+# Main DB
+module "database" {
+  source = "../modules/data/sql"
+
+  instance_name_prefix = "mysql-instance"
+  instance_region      = var.gcp_region
+  instance_tier        = var.sql_instance_tier
+  instance_network     = module.network.vpc_id
+  instance_size        = var.sql_instance_size
 }
 
 # Event pipeline
