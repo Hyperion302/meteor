@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<!--
-   Auth0.plist
-   Runner
-
-   Created by Joseph Shetaye on 4/7/20.
-   Copyright (c) 2020 The Chromium Authors. All rights reserved.
--->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>ClientId</key>
-    <string>LjWZPfSiicA3PpzO5zLtFWyFnabLsQUW</string>
-    <key>Domain</key>
-    <string>dev-swish.auth0.com</string>
+	<key>ClientId</key>
+	<string>lMNultIbeOZA1F5jdtmUE357R061Wcj6</string>
+	<key>Domain</key>
+	<string>swish-auth.us.auth0.com</string>
 </dict>
 </plist>
