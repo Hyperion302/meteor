@@ -93,12 +93,12 @@ variable "redis_instance_name" {
 }
 
 # Database
-variable "sql_instance_tier" {
-  description = "Instance tier of the SQL instance"
+variable "sql_instance_name" {
+  description = "Name for the SQL instance"
   type        = string
 }
-variable "sql_instance_size" {
-  description = "Instance size"
+variable "sql_instance_tier" {
+  description = "Instance tier of the SQL instance"
   type        = string
 }
 

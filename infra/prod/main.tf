@@ -73,11 +73,9 @@ module "watchtime_store" {
 module "database" {
   source = "../modules/data/sql"
 
-  instance_name_prefix = "mysql-instance"
+  instance_name_prefix = var.sql_instance_name
   instance_region      = var.gcp_region
   instance_tier        = var.sql_instance_tier
-  instance_network     = module.network.vpc_id
-  instance_size        = var.sql_instance_size
 }
 
 # Event pipeline

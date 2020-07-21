@@ -17,6 +17,16 @@ variable "gcp_credentials_path" {
   default = "credentials.json"
 }
 
+# Database
+variable "sql_instance_name" {
+  description = "Name for the SQL instance"
+  type        = string
+}
+variable "sql_instance_tier" {
+  description = "Instance tier of the SQL instance"
+  type        = string
+}
+
 # CDN
 variable "cdn_bucket_name" {
   description = "Name of the bucket where videos and icons are stored"
@@ -27,6 +37,22 @@ variable "cdn_bucket_name" {
 # Event pipeline
 variable "mux_webhook_secret" {
   description = "Mux-provided webhook secret"
+  type        = string
+}
+variable "handler_function" {
+  description = "Name of the mux handler function"
+  type        = string
+}
+variable "handler_function_description" {
+  description = "Human friendly name for the handler function"
+  type        = string
+}
+variable "pubsub_topic" {
+  description = "Name of the pubsub topic for the mux pipeline"
+  type        = string
+}
+variable "pubsub_subscription" {
+  description = "Name of the pubsub subscription for the mux pipeline"
   type        = string
 }
 

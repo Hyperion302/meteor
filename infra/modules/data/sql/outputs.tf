@@ -1,6 +1,6 @@
-output "private_address" {
-  description = "Private IP address to connect to in the VPC"
-  value       = google_sql_database_instance.master.private_ip_address
+output "public_address" {
+  description = "Public IP address to connect to in the VPC"
+  value       = google_sql_database_instance.master.public_ip_address
 }
 output "connection_name" {
   description = "Connection name for the SQL proxy"

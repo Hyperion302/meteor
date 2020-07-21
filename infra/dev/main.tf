@@ -13,8 +13,16 @@ terraform {
   }
 }
 
-# Video + Icon CDN
+# Main DB
+module "database" {
+  source = "../modules/data/sql"
 
+  instance_name_prefix = var.sql_instance_name
+  instance_region      = var.gcp_region
+  instance_tier        = var.sql_instance_tier
+}
+
+# Video + Icon CDN
 module "cdn" {
   source = "../modules/data/cdn"
 
@@ -25,9 +33,9 @@ module "cdn" {
 module "event_pipeline" {
   source = "../modules/components/event-pipeline"
 
-  function_name            = "dev-muxWebhookPortal"
-  function_description     = "Authentication and queueing for Mux webhook messages"
-  pubsub_topic_name        = "dev-mux-events"
-  pubsub_subscription_name = "dev-swish-api"
+  function_name            = var.handler_function
+  function_description     = var.handler_function_description
+  pubsub_topic_name        = var.pubsub_topic
+  pubsub_subscription_name = var.pubsub_subscription
   webhook_secret           = var.mux_webhook_secret
 }
