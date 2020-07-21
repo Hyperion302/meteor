@@ -101,6 +101,18 @@ variable "sql_instance_tier" {
   description = "Instance tier of the SQL instance"
   type        = string
 }
+variable "sql_databases" {
+  description = "List of databases for the SQL instance"
+  type        = list(string)
+}
+variable "sql_application_user" {
+  description = "Username for the SQL application user"
+  type        = string
+}
+variable "sql_devops_user" {
+  description = "Username for the SQL devops user"
+  type        = string
+}
 
 # Event pipeline
 variable "mux_webhook_secret" {

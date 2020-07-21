@@ -76,6 +76,9 @@ module "database" {
   instance_name_prefix = var.sql_instance_name
   instance_region      = var.gcp_region
   instance_tier        = var.sql_instance_tier
+  databases            = var.sql_databases
+  application_user     = var.sql_application_user
+  devops_user          = var.sql_devops_user
 }
 
 # Event pipeline
