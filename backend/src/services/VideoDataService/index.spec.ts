@@ -9,20 +9,19 @@ import {
   fakeChannel,
   fakeContent,
   fakeContext,
+  fakeIDs,
 } from '@/sharedTestData';
 const sharedInstances = require('@/sharedInstances');
 const channelDataService = require('@services/ChannelDataService');
 const videoContentService = require('@services/VideoContentService');
 const searchService = require('@services/SearchService');
 const watchtimeService = require('@services/WatchTimeService');
-const uuid = require('uuid/v4');
 
 jest.mock('@/sharedInstances');
 jest.mock('@services/ChannelDataService');
 jest.mock('@services/VideoContentService');
 jest.mock('@services/SearchService');
 jest.mock('@services/WatchTimeService');
-jest.mock('uuid/v4');
 
 function mockImplementations() {
   // Mock firestore document
@@ -46,8 +45,8 @@ function mockImplementations() {
     });
   });
   // Mock UUID
-  uuid.mockImplementation(() => {
-    return '3d1afd2a-04a2-47f9-9c65-e34b6465b83a';
+  sharedInstances.mockID.mockImplementation(() => {
+    return fakeIDs[0];
   });
 }
 
@@ -62,64 +61,47 @@ beforeEach(() => {
 describe('Video Data Service', () => {
   describe('getVideo', () => {
     it('Requests the correct video ID', async () => {
-      await videoDataService.getVideo(
-        fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-      );
+      await videoDataService.getVideo(fakeContext, fakeIDs[0]);
       expect(sharedInstances.mockDoc).toBeCalledWith(
-        `${
-          sharedInstances.mockConfig().dbPrefix
-        }videos/3d1afd2a-04a2-47f9-9c65-e34b6465b83a`,
+        `${sharedInstances.mockConfig().dbPrefix}videos/${fakeIDs[0]}`,
       );
     });
     it('Checks if the video exists', async () => {
-      await videoDataService.getVideo(
-        fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-      );
+      await videoDataService.getVideo(fakeContext, fakeIDs[0]);
       expect(sharedInstances.mockExists).toBeCalled();
     });
     it('Requests the correct channel ID', async () => {
-      await videoDataService.getVideo(
-        fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-      );
+      await videoDataService.getVideo(fakeContext, fakeIDs[0]);
       expect(channelDataService.getChannel).toBeCalledWith(
         fakeContext,
-        '716886dd-c107-4bd7-9060-a47b50f81689',
+        fakeIDs[1],
       );
     });
     it('Requests the correct content ID', async () => {
-      await videoDataService.getVideo(
-        fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-      );
+      await videoDataService.getVideo(fakeContext, fakeIDs[0]);
       expect(videoContentService.getVideo).toBeCalledWith(
         fakeContext,
-        'b5263a52-1c05-4ab7-813d-65b8866bacfd',
+        fakeIDs[2],
       );
     });
     it('Responds with the correct video', async () => {
-      const res = await videoDataService.getVideo(
-        fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-      );
+      const res = await videoDataService.getVideo(fakeContext, fakeIDs[0]);
       expect(res).toMatchInlineSnapshot(`
         Object {
           "author": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
           "channel": Object {
-            "id": "716886dd-c107-4bd7-9060-a47b50f81689",
+            "id": "73877867791908867",
             "name": "Test Channel",
             "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
           },
           "content": Object {
             "assetID": "SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo",
             "duration": 5.2,
-            "id": "b5263a52-1c05-4ab7-813d-65b8866bacfd",
+            "id": "73877867791908866",
             "playbackID": "1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG",
           },
           "description": "Test Video Description",
-          "id": "3d1afd2a-04a2-47f9-9c65-e34b6465b83a",
+          "id": "73878773241479168",
           "title": "Test Video Name",
           "uploadDate": 1578009691,
         }
@@ -130,43 +112,40 @@ describe('Video Data Service', () => {
   describe('createVideo', () => {
     const testTitle = 'Cool vid';
     const testDescription = 'Cool video description';
-    const fakeChannel = '716886dd-c107-4bd7-9060-a47b50f81689';
 
     it('Fetches the videos future channel', async () => {
       await videoDataService.createVideo(
         fakeContext,
         testTitle,
         testDescription,
-        fakeChannel,
+        fakeIDs[1],
       );
 
       expect(channelDataService.getChannel).toHaveBeenCalledWith(
         fakeContext,
-        fakeChannel,
+        fakeIDs[1],
       );
     });
-    it('Generates a UUID for the video', async () => {
+    it('Generates an ID for the video', async () => {
       await videoDataService.createVideo(
         fakeContext,
         testTitle,
         testDescription,
-        fakeChannel,
+        fakeIDs[1],
       );
 
-      expect(uuid).toHaveBeenCalled();
+      expect(sharedInstances.mockID).toHaveBeenCalled();
     });
     it('References a correct path', async () => {
       await videoDataService.createVideo(
         fakeContext,
         testTitle,
         testDescription,
-        fakeChannel,
+        fakeIDs[1],
       );
 
       expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
-        `${
-          sharedInstances.mockConfig().dbPrefix
-        }videos/3d1afd2a-04a2-47f9-9c65-e34b6465b83a`,
+        `${sharedInstances.mockConfig().dbPrefix}videos/${fakeIDs[0]}`,
       );
     });
     it('Sets the correct video data', async () => {
@@ -174,13 +153,13 @@ describe('Video Data Service', () => {
         fakeContext,
         testTitle,
         testDescription,
-        fakeChannel,
+        fakeIDs[1],
       );
 
       expect(sharedInstances.mockSet).toHaveBeenCalledWith({
-        id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+        id: fakeIDs[0],
         author: fakeContext.auth.userID,
-        channel: fakeChannel,
+        channel: fakeChannel.id,
         title: testTitle,
         description: testDescription,
         content: null,
@@ -192,24 +171,24 @@ describe('Video Data Service', () => {
         fakeContext,
         testTitle,
         testDescription,
-        fakeChannel,
+        fakeIDs[1],
       );
 
       expect(res).toMatchInlineSnapshot(`
-                Object {
-                  "author": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
-                  "channel": Object {
-                    "id": "716886dd-c107-4bd7-9060-a47b50f81689",
-                    "name": "Test Channel",
-                    "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
-                  },
-                  "content": null,
-                  "description": "Cool video description",
-                  "id": "3d1afd2a-04a2-47f9-9c65-e34b6465b83a",
-                  "title": "Cool vid",
-                  "uploadDate": 0,
-                }
-            `);
+        Object {
+          "author": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
+          "channel": Object {
+            "id": "73877867791908867",
+            "name": "Test Channel",
+            "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
+          },
+          "content": null,
+          "description": "Cool video description",
+          "id": "73878773241479168",
+          "title": "Cool vid",
+          "uploadDate": 0,
+        }
+      `);
     });
   });
 
@@ -321,7 +300,7 @@ describe('Video Data Service', () => {
     it('Checks to see if the video exists first', async () => {
       await videoDataService.updateVideo(
         fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+        fakeIDs[0],
         testFullUpdate,
       );
       expect(sharedInstances.mockExists).toBeCalled();
@@ -329,7 +308,7 @@ describe('Video Data Service', () => {
     it('Updates the video record', async () => {
       await videoDataService.updateVideo(
         fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+        fakeIDs[0],
         testFullUpdate,
       );
       expect(sharedInstances.mockUpdate).toBeCalled();
@@ -337,7 +316,7 @@ describe('Video Data Service', () => {
     it('Updates the correct video record', async () => {
       await videoDataService.updateVideo(
         fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+        fakeIDs[0],
         testFullUpdate,
       );
       expect(sharedInstances.mockUpdate).toBeCalledWith(testFullUpdate);
@@ -345,7 +324,7 @@ describe('Video Data Service', () => {
     it('Only updates title if given only a title', async () => {
       await videoDataService.updateVideo(
         fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+        fakeIDs[0],
         testTitleUpdate,
       );
       expect(sharedInstances.mockUpdate).toBeCalledWith(testTitleUpdate);
@@ -353,7 +332,7 @@ describe('Video Data Service', () => {
     it('Only updates description if given only a description', async () => {
       await videoDataService.updateVideo(
         fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+        fakeIDs[0],
         testDescriptionUpdate,
       );
       expect(sharedInstances.mockUpdate).toBeCalledWith(testDescriptionUpdate);
@@ -361,7 +340,7 @@ describe('Video Data Service', () => {
     it('Silently performs no update if given no changes', async () => {
       await videoDataService.updateVideo(
         fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+        fakeIDs[0],
         testBlankUpdate,
       );
       expect(sharedInstances.mockUpdate).toBeCalledWith(testBlankUpdate);
@@ -369,7 +348,7 @@ describe('Video Data Service', () => {
     it('Requests a new video record after updating', async () => {
       await videoDataService.updateVideo(
         fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+        fakeIDs[0],
         testFullUpdate,
       );
       expect(sharedInstances.mockDoc).toBeCalled();
@@ -377,19 +356,17 @@ describe('Video Data Service', () => {
     it('Requests the correct new video record', async () => {
       await videoDataService.updateVideo(
         fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+        fakeIDs[0],
         testFullUpdate,
       );
       expect(sharedInstances.mockDoc).toHaveBeenLastCalledWith(
-        `${
-          sharedInstances.mockConfig().dbPrefix
-        }videos/3d1afd2a-04a2-47f9-9c65-e34b6465b83a`,
+        `${sharedInstances.mockConfig().dbPrefix}videos/${fakeIDs[0]}`,
       );
     });
     it('Updates the search index', async () => {
       await videoDataService.updateVideo(
         fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+        fakeIDs[0],
         testFullUpdate,
       );
       expect(searchService.updateVideo).toBeCalled();
@@ -404,7 +381,7 @@ describe('Video Data Service', () => {
       });
       await videoDataService.updateVideo(
         fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+        fakeIDs[0],
         testFullUpdate,
       );
       expect(searchService.updateVideo.mock.calls[0][1]).toMatchObject(
@@ -422,7 +399,7 @@ describe('Video Data Service', () => {
 
       const res = await videoDataService.updateVideo(
         fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+        fakeIDs[0],
         testFullUpdate,
       );
       expect(res).toMatchObject(expectedUpdatedVideo);
@@ -431,25 +408,17 @@ describe('Video Data Service', () => {
 
   describe('deleteVideo', () => {
     it('Checks to see if the video exists first', async () => {
-      await videoDataService.deleteVideo(
-        fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-      );
+      await videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
 
       expect(sharedInstances.mockDoc).toBeCalledWith(
-        `${
-          sharedInstances.mockConfig().dbPrefix
-        }videos/3d1afd2a-04a2-47f9-9c65-e34b6465b83a`,
+        `${sharedInstances.mockConfig().dbPrefix}videos/${fakeIDs[0]}`,
       );
 
       expect(sharedInstances.mockExists).toBeCalled();
     });
 
     it('Deletes everything in the right order', async () => {
-      await videoDataService.deleteVideo(
-        fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-      );
+      await videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
 
       expect(searchService.removeVideo).toHaveBeenCalledBefore(
         videoContentService.deleteVideo,
@@ -460,34 +429,28 @@ describe('Video Data Service', () => {
     });
 
     it('Deletes the search index', async () => {
-      await videoDataService.deleteVideo(
-        fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-      );
+      await videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
       expect(searchService.removeVideo).toHaveBeenCalled();
     });
 
     it('Deletes the correct search index', async () => {
-      await videoDataService.deleteVideo(
-        fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-      );
+      await videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
       expect(searchService.removeVideo.mock.calls[0][1]).toMatchInlineSnapshot(`
 Object {
   "author": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
   "channel": Object {
-    "id": "716886dd-c107-4bd7-9060-a47b50f81689",
+    "id": "73877867791908867",
     "name": "Test Channel",
     "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
   },
   "content": Object {
     "assetID": "SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo",
     "duration": 5.2,
-    "id": "b5263a52-1c05-4ab7-813d-65b8866bacfd",
+    "id": "73877867791908866",
     "playbackID": "1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG",
   },
   "description": "Test Video Description",
-  "id": "3d1afd2a-04a2-47f9-9c65-e34b6465b83a",
+  "id": "73878773241479168",
   "title": "Test Video Name",
   "uploadDate": 1578009691,
 }
@@ -495,28 +458,22 @@ Object {
     });
 
     it('Deletes the video content', async () => {
-      await videoDataService.deleteVideo(
-        fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-      );
+      await videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
       expect(videoContentService.deleteVideo).toHaveBeenCalled();
     });
 
     it('Deletes the correct video content', async () => {
-      await videoDataService.deleteVideo(
-        fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-      );
+      await videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
       expect(videoContentService.deleteVideo).toHaveBeenCalledWith(
         fakeContext,
-        'b5263a52-1c05-4ab7-813d-65b8866bacfd',
+        fakeIDs[2],
       );
     });
 
     it("Doesn't try to delete video content if it does't exist", async () => {
       sharedInstances.mockData.mockImplementation(() => {
         const retVal: {
-          id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a';
+          id: string;
           author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2';
           channel: '716886dd-c107-4bd7-9060-a47b50f81689';
           content: null;
@@ -524,7 +481,7 @@ Object {
           title: 'Test Video Name';
           uploadDate: 1578009691;
         } = {
-          id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+          id: fakeIDs[0],
           author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
           channel: '716886dd-c107-4bd7-9060-a47b50f81689',
           content: null,
@@ -534,18 +491,12 @@ Object {
         }; // Work around for TS
         return retVal;
       });
-      await videoDataService.deleteVideo(
-        fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-      );
+      await videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
       expect(videoContentService.deleteVideo).not.toHaveBeenCalled();
     });
 
     it('Deletes the video record', async () => {
-      await videoDataService.deleteVideo(
-        fakeContext,
-        '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
-      );
+      await videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
       expect(sharedInstances.mockDelete).toHaveBeenCalled();
     });
   });

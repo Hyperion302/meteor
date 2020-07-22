@@ -29,7 +29,7 @@ describe('Search Service', () => {
         .toMatchInlineSnapshot(`
         Object {
           "description": "Test Video Description",
-          "objectID": "3d1afd2a-04a2-47f9-9c65-e34b6465b83a",
+          "objectID": "73878773241479168",
           "title": "Test Video Name",
           "type": "video",
           "uploadDate": 1578009691,
@@ -46,7 +46,7 @@ describe('Search Service', () => {
         .toMatchInlineSnapshot(`
         Object {
           "description": "Test Video Description",
-          "objectID": "3d1afd2a-04a2-47f9-9c65-e34b6465b83a",
+          "objectID": "73878773241479168",
           "title": "Test Video Name",
           "type": "video",
           "uploadDate": 1578009691,
@@ -71,12 +71,12 @@ describe('Search Service', () => {
 
       expect(sharedInstances.mockSaveObject.mock.calls[0][0])
         .toMatchInlineSnapshot(`
-Object {
-  "name": "Test Channel",
-  "objectID": "716886dd-c107-4bd7-9060-a47b50f81689",
-  "type": "channel",
-}
-`);
+        Object {
+          "name": "Test Channel",
+          "objectID": "73877867791908867",
+          "type": "channel",
+        }
+      `);
     });
   });
   describe('updateChannel', () => {
@@ -85,12 +85,12 @@ Object {
 
       expect(sharedInstances.mockSaveObject.mock.calls[0][0])
         .toMatchInlineSnapshot(`
-Object {
-  "name": "Test Channel",
-  "objectID": "716886dd-c107-4bd7-9060-a47b50f81689",
-  "type": "channel",
-}
-`);
+        Object {
+          "name": "Test Channel",
+          "objectID": "73877867791908867",
+          "type": "channel",
+        }
+      `);
     });
   });
   describe('removeChannel', () => {

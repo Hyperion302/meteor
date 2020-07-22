@@ -1,24 +1,22 @@
 import * as ChannelDataService from './';
 import { IChannel, IChannelQuery, IChannelUpdate } from './definitions';
 import { IServiceInvocationContext } from '@/definitions';
-import { fakeChannel, fakeContext } from '@/sharedTestData';
+import { fakeChannel, fakeContext, fakeIDs } from '@/sharedTestData';
 
 const sharedInstances = require('@/sharedInstances');
 const searchService = require('@services/SearchService');
-const uuid = require('uuid/v4');
 
 jest.mock('@/sharedInstances');
 jest.mock('@services/SearchService');
-jest.mock('uuid/v4');
 
 function mockImplementations() {
   // Mock firestore document
   sharedInstances.mockData.mockImplementation(() => {
     return fakeChannel;
   });
-  // Mock UUID
-  uuid.mockImplementation(() => {
-    return '3d1afd2a-04a2-47f9-9c65-e34b6465b83a';
+  // Mock ID
+  sharedInstances.mockID.mockImplementation(() => {
+    return fakeIDs[0];
   });
 }
 
@@ -49,7 +47,7 @@ describe('Channel Data Sevice', () => {
       );
       expect(res).toMatchInlineSnapshot(`
         Object {
-          "id": "716886dd-c107-4bd7-9060-a47b50f81689",
+          "id": "73877867791908867",
           "name": "Test Channel",
           "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
         }
@@ -104,7 +102,7 @@ describe('Channel Data Sevice', () => {
       await ChannelDataService.createChannel(fakeContext, testName);
 
       expect(searchService.addChannel).toHaveBeenCalledWith(fakeContext, {
-        id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+        id: fakeIDs[0],
         owner: fakeContext.auth.userID,
         name: testName,
       });
@@ -113,16 +111,14 @@ describe('Channel Data Sevice', () => {
       await ChannelDataService.createChannel(fakeContext, testName);
 
       expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
-        `${
-          sharedInstances.mockConfig().dbPrefix
-        }channels/3d1afd2a-04a2-47f9-9c65-e34b6465b83a`,
+        `${sharedInstances.mockConfig().dbPrefix}channels/${fakeIDs[0]}`,
       );
     });
     it('Sets the correct data', async () => {
       await ChannelDataService.createChannel(fakeContext, testName);
 
       expect(sharedInstances.mockSet).toHaveBeenCalledWith({
-        id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+        id: fakeIDs[0],
         owner: fakeContext.auth.userID,
         name: testName,
       });
@@ -131,12 +127,12 @@ describe('Channel Data Sevice', () => {
       const res = await ChannelDataService.createChannel(fakeContext, testName);
 
       expect(res).toMatchInlineSnapshot(`
-                Object {
-                  "id": "3d1afd2a-04a2-47f9-9c65-e34b6465b83a",
-                  "name": "New channel",
-                  "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
-                }
-            `);
+        Object {
+          "id": "73878773241479168",
+          "name": "New channel",
+          "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
+        }
+      `);
     });
   });
 
@@ -214,7 +210,7 @@ describe('Channel Data Sevice', () => {
       expect(searchService.updateChannel.mock.calls[0][1])
         .toMatchInlineSnapshot(`
         Object {
-          "id": "716886dd-c107-4bd7-9060-a47b50f81689",
+          "id": "73877867791908867",
           "name": "Test Channel",
           "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
         }
@@ -229,7 +225,7 @@ describe('Channel Data Sevice', () => {
 
       expect(res).toMatchInlineSnapshot(`
         Object {
-          "id": "716886dd-c107-4bd7-9060-a47b50f81689",
+          "id": "73877867791908867",
           "name": "Test Channel",
           "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
         }
@@ -259,7 +255,7 @@ describe('Channel Data Sevice', () => {
       expect(searchService.removeChannel.mock.calls[0][1])
         .toMatchInlineSnapshot(`
 Object {
-  "id": "716886dd-c107-4bd7-9060-a47b50f81689",
+  "id": "73877867791908867",
   "name": "Test Channel",
   "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
 }

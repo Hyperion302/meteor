@@ -4,7 +4,7 @@ import { ObjectReadableMock, ObjectWritableMock } from 'stream-mock';
 import { IServiceInvocationContext } from '@/definitions';
 import moxios from 'moxios';
 import { IVideo } from '@services/VideoDataService/definitions';
-import { fakeContext, fakeContent, fakeVideo } from '@/sharedTestData';
+import { fakeContext, fakeContent, fakeVideo, fakeIDs } from '@/sharedTestData';
 
 const uuid = require('uuid/v4');
 const sharedInstances = require('@/sharedInstances');
@@ -12,7 +12,6 @@ const VideoDataService = require('@services/VideoDataService');
 
 jest.mock('@/sharedInstances');
 jest.mock('@services/VideoDataService');
-jest.mock('uuid/v4');
 
 function mockImplementations() {
   // Mock firestore document
@@ -22,8 +21,8 @@ function mockImplementations() {
   VideoDataService.getVideo.mockImplementation(() => fakeVideo);
 
   // Mock UUID
-  uuid.mockImplementation(() => {
-    return '3d1afd2a-04a2-47f9-9c65-e34b6465b83a';
+  sharedInstances.mockID.mockImplementation(() => {
+    return fakeIDs[0];
   });
 }
 
@@ -59,14 +58,13 @@ describe('Video Content Service', () => {
         Object {
           "assetID": "SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo",
           "duration": 5.2,
-          "id": "b5263a52-1c05-4ab7-813d-65b8866bacfd",
+          "id": "73877867791908866",
           "playbackID": "1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG",
         }
       `);
     });
   });
   describe('uploadVideo', () => {
-    const testID = '3d1afd2a-04a2-47f9-9c65-e34b6465b83a';
     const testMime = 'video/mp4';
 
     beforeEach(() => {
@@ -88,7 +86,7 @@ describe('Video Content Service', () => {
       const testInput = new ObjectReadableMock([0, 1, 2, 3, 4]);
       await videoContentService.uploadVideo(
         fakeContext,
-        testID,
+        fakeIDs[0],
         testInput,
         testMime,
       );
@@ -101,20 +99,20 @@ describe('Video Content Service', () => {
       const testInput = new ObjectReadableMock([0, 1, 2, 3, 4]);
       await videoContentService.uploadVideo(
         fakeContext,
-        testID,
+        fakeIDs[0],
         testInput,
         testMime,
       );
 
       expect(sharedInstances.mockFile).toBeCalledWith(
-        `masters/${fakeContext.auth.userID}/${testID}`,
+        `masters/${fakeContext.auth.userID}/${fakeIDs[0]}`,
       );
     });
     it('Creates a writestream with the correct parameters', async () => {
       const testInput = new ObjectReadableMock([0, 1, 2, 3, 4]);
       await videoContentService.uploadVideo(
         fakeContext,
-        testID,
+        fakeIDs[0],
         testInput,
         testMime,
       );
@@ -129,7 +127,7 @@ describe('Video Content Service', () => {
       const testInput = new ObjectReadableMock([0, 1, 2, 3, 4]);
       await videoContentService.uploadVideo(
         fakeContext,
-        testID,
+        fakeIDs[0],
         testInput,
         testMime,
       );
@@ -139,13 +137,13 @@ describe('Video Content Service', () => {
     it('Sends transcoding request to Mux', (done) => {
       const testInput = new ObjectReadableMock([0, 1, 2, 3, 4]);
       videoContentService
-        .uploadVideo(fakeContext, testID, testInput, testMime)
+        .uploadVideo(fakeContext, fakeIDs[0], testInput, testMime)
         .then(() => {
           moxios.wait(() => {
             const request = moxios.requests.mostRecent();
             expect(request.config.method).toEqual('post');
             expect(request.config.data).toMatchInlineSnapshot(
-              `"{\\"input\\":\\"https://storage.googleapis.com/dev-swish/masters/FDJIVPG1xgXfXmm67ETETSn9MSe2/3d1afd2a-04a2-47f9-9c65-e34b6465b83a\\",\\"playback_policy\\":[\\"public\\"],\\"passthrough\\":\\"3d1afd2a-04a2-47f9-9c65-e34b6465b83a:3d1afd2a-04a2-47f9-9c65-e34b6465b83a\\"}"`,
+              `"{\\"input\\":\\"https://storage.googleapis.com/dev-swish/masters/FDJIVPG1xgXfXmm67ETETSn9MSe2/73878773241479168\\",\\"playback_policy\\":[\\"public\\"],\\"passthrough\\":\\"73878773241479168:73878773241479168\\"}"`,
             );
             done();
           });

@@ -5,10 +5,13 @@ import {
   InternalError,
   AuthorizationError,
 } from '@/errors';
-import uuid from 'uuid/v4';
 import { IChannel, IChannelQuery, IChannelUpdate } from './definitions';
 import * as search from '@services/SearchService';
-import { firestoreInstance, appConfig } from '@/sharedInstances';
+import {
+  firestoreInstance,
+  appConfig,
+  swishflakeGenerator,
+} from '@/sharedInstances';
 import { toGlobal, toNamespaced } from '@/utils';
 
 // Predefined constants
@@ -104,7 +107,7 @@ export async function createChannel(
 ): Promise<IChannel> {
   // Build channel object
   const channelData: IChannel = {
-    id: uuid(),
+    id: swishflakeGenerator.nextID(),
     owner: context.auth.userID,
     name,
   };

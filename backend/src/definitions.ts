@@ -52,4 +52,15 @@ export interface IAppConfiguration {
     jwt_audience: string;
     jwt_issuer: string;
   };
+  sql: {
+    host: string;
+    user: string;
+    pass: string;
+    databases: {
+      channelData: string;
+      videoContent: string;
+      videoData: string;
+    };
+  };
+  nodeID: number;
 }

@@ -11,21 +11,27 @@ export const fakeContext: IServiceInvocationContext = {
   },
 };
 
+export const fakeIDs: string[] = [
+  '73878773241479168', // Video
+  '73877867791908867', // Channel
+  '73877867791908866', // Content
+];
+
 export const fakeChannel: IChannel = {
-  id: '716886dd-c107-4bd7-9060-a47b50f81689',
+  id: fakeIDs[1],
   name: 'Test Channel',
   owner: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
 };
 
 export const fakeContent: IVideoContent = {
-  id: 'b5263a52-1c05-4ab7-813d-65b8866bacfd',
+  id: fakeIDs[2],
   assetID: 'SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo',
   playbackID: '1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG',
   duration: 5.2,
 };
 
 export const fakeVideo: IVideo = {
-  id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+  id: fakeIDs[0],
   author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
   channel: fakeChannel,
   content: fakeContent,
@@ -35,7 +41,7 @@ export const fakeVideo: IVideo = {
 };
 
 export const fakeVideoSchema: IVideoSchema = {
-  id: '3d1afd2a-04a2-47f9-9c65-e34b6465b83a',
+  id: fakeIDs[0],
   author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
   channel: fakeChannel.id,
   content: fakeContent.id,

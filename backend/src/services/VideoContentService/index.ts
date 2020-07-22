@@ -4,6 +4,7 @@ import {
   storageInstance,
   pubsubSubscription,
   appConfig,
+  swishflakeGenerator,
 } from '@/sharedInstances';
 import {
   IVideoContent,
@@ -15,7 +16,6 @@ import * as SearchService from '@services/SearchService';
 import axios from 'axios';
 import { ResourceNotFoundError, AuthorizationError } from '@/errors';
 import { Message } from '@google-cloud/pubsub';
-import uuid from 'uuid/v4';
 import { toNamespaced } from '@/utils';
 import { IVideo } from '@services/VideoDataService/definitions';
 
@@ -242,14 +242,14 @@ export async function uploadVideo(
   await storageObject.makePublic();
   // Call transcoder
 
-  // NOTE: Here is where I create the UUID for the new content record.
+  // NOTE: Here is where I create the ID for the new content record.
   // The passthrough value takes the form <videoID>:<contentID>
   await axios.post(
     'https://api.mux.com/video/v1/assets',
     {
       input: `https://storage.googleapis.com/${appConfig.bucket}/${path}`,
       playback_policy: ['public'],
-      passthrough: `${id}:${uuid()}`,
+      passthrough: `${id}:${swishflakeGenerator.nextID()}`,
     },
     {
       headers: {

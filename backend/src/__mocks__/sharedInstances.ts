@@ -1,5 +1,6 @@
 import { ObjectWritableMock } from 'stream-mock';
 import { Callback } from 'redis';
+import { SwishflakeGenerator } from '@/SwishflakeGenerator';
 
 // Mock appConfig
 export const mockConfig = jest.fn(() => {
@@ -284,3 +285,12 @@ export class MockedRedis {
 }
 
 export const redisClient = new MockedRedis();
+
+// Mock Swishflake
+export const mockID = jest.fn(() => '');
+export class MockSwishflakeGenerator {
+  nextID() {
+    return mockID();
+  }
+}
+export const swishflakeGenerator = new MockSwishflakeGenerator();

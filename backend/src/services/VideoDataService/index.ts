@@ -1,7 +1,10 @@
 import { tID, IError, IServiceInvocationContext } from '@/definitions';
 import { IVideo, IVideoQuery, IVideoSchema, IVideoUpdate } from './definitions';
-import uuid from 'uuid/v4';
-import { firestoreInstance, appConfig } from '@/sharedInstances';
+import {
+  firestoreInstance,
+  appConfig,
+  swishflakeGenerator,
+} from '@/sharedInstances';
 import * as channelDataService from '@services/ChannelDataService';
 import * as videoContentService from '@services/VideoContentService';
 import * as searchService from '@services/SearchService';
@@ -172,7 +175,7 @@ export async function createVideo(
   }
 
   const videoData: IVideo = {
-    id: uuid(),
+    id: swishflakeGenerator.nextID(),
     author: context.auth.userID,
     channel: channelData,
     title,

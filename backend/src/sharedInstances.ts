@@ -5,6 +5,7 @@ import algoliasearch from 'algoliasearch';
 import { ClientConfig } from '@google-cloud/pubsub/build/src/pubsub';
 import { IAppConfiguration } from './definitions';
 import redis from 'redis';
+import { SwishflakeGenerator } from '@/SwishflakeGenerator';
 
 const runtimeEnv = process.env.RUNTIMEENV;
 
@@ -40,6 +41,17 @@ export const appConfig: IAppConfiguration = {
     jwt_audience: process.env.JWT_AUDIENCE,
     jwt_issuer: process.env.JWT_ISSUER,
   },
+  sql: {
+    host: process.env.SQL_HOST,
+    user: process.env.SQL_USER,
+    pass: process.env.SQL_PASS,
+    databases: {
+      videoContent: process.env.SQL_VIDEO_CONTENT_DB,
+      videoData: process.env.SQL_VIDEO_DATA_DB,
+      channelData: process.env.SQL_CHANNEL_DATA_DB,
+    },
+  },
+  nodeID: parseInt(process.env.NODE_ID),
 };
 // //#endregion App Configuration
 
@@ -82,3 +94,10 @@ export const redisClient = redis.createClient({
   db: appConfig.redisDB,
   detect_buffers: true,
 });
+// #endregion Redis
+
+// #region Swishflake
+
+// Mean to be used as a singleton per node
+export const swishflakeGenerator = new SwishflakeGenerator(appConfig.nodeID);
+// #endregion Swishflake
