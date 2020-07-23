@@ -5,7 +5,12 @@ import {
   InternalError,
   AuthorizationError,
 } from '@/errors';
-import { IChannel, IChannelQuery, IChannelUpdate } from './definitions';
+import {
+  IChannel,
+  IChannelQuery,
+  IChannelUpdate,
+  IChannelSchema,
+} from './definitions';
 import * as search from '@services/SearchService';
 import {
   firestoreInstance,
@@ -13,9 +18,23 @@ import {
   swishflakeGenerator,
 } from '@/sharedInstances';
 import { toGlobal, toNamespaced } from '@/utils';
+import knex from 'knex';
 
 // Predefined constants
 const MAX_CHANNELS: number = 10;
+
+// Database Instance
+const knexInstance = knex({
+  client: 'mysql2',
+  connection: {
+    host: appConfig.sql.host,
+    user: appConfig.sql.user,
+    password: appConfig.sql.pass,
+    database: appConfig.sql.databases.channelData,
+    supportBigNumbers: true,
+    bigNumberStrings: true,
+  },
+});
 
 /**
  * Retrieves a single channel record
@@ -24,20 +43,24 @@ const MAX_CHANNELS: number = 10;
  * @ignore
  */
 async function getSingleChannelRecord(id: tID): Promise<IChannel> {
-  // Get basic channel data
-  const channelDoc = firestoreInstance.doc(
-    toNamespaced(`channels/${id}`, appConfig.dbPrefix),
-  );
-  const channelDocSnap = await channelDoc.get();
-  if (!channelDocSnap.exists) {
+  const rows = await knexInstance
+    .select('*')
+    .from<IChannelSchema>('channel')
+    .where('id', id);
+  if (rows.length == 0) {
     throw new ResourceNotFoundError('ChannelData', 'channel', id);
   }
-  const channelData = channelDocSnap.data();
-  // Build channel object
+  if (rows.length > 1) {
+    throw new InternalError(
+      'ChannelData',
+      'More than one channel was found with matching ID',
+    );
+  }
+  const channelSchema = rows[0];
   return {
-    id,
-    owner: channelData.owner,
-    name: channelData.name,
+    id: channelSchema.id,
+    owner: channelSchema.owner_id,
+    name: channelSchema.name,
   };
 }
 
@@ -66,39 +89,22 @@ export async function queryChannel(
     // No query
     throw new InvalidQueryError('ChannelData', query);
   }
-  const collection = firestoreInstance.collection(
-    toNamespaced('channels', appConfig.dbPrefix),
-  );
-  let fsQuery;
-  if (query.owner) {
-    fsQuery = (fsQuery ? fsQuery : collection).where(
-      'owner',
-      '==',
-      query.owner,
-    );
-  }
-  if (!fsQuery) {
-    throw new InternalError(
-      'ChannelData',
-      'fsQuery was not supposed to be undefined',
-    );
-  }
-
-  // Query FS
-  const querySnap = await fsQuery.get();
-  const queryPromises = querySnap.docs.map((doc) => {
-    return getSingleChannelRecord(doc.id);
+  const rows = await knexInstance
+    .select('*')
+    .from<IChannelSchema>('channel')
+    .where('owner_id', query.owner);
+  return rows.map((schema) => {
+    return {
+      id: schema.id,
+      owner: schema.owner_id,
+      name: schema.name,
+    };
   });
-
-  // Wait for all to run
-  const channels = await Promise.all(queryPromises);
-  return channels;
 }
 
 /**
  * Creates a channel
  * @param name Name of channel
- * @param owner TEMPORARY removed with auth
  * @returns Promise resolves to created channel
  */
 export async function createChannel(
@@ -127,10 +133,11 @@ export async function createChannel(
   await search.addChannel(context, channelData);
 
   // Write to DB
-  const channelDoc = firestoreInstance.doc(
-    toNamespaced(`channels/${channelData.id}`, appConfig.dbPrefix),
-  );
-  await channelDoc.set(channelData);
+  await knexInstance.table<IChannelSchema>('channel').insert({
+    id: channelData.id,
+    owner_id: channelData.owner,
+    name: channelData.name,
+  });
   return channelData;
 }
 
@@ -146,9 +153,6 @@ export async function updateChannel(
   update: IChannelUpdate,
 ): Promise<IChannel> {
   // Fetch channel to make sure it exists
-  const channelDoc = firestoreInstance.doc(
-    toNamespaced(`channels/${id}`, appConfig.dbPrefix),
-  );
   const oldChannel = await getSingleChannelRecord(id);
 
   // Authorization Check
@@ -157,8 +161,12 @@ export async function updateChannel(
     throw new AuthorizationError('ChannelData', 'update channel');
   }
 
-  // Update doc in DB and fetch again
-  await channelDoc.update(update);
+  // Update record in DB and fetch again
+  await knexInstance
+    .table<IChannelSchema>('channel')
+    .where('id', id)
+    .update(update);
+  // FIXME: Could probably use the output of the DB update instead of a refetch
   const newChannel = await getSingleChannelRecord(id);
 
   // Update search index
@@ -177,9 +185,6 @@ export async function deleteChannel(
   id: tID,
 ): Promise<void> {
   // Fetch channel to make sure it exists
-  const channelDoc = firestoreInstance.doc(
-    `${appConfig.dbPrefix}channels/${id}`,
-  );
   const channelData = await getSingleChannelRecord(id);
 
   // Authorization Check
@@ -192,5 +197,8 @@ export async function deleteChannel(
   await search.removeChannel(context, channelData);
 
   // Remove from DB
-  await channelDoc.delete();
+  await knexInstance
+    .table('channel')
+    .where('id', id)
+    .del();
 }

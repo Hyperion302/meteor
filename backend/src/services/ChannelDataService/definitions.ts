@@ -5,7 +5,16 @@ import { tID } from '@/definitions';
  */
 export interface IChannel {
   id: tID;
-  owner: string;
+  owner: tID;
+  name: string;
+}
+
+/**
+ * Describes a channel in the database
+ */
+export interface IChannelSchema {
+  id: tID;
+  owner_id: tID;
   name: string;
 }
 
@@ -20,5 +29,5 @@ export interface IChannelUpdate {
  * Describes a channel query
  */
 export interface IChannelQuery {
-  owner?: string;
+  owner?: tID;
 }
