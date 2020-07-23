@@ -17,6 +17,7 @@ export interface IJWTToken {
   exp: number;
   azp: string;
   gty: string;
+  'https://swish.tv/swishflake': string;
 }
 
 /**

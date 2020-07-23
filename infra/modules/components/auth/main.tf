@@ -42,6 +42,9 @@ resource "auth0_client" "m_to_m_client" {
   is_first_party  = true
   oidc_conformant = true
   grant_types     = [ "client_credentials" ]
+  client_metadata = {
+    swishflake = "73946096308584448"
+  }
   jwt_configuration {
     alg = "RS256"
   }
@@ -87,4 +90,29 @@ resource "auth0_client_grant" "m_to_m_grant" {
   client_id = auth0_client.m_to_m_client.id
   audience  = auth0_resource_server.api_resource_server.identifier
   scope     = []
+}
+
+#
+# Hooks
+#
+resource "auth0_hook" "swishflake_hook" {
+  name       = "swishflake-hook"
+  script     = file("${path.module}/hooks/pre-user-registration.js")
+  trigger_id = "pre-user-registration"
+  enabled    = true
+}
+resource "auth0_hook" "swishflake_client_credentials_hook" {
+  name       = "swishflake-credentials-exchange-hook"
+  script     = file("${path.module}/hooks/credentials-exchange.js")
+  trigger_id = "credentials-exchange"
+  enabled    = true
+}
+
+#
+# Rules
+#
+resource "auth0_rule" "swishflake_rule" {
+  name    = "swishflake-rule"
+  script  = file("${path.module}/rules/swishflake-rule.js")
+  enabled = true
 }

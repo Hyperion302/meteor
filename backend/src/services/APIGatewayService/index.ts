@@ -47,10 +47,11 @@ app.use('/channel*', authMiddleware);
 // Context
 app.use(['/video*', '/channel*'], (req, res, next) => {
   // Generate invocation context
+  console.log(req.user);
   req.context = {
     auth: {
       elevated: false,
-      userID: req.user.sub,
+      userID: req.user['https://swish.tv/swishflake'],
       token: req.user,
     },
   };

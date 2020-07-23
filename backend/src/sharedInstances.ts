@@ -97,7 +97,6 @@ export const redisClient = redis.createClient({
 // #endregion Redis
 
 // #region Swishflake
-
-// Mean to be used as a singleton per node
+// Meant to be used as a singleton per node
 export const swishflakeGenerator = new SwishflakeGenerator(appConfig.nodeID);
 // #endregion Swishflake
