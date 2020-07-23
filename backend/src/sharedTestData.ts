@@ -6,7 +6,8 @@ import { IVideoContent } from '@services/VideoContentService/definitions';
 export const fakeContext: IServiceInvocationContext = {
   auth: {
     elevated: false,
-    userID: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
+    userID: '73946096308584448',
+    userIDInt: BigInt('73946096308584448'),
     token: null, // None of the services should be using this
   },
 };

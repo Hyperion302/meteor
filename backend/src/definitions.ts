@@ -4,6 +4,7 @@ export type tTimestamp = number;
 export interface IServiceInvocationContext {
   auth: {
     userID: string;
+    userIDInt: BigInt;
     elevated: boolean;
     token: IJWTToken;
   };
