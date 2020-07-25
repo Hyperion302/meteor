@@ -17,24 +17,10 @@ import {
   appConfig,
   swishflakeGenerator,
 } from '@/sharedInstances';
-import { toGlobal, toNamespaced } from '@/utils';
-import knex from 'knex';
+import { knexInstance } from './db';
 
 // Predefined constants
-const MAX_CHANNELS: number = 10;
-
-// Database Instance
-const knexInstance = knex({
-  client: 'mysql2',
-  connection: {
-    host: appConfig.sql.host,
-    user: appConfig.sql.user,
-    password: appConfig.sql.pass,
-    database: appConfig.sql.databases.channelData,
-    supportBigNumbers: true,
-    bigNumberStrings: true,
-  },
-});
+export const MAX_CHANNELS: number = 10;
 
 /**
  * Retrieves a single channel record
@@ -157,8 +143,14 @@ export async function updateChannel(
 
   // Authorization Check
   // Channels can only be updated by the owner
+  console.log(oldChannel);
   if (context.auth.userID !== oldChannel.owner) {
     throw new AuthorizationError('ChannelData', 'update channel');
+  }
+
+  // Check if empty update
+  if (!update.name) {
+    return oldChannel;
   }
 
   // Update record in DB and fetch again

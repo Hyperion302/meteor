@@ -10,6 +10,15 @@ export const mockConfig = jest.fn(() => {
     bucket: 'dev-swish',
     dbPrefix: 'dev',
     muxSubscription: 'dev-swish-api',
+    sql: {
+      host: '',
+      pass: '',
+      databases: {
+        channelData: '',
+        videoContent: '',
+        videoData: '',
+      },
+    },
   };
 });
 export class MockedAppConfig {
@@ -27,6 +36,9 @@ export class MockedAppConfig {
   }
   get muxSubscription() {
     return mockConfig().muxSubscription;
+  }
+  get sql() {
+    return mockConfig().sql;
   }
 }
 export const appConfig = new MockedAppConfig();

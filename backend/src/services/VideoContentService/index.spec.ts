@@ -143,7 +143,7 @@ describe('Video Content Service', () => {
             const request = moxios.requests.mostRecent();
             expect(request.config.method).toEqual('post');
             expect(request.config.data).toMatchInlineSnapshot(
-              `"{\\"input\\":\\"https://storage.googleapis.com/dev-swish/masters/FDJIVPG1xgXfXmm67ETETSn9MSe2/73878773241479168\\",\\"playback_policy\\":[\\"public\\"],\\"passthrough\\":\\"73878773241479168:73878773241479168\\"}"`,
+              `"{\\"input\\":\\"https://storage.googleapis.com/dev-swish/masters/73946096308584448/73878773241479168\\",\\"playback_policy\\":[\\"public\\"],\\"passthrough\\":\\"73878773241479168:73878773241479168\\"}"`,
             );
             done();
           });

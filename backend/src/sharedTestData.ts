@@ -1,5 +1,8 @@
 import { IServiceInvocationContext } from '@/definitions';
-import { IChannel } from '@services/ChannelDataService/definitions';
+import {
+  IChannel,
+  IChannelSchema,
+} from '@services/ChannelDataService/definitions';
 import { IVideo, IVideoSchema } from '@services/VideoDataService/definitions';
 import { IVideoContent } from '@services/VideoContentService/definitions';
 
@@ -21,7 +24,12 @@ export const fakeIDs: string[] = [
 export const fakeChannel: IChannel = {
   id: fakeIDs[1],
   name: 'Test Channel',
-  owner: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
+  owner: fakeContext.auth.userID,
+};
+export const fakeChannelSchema: IChannelSchema = {
+  id: fakeChannel.id,
+  name: fakeChannel.name,
+  owner_id: fakeChannel.owner,
 };
 
 export const fakeContent: IVideoContent = {
@@ -33,7 +41,7 @@ export const fakeContent: IVideoContent = {
 
 export const fakeVideo: IVideo = {
   id: fakeIDs[0],
-  author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
+  author: fakeContext.auth.userID,
   channel: fakeChannel,
   content: fakeContent,
   description: 'Test Video Description',
@@ -43,7 +51,7 @@ export const fakeVideo: IVideo = {
 
 export const fakeVideoSchema: IVideoSchema = {
   id: fakeIDs[0],
-  author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
+  author: fakeContext.auth.userID,
   channel: fakeChannel.id,
   content: fakeContent.id,
   description: 'Test Video Description',

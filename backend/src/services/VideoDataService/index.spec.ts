@@ -88,11 +88,11 @@ describe('Video Data Service', () => {
       const res = await videoDataService.getVideo(fakeContext, fakeIDs[0]);
       expect(res).toMatchInlineSnapshot(`
         Object {
-          "author": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
+          "author": "73946096308584448",
           "channel": Object {
             "id": "73877867791908867",
             "name": "Test Channel",
-            "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
+            "owner": "73946096308584448",
           },
           "content": Object {
             "assetID": "SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo",
@@ -176,11 +176,11 @@ describe('Video Data Service', () => {
 
       expect(res).toMatchInlineSnapshot(`
         Object {
-          "author": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
+          "author": "73946096308584448",
           "channel": Object {
             "id": "73877867791908867",
             "name": "Test Channel",
-            "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
+            "owner": "73946096308584448",
           },
           "content": null,
           "description": "Cool video description",
@@ -436,25 +436,25 @@ describe('Video Data Service', () => {
     it('Deletes the correct search index', async () => {
       await videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
       expect(searchService.removeVideo.mock.calls[0][1]).toMatchInlineSnapshot(`
-Object {
-  "author": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
-  "channel": Object {
-    "id": "73877867791908867",
-    "name": "Test Channel",
-    "owner": "FDJIVPG1xgXfXmm67ETETSn9MSe2",
-  },
-  "content": Object {
-    "assetID": "SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo",
-    "duration": 5.2,
-    "id": "73877867791908866",
-    "playbackID": "1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG",
-  },
-  "description": "Test Video Description",
-  "id": "73878773241479168",
-  "title": "Test Video Name",
-  "uploadDate": 1578009691,
-}
-`);
+        Object {
+          "author": "73946096308584448",
+          "channel": Object {
+            "id": "73877867791908867",
+            "name": "Test Channel",
+            "owner": "73946096308584448",
+          },
+          "content": Object {
+            "assetID": "SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo",
+            "duration": 5.2,
+            "id": "73877867791908866",
+            "playbackID": "1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG",
+          },
+          "description": "Test Video Description",
+          "id": "73878773241479168",
+          "title": "Test Video Name",
+          "uploadDate": 1578009691,
+        }
+      `);
     });
 
     it('Deletes the video content', async () => {

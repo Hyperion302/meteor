@@ -18,6 +18,7 @@ import { ResourceNotFoundError, AuthorizationError } from '@/errors';
 import { Message } from '@google-cloud/pubsub';
 import { toNamespaced } from '@/utils';
 import { IVideo } from '@services/VideoDataService/definitions';
+import knex from 'knex';
 
 // Auth Token
 const username =
@@ -35,6 +36,19 @@ const authToken = Buffer.from(
   ).replace('\n', '')}`,
   'utf8',
 ).toString('base64');
+
+// Database Instance
+// const knexInstance = knex({
+//   client: 'mysql2',
+//   connection: {
+//     host: appConfig.sql.host,
+//     user: appConfig.sql.user,
+//     password: appConfig.sql.pass,
+//     database: appConfig.sql.databases.channelData,
+//     supportBigNumbers: true,
+//     bigNumberStrings: true,
+//   },
+// });
 
 // #region Pubsub handler registration
 pubsubSubscription.on('message', async (message: Message) => {
