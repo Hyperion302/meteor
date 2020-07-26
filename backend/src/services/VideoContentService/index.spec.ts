@@ -4,26 +4,33 @@ import { ObjectReadableMock, ObjectWritableMock } from 'stream-mock';
 import { IServiceInvocationContext } from '@/definitions';
 import moxios from 'moxios';
 import { IVideo } from '@services/VideoDataService/definitions';
-import { fakeContext, fakeContent, fakeVideo, fakeIDs } from '@/sharedTestData';
+import {
+  fakeContext,
+  fakeContent,
+  fakeVideo,
+  fakeIDs,
+  fakeContentSchema,
+} from '@/sharedTestData';
+import { ResourceNotFoundError } from '@/errors';
 
-const uuid = require('uuid/v4');
 const sharedInstances = require('@/sharedInstances');
-const VideoDataService = require('@services/VideoDataService');
-
 jest.mock('@/sharedInstances');
+
+const VideoDataService = require('@services/VideoDataService');
 jest.mock('@services/VideoDataService');
 
+const db = require('./db');
+jest.mock('./db');
+
 function mockImplementations() {
-  // Mock firestore document
-  sharedInstances.mockData.mockImplementation(() => fakeContent);
+  // Mock DB
+  db.mockResponse.mockReturnValue([fakeContentSchema]);
 
-  // Mock video
-  VideoDataService.getVideo.mockImplementation(() => fakeVideo);
+  // Mock video data
+  VideoDataService.getVideo.mockReturnValue(fakeVideo);
 
-  // Mock UUID
-  sharedInstances.mockID.mockImplementation(() => {
-    return fakeIDs[0];
-  });
+  // Mock ID
+  sharedInstances.mockID.mockReturnValue(fakeIDs[0]);
 }
 
 beforeAll(() => {
@@ -36,32 +43,32 @@ beforeEach(() => {
 
 describe('Video Content Service', () => {
   describe('getVideo', () => {
-    it('Requests the correct content record', async () => {
+    it('Executes the correct query', async () => {
       await videoContentService.getVideo(fakeContext, fakeContent.id);
 
-      expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
-        `${sharedInstances.mockConfig().dbPrefix}content/${fakeContent.id}`,
+      expect(db.mockSelect).toHaveBeenCalledWith('*'); // Correct fields
+      expect(db.mockFrom).toHaveBeenCalledWith('content'); // Correct table
+      expect(db.mockWhere).toHaveBeenCalledWith('id', fakeContent.id); // Correct query
+    });
+    it("Fails if the content doesn't exist", () => {
+      db.mockResponse.mockReturnValueOnce([]);
+      const promise = videoContentService.getVideo(fakeContext, fakeContent.id);
+
+      return expect(promise).rejects.toEqual(
+        new ResourceNotFoundError(
+          'VideoContent',
+          'videoContent',
+          fakeContent.id,
+        ),
       );
     });
-    it('Checks to see if the content record exists', async () => {
-      await videoContentService.getVideo(fakeContext, fakeContent.id);
-
-      expect(sharedInstances.mockExists).toHaveBeenCalled();
-    });
-    it('Responds with the correct content data', async () => {
+    it('Responds with the correct content record', async () => {
       const res = await videoContentService.getVideo(
         fakeContext,
         fakeContent.id,
       );
 
-      expect(res).toMatchInlineSnapshot(`
-        Object {
-          "assetID": "SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo",
-          "duration": 5.2,
-          "id": "73877867791908866",
-          "playbackID": "1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG",
-        }
-      `);
+      expect(res).toEqual(fakeContent);
     });
   });
   describe('uploadVideo', () => {
@@ -163,13 +170,20 @@ describe('Video Content Service', () => {
       // Teardown Moxios
       moxios.uninstall();
     });
-    it('Checks if the content record exists', async () => {
-      await videoContentService.deleteVideo(fakeContext, fakeContent.id);
-
-      expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
-        `${sharedInstances.mockConfig().dbPrefix}content/${fakeContent.id}`,
+    it("Fails if the content record doesn't exist", () => {
+      db.mockResponse.mockReturnValueOnce([]);
+      const promise = videoContentService.deleteVideo(
+        fakeContext,
+        fakeContent.id,
       );
-      expect(sharedInstances.mockExists).toHaveBeenCalled();
+
+      return expect(promise).rejects.toEqual(
+        new ResourceNotFoundError(
+          'VideoContent',
+          'videoContent',
+          fakeContent.id,
+        ),
+      );
     });
     it('Deletes the Mux asset', (done) => {
       videoContentService.deleteVideo(fakeContext, fakeContent.id).then(() => {

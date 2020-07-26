@@ -4,7 +4,10 @@ import {
   IChannelSchema,
 } from '@services/ChannelDataService/definitions';
 import { IVideo, IVideoSchema } from '@services/VideoDataService/definitions';
-import { IVideoContent } from '@services/VideoContentService/definitions';
+import {
+  IVideoContent,
+  IVideoContentSchema,
+} from '@services/VideoContentService/definitions';
 
 export const fakeContext: IServiceInvocationContext = {
   auth: {
@@ -38,6 +41,7 @@ export const fakeContent: IVideoContent = {
   playbackID: '1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG',
   duration: 5.2,
 };
+export const fakeContentSchema: IVideoContentSchema = fakeContent;
 
 export const fakeVideo: IVideo = {
   id: fakeIDs[0],

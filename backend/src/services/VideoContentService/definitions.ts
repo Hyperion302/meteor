@@ -10,6 +10,16 @@ export interface IVideoContent {
   duration: number;
 }
 
+/**
+ * Describes a video content record in the database
+ */
+export interface IVideoContentSchema {
+  id: tID;
+  assetID: string;
+  playbackID: string;
+  duration: number;
+}
+
 export interface IMuxAssetReadyEvent {
   type: 'ready';
   videoID: tID; // Passthrough value
