@@ -11,7 +11,6 @@ export interface IVideo {
   channel: IChannel;
   title: string;
   description: string;
-  uploadDate: number;
   content: IVideoContent;
 }
 
@@ -20,12 +19,12 @@ export interface IVideo {
  */
 export interface IVideoSchema {
   id: tID;
-  author: string;
-  channel: tID;
+  author_id: tID;
+  channel_id: tID;
   title: string;
   description: string;
-  uploadDate: number;
-  content?: tID;
+  content_id: tID;
+  created_at: number;
 }
 
 /**
@@ -34,8 +33,8 @@ export interface IVideoSchema {
 export interface IVideoQuery {
   author?: string;
   channel?: tID;
-  before?: string;
-  after?: string;
+  before?: number;
+  after?: number;
 }
 
 /**

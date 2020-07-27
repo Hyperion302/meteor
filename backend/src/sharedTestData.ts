@@ -50,15 +50,14 @@ export const fakeVideo: IVideo = {
   content: fakeContent,
   description: 'Test Video Description',
   title: 'Test Video Name',
-  uploadDate: 1578009691,
 };
 
 export const fakeVideoSchema: IVideoSchema = {
   id: fakeIDs[0],
-  author: fakeContext.auth.userID,
-  channel: fakeChannel.id,
-  content: fakeContent.id,
+  author_id: fakeContext.auth.userID,
+  channel_id: fakeChannel.id,
+  content_id: fakeContent.id,
   description: 'Test Video Description',
   title: 'Test Video Name',
-  uploadDate: 1578009691,
+  created_at: new Date().getTime(),
 };

@@ -16,6 +16,7 @@ import {
   InternalError,
 } from '@/errors';
 import { toNamespaced, toGlobal } from '@/utils';
+import { knexInstance } from './db';
 
 // Predefined constants
 const MAX_VIDEOS: number = 1000;
@@ -31,33 +32,38 @@ async function getSingleVideoRecord(
   context: IServiceInvocationContext,
   id: tID,
 ): Promise<IVideo> {
-  // Get basic video data
-  const videoDoc = firestoreInstance.doc(
-    toNamespaced(`videos/${id}`, appConfig.dbPrefix),
-  );
-  const videoDocSnap = await videoDoc.get();
-  if (!videoDocSnap.exists) {
+  // Get video schema
+  const rows = await knexInstance
+    .select('*')
+    .from<IVideoSchema>('video')
+    .where('id', id);
+  if (rows.length == 0) {
     throw new ResourceNotFoundError('VideoData', 'video', id);
   }
-  const videoData = videoDocSnap.data();
+  if (rows.length > 1) {
+    throw new InternalError(
+      'VideoData',
+      `More than one video record found with ID ${id}`,
+    );
+  }
+  const videoData = rows[0];
 
   // Get channel data
   const channelData = await channelDataService.getChannel(
     context,
-    videoData.channel,
+    videoData.channel_id,
   );
 
   // Get content data.  If there's no content data that means there's no uploaded video data for a video
-  const contentData = videoData.content
-    ? await videoContentService.getVideo(context, videoData.content)
+  const contentData = videoData.content_id
+    ? await videoContentService.getVideo(context, videoData.content_id)
     : null;
 
   return {
     id,
-    author: videoData.author,
+    author: videoData.author_id,
     title: videoData.title,
     description: videoData.description,
-    uploadDate: videoData.uploadDate,
     channel: channelData,
     content: contentData,
   };
@@ -77,60 +83,84 @@ export async function queryVideo(
     // No query
     throw new InvalidQueryError('VideoData', query);
   }
-  if (query.after && query.before && query.after <= query.before) {
+  if (query.after && query.before && query.after >= query.before) {
     // Invalid dates
     throw new InvalidQueryError('VideoData', query);
   }
-  // Build FS query
-  const collection = firestoreInstance.collection(
-    toNamespaced('videos', appConfig.dbPrefix),
-  );
-  let fsQuery;
-  if (query.after) {
-    fsQuery = (fsQuery ? fsQuery : collection).where(
-      'uploadDate',
-      '>',
-      parseInt(query.after, 10),
-    );
-  }
-  if (query.before) {
-    fsQuery = (fsQuery ? fsQuery : collection).where(
-      'uploadDate',
-      '<',
-      parseInt(query.before, 10),
-    );
+
+  // Start building query
+  const queryBuilder = knexInstance.select('*').from<IVideoSchema>('video');
+
+  // Tracks if the first where query was already called so I can call
+  // the rest of them using the 'and' prefix
+  let firstWhereBuilt = false;
+
+  if (query.channel) {
+    if (firstWhereBuilt) {
+      queryBuilder.andWhere('channel_id', query.channel);
+    } else {
+      queryBuilder.where('channel_id', query.channel);
+      firstWhereBuilt = true;
+    }
   }
   if (query.author) {
-    fsQuery = (fsQuery ? fsQuery : collection).where(
-      'author',
-      '==',
-      query.author,
-    );
+    if (firstWhereBuilt) {
+      queryBuilder.andWhere('author_id', query.author);
+    } else {
+      queryBuilder.where('author_id', query.author);
+      firstWhereBuilt = true;
+    }
   }
-  if (query.channel) {
-    fsQuery = (fsQuery ? fsQuery : collection).where(
-      'channel',
-      '==',
-      query.channel,
-    );
-  }
-  if (!fsQuery) {
-    throw new InternalError(
-      'VideoData',
-      'fsQuery was not supposed to be undefined',
-    );
+  if (query.before && query.after) {
+    if (firstWhereBuilt) {
+      queryBuilder.andWhereBetween('created_at', [
+        new Date().setTime(query.before),
+        new Date().setTime(query.after),
+      ]);
+    } else {
+      queryBuilder.whereBetween('created_at', [
+        new Date().setTime(query.before),
+        new Date().setTime(query.after),
+      ]);
+      firstWhereBuilt = true;
+    }
+  } else if (query.before && !query.after) {
+    queryBuilder.where('created_at', '<', new Date().setTime(query.before));
+  } else if (query.after && !query.before) {
+    queryBuilder.where('created_at', '>', new Date().setTime(query.after));
   }
 
-  // Query FS
-  const querySnap = await fsQuery.get();
-  const queryPromises = querySnap.docs.map((doc) => {
-    // doc.id is in namespaced form
-    return getSingleVideoRecord(context, doc.id);
-  });
+  const schemaRows = await queryBuilder;
 
-  // Wait for all to run
-  const videos = await Promise.all(queryPromises);
-  return videos;
+  const resolvedVideos = Promise.all(
+    schemaRows.map(
+      (videoSchema): Promise<IVideo> => {
+        const promises: Promise<any>[] = [];
+        promises.push(
+          channelDataService.getChannel(context, videoSchema.channel_id),
+        );
+        if (videoSchema.content_id) {
+          promises.push(
+            videoContentService.getVideo(context, videoSchema.content_id),
+          );
+        } else {
+          promises.push(null);
+        }
+        return Promise.all(promises).then(([channel, content]) => {
+          return {
+            id: videoSchema.id,
+            author: videoSchema.author_id,
+            title: videoSchema.title,
+            description: videoSchema.description,
+            content: content,
+            channel: channel,
+          };
+        });
+      },
+    ),
+  );
+
+  return resolvedVideos;
 }
 
 /**
@@ -181,7 +211,14 @@ export async function createVideo(
     title,
     description,
     content: null,
-    uploadDate: 0,
+  };
+  const videoSchema: Partial<IVideoSchema> = {
+    id: videoData.id,
+    author_id: videoData.author,
+    channel_id: videoData.channel.id,
+    title: videoData.title,
+    description: videoData.description,
+    content_id: null,
   };
 
   // Check # of videos
@@ -196,18 +233,7 @@ export async function createVideo(
   }
 
   // Add to DB
-  const videoDoc = firestoreInstance.doc(
-    toNamespaced(`videos/${videoData.id}`, appConfig.dbPrefix),
-  );
-  await videoDoc.set({
-    id: videoData.id,
-    author: videoData.author,
-    channel: videoData.channel.id,
-    title: videoData.title,
-    description: videoData.description,
-    content: null,
-    uploadDate: 0,
-  }); // Uses a schema form of IVideo
+  await knexInstance.table<IVideoSchema>('video').insert(videoSchema);
   return videoData;
 }
 
@@ -223,13 +249,9 @@ export async function updateVideo(
   update: IVideoUpdate,
 ) {
   // Fetch video to make sure it exists
-  const videoDoc = firestoreInstance.doc(
-    toNamespaced(`videos/${id}`, appConfig.dbPrefix),
-  );
   const oldVideo = await getSingleVideoRecord(context, id);
 
   // Authorization check
-
   // Videos can only be updated by their author or the channel owner
   if (
     oldVideo.author !== context.auth.userID &&
@@ -238,8 +260,16 @@ export async function updateVideo(
     throw new AuthorizationError('VideoData', 'update video');
   }
 
+  // Empty update check
+  if (!(update.description || update.title)) {
+    return;
+  }
+
   // Update doc in DB and fetch it again
-  await videoDoc.update(update);
+  await knexInstance
+    .table<IVideoSchema>('video')
+    .where('id', id)
+    .update(update);
   const newVideo = await getSingleVideoRecord(context, id);
 
   // Update doc in search index
@@ -249,15 +279,32 @@ export async function updateVideo(
 }
 
 /**
+ * Updates a video record to reference a new content record
+ * @param context Invocation context (unused)
+ * @param id ID of video to update
+ * @param contentID ID of new content record
+ */
+export async function updateContent(
+  context: IServiceInvocationContext,
+  id: tID,
+  contentID: tID,
+) {
+  await getSingleVideoRecord(context, id);
+
+  await knexInstance
+    .table<IVideoSchema>('video')
+    .where('id', id)
+    .update('content_id', contentID);
+  return;
+}
+
+/**
  * Deletes a video record and it's associated resources
  * @param context Invocation Context
  * @param id ID of video to delete
  */
 export async function deleteVideo(context: IServiceInvocationContext, id: tID) {
   // Fetch video to make sure it exists
-  const videoDoc = firestoreInstance.doc(
-    toNamespaced(`videos/${id}`, appConfig.dbPrefix),
-  );
   const videoData = await getSingleVideoRecord(context, id);
 
   // Authorization check
@@ -282,5 +329,8 @@ export async function deleteVideo(context: IServiceInvocationContext, id: tID) {
   }
 
   // Delete from firestore
-  await videoDoc.delete();
+  await knexInstance
+    .table<IVideoSchema>('video')
+    .where('id', id)
+    .del();
 }

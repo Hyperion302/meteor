@@ -67,8 +67,8 @@ app.get('/video', async (req, res, next) => {
     // Build query
     const query: IVideoQuery = {
       author: req.query.author,
-      before: req.query.before,
-      after: req.query.after,
+      before: parseInt(req.query.before, 10),
+      after: parseInt(req.query.after, 10),
       channel: req.query.channel,
     };
     const videos = await videoDataService.queryVideo(req.context, query);

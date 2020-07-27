@@ -10,44 +10,36 @@ import {
   fakeContent,
   fakeContext,
   fakeIDs,
+  fakeVideo,
 } from '@/sharedTestData';
+import { ResourceNotFoundError, InvalidQueryError } from '@/errors';
 const sharedInstances = require('@/sharedInstances');
-const channelDataService = require('@services/ChannelDataService');
-const videoContentService = require('@services/VideoContentService');
-const searchService = require('@services/SearchService');
-const watchtimeService = require('@services/WatchTimeService');
-
 jest.mock('@/sharedInstances');
+
+const channelDataService = require('@services/ChannelDataService');
 jest.mock('@services/ChannelDataService');
+
+const videoContentService = require('@services/VideoContentService');
 jest.mock('@services/VideoContentService');
+
+const searchService = require('@services/SearchService');
 jest.mock('@services/SearchService');
+
+const watchtimeService = require('@services/WatchTimeService');
 jest.mock('@services/WatchTimeService');
+
+const db = require('./db');
+jest.mock('./db');
 
 function mockImplementations() {
   // Mock firestore document
-  sharedInstances.mockData.mockImplementation(() => {
-    return fakeVideoSchema;
-  });
+  db.mockResponse.mockReturnValue([fakeVideoSchema]);
   // Mock Channel
-  channelDataService.getChannel.mockImplementation((id: string) => {
-    return new Promise((resolve) => {
-      process.nextTick(() => {
-        resolve(fakeChannel);
-      });
-    });
-  });
+  channelDataService.getChannel.mockResolvedValue(fakeChannel);
   // Mock Content
-  videoContentService.getVideo.mockImplementation((id: string) => {
-    return new Promise((resolve) => {
-      process.nextTick(() => {
-        resolve(fakeContent);
-      });
-    });
-  });
-  // Mock UUID
-  sharedInstances.mockID.mockImplementation(() => {
-    return fakeIDs[0];
-  });
+  videoContentService.getVideo.mockResolvedValue(fakeContent);
+  // Mock ID
+  sharedInstances.mockID.mockReturnValue(fakeIDs[0]);
 }
 
 beforeAll(() => {
@@ -60,15 +52,18 @@ beforeEach(() => {
 
 describe('Video Data Service', () => {
   describe('getVideo', () => {
-    it('Requests the correct video ID', async () => {
+    it('Executes the correct query', async () => {
       await videoDataService.getVideo(fakeContext, fakeIDs[0]);
-      expect(sharedInstances.mockDoc).toBeCalledWith(
-        `${sharedInstances.mockConfig().dbPrefix}videos/${fakeIDs[0]}`,
-      );
+      expect(db.mockSelect).toHaveBeenCalledWith('*'); // Correct fields
+      expect(db.mockFrom).toHaveBeenCalledWith('video'); // Correct table
+      expect(db.mockWhere).toHaveBeenCalledWith('id', fakeIDs[0]); // Correct video
     });
-    it('Checks if the video exists', async () => {
-      await videoDataService.getVideo(fakeContext, fakeIDs[0]);
-      expect(sharedInstances.mockExists).toBeCalled();
+    it('Fails if the video does not exist', () => {
+      db.mockResponse.mockReturnValueOnce([]);
+      const promise = videoDataService.getVideo(fakeContext, fakeIDs[0]);
+      return expect(promise).rejects.toEqual(
+        new ResourceNotFoundError('VideoData', 'video', fakeIDs[0]),
+      );
     });
     it('Requests the correct channel ID', async () => {
       await videoDataService.getVideo(fakeContext, fakeIDs[0]);
@@ -86,32 +81,30 @@ describe('Video Data Service', () => {
     });
     it('Responds with the correct video', async () => {
       const res = await videoDataService.getVideo(fakeContext, fakeIDs[0]);
-      expect(res).toMatchInlineSnapshot(`
-        Object {
-          "author": "73946096308584448",
-          "channel": Object {
-            "id": "73877867791908867",
-            "name": "Test Channel",
-            "owner": "73946096308584448",
-          },
-          "content": Object {
-            "assetID": "SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo",
-            "duration": 5.2,
-            "id": "73877867791908866",
-            "playbackID": "1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG",
-          },
-          "description": "Test Video Description",
-          "id": "73878773241479168",
-          "title": "Test Video Name",
-          "uploadDate": 1578009691,
-        }
-      `);
+      expect(res).toEqual(fakeVideo);
     });
   });
 
   describe('createVideo', () => {
     const testTitle = 'Cool vid';
     const testDescription = 'Cool video description';
+
+    const expectedNewSchema: Partial<IVideoSchema> = {
+      id: fakeIDs[0],
+      channel_id: fakeIDs[1],
+      author_id: fakeContext.auth.userID,
+      description: testDescription,
+      title: testTitle,
+      content_id: null,
+    };
+    const expectedNewVideo: IVideo = {
+      id: fakeIDs[0],
+      channel: fakeChannel,
+      author: fakeContext.auth.userID,
+      title: testTitle,
+      description: testDescription,
+      content: null,
+    };
 
     it('Fetches the videos future channel', async () => {
       await videoDataService.createVideo(
@@ -136,7 +129,7 @@ describe('Video Data Service', () => {
 
       expect(sharedInstances.mockID).toHaveBeenCalled();
     });
-    it('References a correct path', async () => {
+    it('Executes the correct query', async () => {
       await videoDataService.createVideo(
         fakeContext,
         testTitle,
@@ -144,29 +137,10 @@ describe('Video Data Service', () => {
         fakeIDs[1],
       );
 
-      expect(sharedInstances.mockDoc).toHaveBeenCalledWith(
-        `${sharedInstances.mockConfig().dbPrefix}videos/${fakeIDs[0]}`,
-      );
+      expect(db.mockTable).toHaveBeenCalledWith('video');
+      expect(db.mockInsert).toHaveBeenCalledWith(expectedNewSchema);
     });
-    it('Sets the correct video data', async () => {
-      await videoDataService.createVideo(
-        fakeContext,
-        testTitle,
-        testDescription,
-        fakeIDs[1],
-      );
-
-      expect(sharedInstances.mockSet).toHaveBeenCalledWith({
-        id: fakeIDs[0],
-        author: fakeContext.auth.userID,
-        channel: fakeChannel.id,
-        title: testTitle,
-        description: testDescription,
-        content: null,
-        uploadDate: 0,
-      });
-    });
-    it('Returns the correct video', async () => {
+    it('Returns the new video', async () => {
       const res = await videoDataService.createVideo(
         fakeContext,
         testTitle,
@@ -174,96 +148,59 @@ describe('Video Data Service', () => {
         fakeIDs[1],
       );
 
-      expect(res).toMatchInlineSnapshot(`
-        Object {
-          "author": "73946096308584448",
-          "channel": Object {
-            "id": "73877867791908867",
-            "name": "Test Channel",
-            "owner": "73946096308584448",
-          },
-          "content": null,
-          "description": "Cool video description",
-          "id": "73878773241479168",
-          "title": "Cool vid",
-          "uploadDate": 0,
-        }
-      `);
+      expect(res).toEqual(expectedNewVideo);
     });
   });
 
   describe('queryVideo', () => {
     const sampleQuery: IVideoQuery = {
-      channel: '716886dd-c107-4bd7-9060-a47b50f81689',
-      before: '30',
-      after: '50',
-      author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
+      channel: fakeIDs[1],
+      before: 1595771074,
+      after: 1595771065,
+      author: fakeContext.auth.userID,
     };
-    it('Fails with empty query', async () => {
+    it('Fails with empty query', () => {
       const promise = videoDataService.queryVideo(fakeContext, {});
 
-      expect(promise).rejects.toThrow();
+      return expect(promise).rejects.toEqual(
+        new InvalidQueryError('VideoData', {}),
+      );
     });
-    it('Fails with invalid query dates', async () => {
+    it('Fails with impossible query dates', () => {
       const promise = videoDataService.queryVideo(fakeContext, {
-        before: '10',
-        after: '5',
+        before: 1595771065,
+        after: 1595771074,
       });
 
-      expect(promise).rejects.toThrow();
-    });
-    it('References correct collection', async () => {
-      await videoDataService.queryVideo(fakeContext, sampleQuery);
-
-      expect(sharedInstances.mockCollection).toBeCalledWith(
-        `${sharedInstances.mockConfig().dbPrefix}videos`,
+      return expect(promise).rejects.toEqual(
+        new InvalidQueryError('VideoData', {
+          before: 1595771065,
+          after: 1595771074,
+        }),
       );
     });
-    it("Constructs the correct query for 'after'", async () => {
+    it('Executes the correct query', async () => {
       await videoDataService.queryVideo(fakeContext, sampleQuery);
 
-      expect(sharedInstances.mockWhere).toHaveBeenCalledWith(
-        'uploadDate',
-        '>',
-        parseInt(sampleQuery.after),
-      );
-    });
-    it("Constructs the correct query for 'before'", async () => {
-      await videoDataService.queryVideo(fakeContext, sampleQuery);
-
-      expect(sharedInstances.mockWhere).toHaveBeenCalledWith(
-        'uploadDate',
-        '<',
-        parseInt(sampleQuery.before),
-      );
-    });
-    it("Constructs the correct query for 'channel'", async () => {
-      await videoDataService.queryVideo(fakeContext, sampleQuery);
-
-      expect(sharedInstances.mockWhere).toHaveBeenCalledWith(
-        'channel',
-        '==',
+      expect(db.mockSelect).toHaveBeenCalledWith('*');
+      expect(db.mockFrom).toHaveBeenCalledWith('video');
+      expect(db.mockWhere).toHaveBeenCalledWith(
+        'channel_id',
         sampleQuery.channel,
       );
-    });
-    it("Constructs the correct query for 'author'", async () => {
-      await videoDataService.queryVideo(fakeContext, sampleQuery);
-
-      expect(sharedInstances.mockWhere).toHaveBeenCalledWith(
-        'author',
-        '==',
+      expect(db.mockAndWhere).toHaveBeenCalledWith(
+        'author_id',
         sampleQuery.author,
       );
-    });
-    it('Properly maps query responses', async () => {
-      await videoDataService.queryVideo(fakeContext, sampleQuery);
-
-      expect(sharedInstances.mockMap).toHaveBeenCalled();
+      expect(db.mockAndWhereBetween).toHaveBeenCalledWith('created_at', [
+        new Date().setTime(sampleQuery.before),
+        new Date().setTime(sampleQuery.after),
+      ]);
     });
     it('Returns the correct data', async () => {
       const res = await videoDataService.queryVideo(fakeContext, sampleQuery);
 
-      expect(res).toBeArray(); // Probably should test return value
+      expect(res).toBeArrayOfSize(1); // Probably should test return value
     });
   });
 
@@ -279,142 +216,136 @@ describe('Video Data Service', () => {
       description: 'New description',
     };
     const updatedVideoSchema: IVideoSchema = {
-      author: fakeVideoSchema.author,
-      channel: fakeVideoSchema.channel,
-      content: fakeVideoSchema.content,
+      author_id: fakeVideoSchema.author_id,
+      channel_id: fakeVideoSchema.channel_id,
+      content_id: fakeVideoSchema.content_id,
       description: testFullUpdate.description,
       id: fakeVideoSchema.id,
       title: testFullUpdate.title,
-      uploadDate: fakeVideoSchema.uploadDate,
+      created_at: null,
     };
     const expectedUpdatedVideo: IVideo = {
-      author: fakeVideoSchema.author,
+      author: fakeVideoSchema.author_id,
       channel: fakeChannel,
       content: fakeContent,
       description: testFullUpdate.description,
       id: fakeVideoSchema.id,
       title: testFullUpdate.title,
-      uploadDate: fakeVideoSchema.uploadDate,
     };
     const testBlankUpdate: IVideoUpdate = {};
-    it('Checks to see if the video exists first', async () => {
+    it('Fails if video does not exist', () => {
+      db.mockResponse.mockReturnValueOnce([]);
+      const promise = videoDataService.updateVideo(
+        fakeContext,
+        fakeIDs[0],
+        testFullUpdate,
+      );
+      return expect(promise).rejects.toEqual(
+        new ResourceNotFoundError('VideoData', 'video', fakeIDs[0]),
+      );
+    });
+    it('Executes the correct query given a full update', async () => {
       await videoDataService.updateVideo(
         fakeContext,
         fakeIDs[0],
         testFullUpdate,
       );
-      expect(sharedInstances.mockExists).toBeCalled();
+      expect(db.mockTable).toHaveBeenCalledWith('video');
+      expect(db.mockWhere).toHaveBeenCalledWith('id', fakeIDs[0]);
+      expect(db.mockUpdate).toHaveBeenCalledWith(testFullUpdate);
     });
-    it('Updates the video record', async () => {
-      await videoDataService.updateVideo(
-        fakeContext,
-        fakeIDs[0],
-        testFullUpdate,
-      );
-      expect(sharedInstances.mockUpdate).toBeCalled();
-    });
-    it('Updates the correct video record', async () => {
-      await videoDataService.updateVideo(
-        fakeContext,
-        fakeIDs[0],
-        testFullUpdate,
-      );
-      expect(sharedInstances.mockUpdate).toBeCalledWith(testFullUpdate);
-    });
-    it('Only updates title if given only a title', async () => {
+    it('Executes the correct query given only a title', async () => {
       await videoDataService.updateVideo(
         fakeContext,
         fakeIDs[0],
         testTitleUpdate,
       );
-      expect(sharedInstances.mockUpdate).toBeCalledWith(testTitleUpdate);
+      expect(db.mockTable).toHaveBeenCalledWith('video');
+      expect(db.mockWhere).toHaveBeenCalledWith('id', fakeIDs[0]);
+      expect(db.mockUpdate).toHaveBeenCalledWith(testTitleUpdate);
     });
-    it('Only updates description if given only a description', async () => {
+    it('Executes the correct query given only a description', async () => {
       await videoDataService.updateVideo(
         fakeContext,
         fakeIDs[0],
         testDescriptionUpdate,
       );
-      expect(sharedInstances.mockUpdate).toBeCalledWith(testDescriptionUpdate);
+      expect(db.mockTable).toHaveBeenCalledWith('video');
+      expect(db.mockWhere).toHaveBeenCalledWith('id', fakeIDs[0]);
+      expect(db.mockUpdate).toHaveBeenCalledWith(testDescriptionUpdate);
     });
-    it('Silently performs no update if given no changes', async () => {
+    it('Executes no query given no changes', async () => {
       await videoDataService.updateVideo(
         fakeContext,
         fakeIDs[0],
         testBlankUpdate,
       );
-      expect(sharedInstances.mockUpdate).toBeCalledWith(testBlankUpdate);
-    });
-    it('Requests a new video record after updating', async () => {
-      await videoDataService.updateVideo(
-        fakeContext,
-        fakeIDs[0],
-        testFullUpdate,
-      );
-      expect(sharedInstances.mockDoc).toBeCalled();
-    });
-    it('Requests the correct new video record', async () => {
-      await videoDataService.updateVideo(
-        fakeContext,
-        fakeIDs[0],
-        testFullUpdate,
-      );
-      expect(sharedInstances.mockDoc).toHaveBeenLastCalledWith(
-        `${sharedInstances.mockConfig().dbPrefix}videos/${fakeIDs[0]}`,
-      );
+      expect(db.mockUpdate).not.toHaveBeenCalled();
+      expect(searchService.updateVideo).not.toHaveBeenCalled();
     });
     it('Updates the search index', async () => {
+      db.mockResponse.mockReturnValueOnce([fakeVideo]);
+      db.mockResponse.mockReturnValueOnce([]);
+      db.mockResponse.mockReturnValueOnce([updatedVideoSchema]);
+
       await videoDataService.updateVideo(
         fakeContext,
         fakeIDs[0],
         testFullUpdate,
       );
-      expect(searchService.updateVideo).toBeCalled();
-    });
-    it('Updates the correct video in the search index', async () => {
-      // Mock re-request
-      sharedInstances.mockData.mockImplementationOnce(() => {
-        return updatedVideoSchema; // Updated test video schema.  Updated with test update data
-      });
-      sharedInstances.mockData.mockImplementationOnce(() => {
-        return updatedVideoSchema; // Updated test video schema.  Updated with test update data
-      });
-      await videoDataService.updateVideo(
-        fakeContext,
-        fakeIDs[0],
-        testFullUpdate,
-      );
-      expect(searchService.updateVideo.mock.calls[0][1]).toMatchObject(
+      expect(searchService.updateVideo.mock.calls[0][1]).toEqual(
         expectedUpdatedVideo,
       );
     });
     it('Returns the updated video', async () => {
-      // Mock re-request
-      sharedInstances.mockData.mockImplementationOnce(() => {
-        return updatedVideoSchema; // Updated test video schema.  Updated with test update data
-      });
-      sharedInstances.mockData.mockImplementationOnce(() => {
-        return updatedVideoSchema; // Updated test video schema.  Updated with test update data
-      });
+      db.mockResponse.mockReturnValueOnce([fakeVideo]);
+      db.mockResponse.mockReturnValueOnce([]);
+      db.mockResponse.mockReturnValueOnce([updatedVideoSchema]);
 
       const res = await videoDataService.updateVideo(
         fakeContext,
         fakeIDs[0],
         testFullUpdate,
       );
-      expect(res).toMatchObject(expectedUpdatedVideo);
+      expect(res).toEqual(expectedUpdatedVideo);
+    });
+  });
+
+  describe('updateContent', () => {
+    it('Fails if the video does not exist', () => {
+      db.mockResponse.mockReturnValueOnce([]);
+
+      const promise = videoDataService.updateContent(
+        null,
+        fakeIDs[0],
+        fakeIDs[2],
+      );
+      return expect(promise).rejects.toEqual(
+        new ResourceNotFoundError('VideoData', 'video', fakeIDs[0]),
+      );
+    });
+    it('Executes the correct update query', async () => {
+      await videoDataService.updateContent(null, fakeIDs[0], fakeIDs[2]);
+
+      expect(db.mockTable).toHaveBeenCalledWith('video');
+      expect(db.mockUpdate).toHaveBeenCalledWith('content_id', fakeIDs[2]);
+    });
+    it('Works as expected given a null contentID', async () => {
+      await videoDataService.updateContent(null, fakeIDs[0], null);
+
+      expect(db.mockTable).toHaveBeenCalledWith('video');
+      expect(db.mockUpdate).toHaveBeenCalledWith('content_id', null);
     });
   });
 
   describe('deleteVideo', () => {
-    it('Checks to see if the video exists first', async () => {
-      await videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
+    it('Fails if the video does not exist', () => {
+      db.mockResponse.mockReturnValueOnce([]);
+      const promise = videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
 
-      expect(sharedInstances.mockDoc).toBeCalledWith(
-        `${sharedInstances.mockConfig().dbPrefix}videos/${fakeIDs[0]}`,
+      return expect(promise).rejects.toEqual(
+        new ResourceNotFoundError('VideoData', 'video', fakeIDs[0]),
       );
-
-      expect(sharedInstances.mockExists).toBeCalled();
     });
 
     it('Deletes everything in the right order', async () => {
@@ -424,42 +355,22 @@ describe('Video Data Service', () => {
         videoContentService.deleteVideo,
       ); // Search before content
       expect(videoContentService.deleteVideo).toHaveBeenCalledBefore(
-        sharedInstances.mockDelete,
+        db.mockDel,
       ); // Content before delete
     });
-
-    it('Deletes the search index', async () => {
+    it('Deletes the search index entry', async () => {
       await videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
-      expect(searchService.removeVideo).toHaveBeenCalled();
-    });
-
-    it('Deletes the correct search index', async () => {
-      await videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
-      expect(searchService.removeVideo.mock.calls[0][1]).toMatchInlineSnapshot(`
-        Object {
-          "author": "73946096308584448",
-          "channel": Object {
-            "id": "73877867791908867",
-            "name": "Test Channel",
-            "owner": "73946096308584448",
-          },
-          "content": Object {
-            "assetID": "SNW1q1R01PdIkf26Kn01DIKAgYtq2qgWRo",
-            "duration": 5.2,
-            "id": "73877867791908866",
-            "playbackID": "1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG",
-          },
-          "description": "Test Video Description",
-          "id": "73878773241479168",
-          "title": "Test Video Name",
-          "uploadDate": 1578009691,
-        }
-      `);
+      expect(searchService.removeVideo.mock.calls[0][1]).toEqual(fakeVideo);
     });
 
     it('Deletes the video content', async () => {
       await videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
       expect(videoContentService.deleteVideo).toHaveBeenCalled();
+    });
+
+    it('Deletes the watchtime data', async () => {
+      await videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
+      expect(watchtimeService.clearVideo).toHaveBeenCalled();
     });
 
     it('Deletes the correct video content', async () => {
@@ -471,33 +382,22 @@ describe('Video Data Service', () => {
     });
 
     it("Doesn't try to delete video content if it does't exist", async () => {
-      sharedInstances.mockData.mockImplementation(() => {
-        const retVal: {
-          id: string;
-          author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2';
-          channel: '716886dd-c107-4bd7-9060-a47b50f81689';
-          content: null;
-          description: 'Test Video Description';
-          title: 'Test Video Name';
-          uploadDate: 1578009691;
-        } = {
-          id: fakeIDs[0],
-          author: 'FDJIVPG1xgXfXmm67ETETSn9MSe2',
-          channel: '716886dd-c107-4bd7-9060-a47b50f81689',
-          content: null,
-          description: 'Test Video Description',
-          title: 'Test Video Name',
-          uploadDate: 1578009691,
-        }; // Work around for TS
-        return retVal;
-      });
+      db.mockResponse.mockReturnValueOnce([
+        {
+          ...fakeVideoSchema,
+          content_id: null,
+        },
+      ]);
       await videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
       expect(videoContentService.deleteVideo).not.toHaveBeenCalled();
     });
 
-    it('Deletes the video record', async () => {
+    it('Executes the correct delete query', async () => {
       await videoDataService.deleteVideo(fakeContext, fakeIDs[0]);
-      expect(sharedInstances.mockDelete).toHaveBeenCalled();
+
+      expect(db.mockTable).toHaveBeenCalledWith('video');
+      expect(db.mockWhere).toHaveBeenCalledWith('id', fakeIDs[0]);
+      expect(db.mockDel).toHaveBeenCalled();
     });
   });
 });

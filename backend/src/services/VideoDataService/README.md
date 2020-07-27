@@ -34,6 +34,12 @@ _Videos can only be updated by their author or the channel owner_
 1. Updates video in DB with provided fields
 2. Calls [SearchService](../SearchService/README.md)/updateVideo to update fields
 
+## updateContent
+
+_Internally used (not exposed to API), so it performs no authorization checks!_
+
+1. Updates the ID in the content_id field
+
 ## deleteVideo
 
 _Videos can only be deleted by their author or the channel owner_
