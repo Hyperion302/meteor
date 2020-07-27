@@ -8,8 +8,8 @@
     "build": "tsc",
     "build:watch": "tsc -w",
     "prestart": "npm run build",
-    "start": "cross-env node --require dotenv/config dist/src/main.js",
-    "start:watch": "cross-env node-dev --require dotenv/config --no-deps --respawn dist/src/main.js",
+    "start": "cross-env node --require dotenv/config dist/main.js",
+    "start:watch": "cross-env node-dev --require dotenv/config --no-deps --respawn dist/main.js",
     "doc": "typedoc --out docs",
     "test": "cross-env NODE_ENV=test jest --setupFiles dotenv/config --verbose",
     "test:coverage": "cross-env NODE_ENV=test jest --setupFiles dotenv/config --verbose --collectCoverage",
@@ -21,8 +21,8 @@
   "author": "Joseph Shetaye",
   "license": "ISC",
   "_moduleAliases": {
-    "@services": "dist/src/services",
-    "@": "dist/src"
+    "@services": "dist/services",
+    "@": "dist"
   },
   "dependencies": {
     "@google-cloud/firestore": "^3.5.0",
