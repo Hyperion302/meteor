@@ -2,7 +2,13 @@ import * as SearchService from './';
 import { IChannel } from '@services/ChannelDataService/definitions';
 import { IVideo } from '@services/VideoDataService/definitions';
 import { IServiceInvocationContext } from '@/definitions';
-import { fakeContext, fakeVideo, fakeChannel } from '@/sharedTestData';
+import {
+  fakeContext,
+  fakeVideo,
+  fakeChannel,
+  fakeVideoSearchObject,
+  fakeChannelSearchObject,
+} from '@/sharedTestData';
 
 const sharedInstances = require('@/sharedInstances');
 
@@ -25,34 +31,18 @@ describe('Search Service', () => {
     it('Saves video object in Algolia', async () => {
       await SearchService.addVideo(fakeContext, fakeVideo);
 
-      expect(sharedInstances.mockSaveObject.mock.calls[0][0])
-        .toMatchInlineSnapshot(`
-        Object {
-          "description": "Test Video Description",
-          "objectID": "73878773241479168",
-          "title": "Test Video Name",
-          "type": "video",
-          "uploadDate": 1578009691,
-          "watchtime": 0,
-        }
-      `);
+      expect(sharedInstances.mockSaveObject.mock.calls[0][0]).toEqual(
+        fakeVideoSearchObject,
+      );
     });
   });
   describe('updateVideo', () => {
     it('Saves video object in Algolia', async () => {
       await SearchService.updateVideo(fakeContext, fakeVideo);
 
-      expect(sharedInstances.mockSaveObject.mock.calls[0][0])
-        .toMatchInlineSnapshot(`
-        Object {
-          "description": "Test Video Description",
-          "objectID": "73878773241479168",
-          "title": "Test Video Name",
-          "type": "video",
-          "uploadDate": 1578009691,
-          "watchtime": 0,
-        }
-      `);
+      expect(sharedInstances.mockSaveObject.mock.calls[0][0]).toEqual(
+        fakeVideoSearchObject,
+      );
     });
   });
   describe('removeVideo', () => {
@@ -69,28 +59,18 @@ describe('Search Service', () => {
     it('Saves channel object in Algolia', async () => {
       await SearchService.addChannel(fakeContext, fakeChannel);
 
-      expect(sharedInstances.mockSaveObject.mock.calls[0][0])
-        .toMatchInlineSnapshot(`
-        Object {
-          "name": "Test Channel",
-          "objectID": "73877867791908867",
-          "type": "channel",
-        }
-      `);
+      expect(sharedInstances.mockSaveObject.mock.calls[0][0]).toEqual(
+        fakeChannelSearchObject,
+      );
     });
   });
   describe('updateChannel', () => {
     it('Saves channel object in Algolia', async () => {
       await SearchService.updateChannel(fakeContext, fakeChannel);
 
-      expect(sharedInstances.mockSaveObject.mock.calls[0][0])
-        .toMatchInlineSnapshot(`
-        Object {
-          "name": "Test Channel",
-          "objectID": "73877867791908867",
-          "type": "channel",
-        }
-      `);
+      expect(sharedInstances.mockSaveObject.mock.calls[0][0]).toEqual(
+        fakeChannelSearchObject,
+      );
     });
   });
   describe('removeChannel', () => {

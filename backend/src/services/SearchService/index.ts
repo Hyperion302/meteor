@@ -4,13 +4,14 @@ import { tID, IServiceInvocationContext, IError } from '@/definitions';
 import { algoliaIndexInstance } from '@/sharedInstances';
 import { IVideoSearchObject, IChannelSearchObject } from './definitions';
 import { AuthorizationError } from '@/errors';
+import { millsFromSwishflake } from '@/utils';
 
 function algoliaFromVideo(video: IVideo): IVideoSearchObject {
   return {
     objectID: video.id,
     title: video.title,
     description: video.description,
-    uploadDate: video.uploadDate,
+    uploadDate: millsFromSwishflake(video.id),
     // Assume 0 watch time when converting from video schema
     watchtime: 0,
     type: 'video',

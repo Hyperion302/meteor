@@ -1,12 +1,8 @@
+import { NODE_BITS, NONCE_BITS, EPOCH_BITS, EPOCH } from '@/constants';
 // Inspired by https://github.com/twitter/snowflake/tree/snowflake-2010
 export class SwishflakeGenerator {
-  EPOCH_BITS = 42;
-  NODE_BITS = 10;
-  NONCE_BITS = 12;
-  EPOCH = 1577836800000; // First millisecond of 2020
-
-  maxNode = Math.pow(2, this.NODE_BITS);
-  maxNonce = Math.pow(2, this.NONCE_BITS);
+  maxNode = Math.pow(2, NODE_BITS);
+  maxNonce = Math.pow(2, NONCE_BITS);
 
   nonce: number = 0;
   node: number;
@@ -45,15 +41,15 @@ export class SwishflakeGenerator {
     return BigInt(
       `0b${currentTimestamp
         .toString(2)
-        .padStart(this.EPOCH_BITS, '0')}${this.node
+        .padStart(EPOCH_BITS, '0')}${this.node
         .toString(2)
-        .padStart(this.NODE_BITS, '0')}${this.nonce
+        .padStart(NODE_BITS, '0')}${this.nonce
         .toString(2)
-        .padStart(this.NONCE_BITS, '0')}`,
+        .padStart(NONCE_BITS, '0')}`,
     ).toString();
   }
 
   timestamp(): number {
-    return new Date().getTime() - this.EPOCH;
+    return new Date().getTime() - EPOCH;
   }
 }

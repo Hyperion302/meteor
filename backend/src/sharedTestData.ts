@@ -8,6 +8,10 @@ import {
   IVideoContent,
   IVideoContentSchema,
 } from '@services/VideoContentService/definitions';
+import {
+  IVideoSearchObject,
+  IChannelSearchObject,
+} from '@services/SearchService/definitions';
 
 export const fakeContext: IServiceInvocationContext = {
   auth: {
@@ -34,6 +38,11 @@ export const fakeChannelSchema: IChannelSchema = {
   name: fakeChannel.name,
   owner_id: fakeChannel.owner,
 };
+export const fakeChannelSearchObject: IChannelSearchObject = {
+  objectID: fakeChannel.id,
+  name: fakeChannel.name,
+  type: 'channel',
+};
 
 export const fakeContent: IVideoContent = {
   id: fakeIDs[2],
@@ -51,7 +60,6 @@ export const fakeVideo: IVideo = {
   description: 'Test Video Description',
   title: 'Test Video Name',
 };
-
 export const fakeVideoSchema: IVideoSchema = {
   id: fakeIDs[0],
   author_id: fakeContext.auth.userID,
@@ -60,4 +68,12 @@ export const fakeVideoSchema: IVideoSchema = {
   description: 'Test Video Description',
   title: 'Test Video Name',
   created_at: new Date().getTime(),
+};
+export const fakeVideoSearchObject: IVideoSearchObject = {
+  objectID: fakeIDs[0],
+  type: 'video',
+  title: fakeVideo.title,
+  description: fakeVideo.description,
+  uploadDate: 17614072142, // From fakeIDs[0]
+  watchtime: 0,
 };
