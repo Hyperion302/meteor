@@ -1,8 +1,6 @@
-import { Firestore } from '@google-cloud/firestore';
-import { Storage, StorageOptions } from '@google-cloud/storage';
+import { Storage } from '@google-cloud/storage';
 import { PubSub } from '@google-cloud/pubsub';
 import algoliasearch from 'algoliasearch';
-import { ClientConfig } from '@google-cloud/pubsub/build/src/pubsub';
 import { IAppConfiguration } from './definitions';
 import redis from 'redis';
 import { SwishflakeGenerator } from '@/SwishflakeGenerator';
@@ -54,13 +52,6 @@ export const appConfig: IAppConfiguration = {
   nodeID: parseInt(process.env.NODE_ID),
 };
 // //#endregion App Configuration
-
-// #region Firestore
-export const firestoreInstance = new Firestore({
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-});
-
-// #endregion Firestore
 
 // #region Storage
 export const storageInstance = new Storage({

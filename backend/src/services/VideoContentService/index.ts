@@ -1,6 +1,5 @@
 import { tID, IError, IServiceInvocationContext } from '@/definitions';
 import {
-  firestoreInstance,
   storageInstance,
   pubsubSubscription,
   appConfig,

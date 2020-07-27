@@ -1,9 +1,5 @@
 import sharp from 'sharp';
-import {
-  firestoreInstance,
-  storageInstance,
-  appConfig,
-} from '@/sharedInstances';
+import { storageInstance, appConfig } from '@/sharedInstances';
 import { tID, IServiceInvocationContext } from '@/definitions';
 import { AuthorizationError } from '@/errors';
 import { CreateWriteStreamOptions } from '@google-cloud/storage';

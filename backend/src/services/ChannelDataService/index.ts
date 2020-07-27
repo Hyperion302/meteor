@@ -12,11 +12,7 @@ import {
   IChannelSchema,
 } from './definitions';
 import * as search from '@services/SearchService';
-import {
-  firestoreInstance,
-  appConfig,
-  swishflakeGenerator,
-} from '@/sharedInstances';
+import { swishflakeGenerator } from '@/sharedInstances';
 import { knexInstance } from './db';
 
 // Predefined constants
