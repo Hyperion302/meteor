@@ -50,7 +50,12 @@ export const fakeContent: IVideoContent = {
   playbackID: '1ZjsLIn0167NzZ02TGbbGEngvGbMCAA00sG',
   duration: 5.2,
 };
-export const fakeContentSchema: IVideoContentSchema = fakeContent;
+export const fakeContentSchema: IVideoContentSchema = {
+  id: fakeIDs[2],
+  asset_id: fakeContent.assetID,
+  playback_id: fakeContent.playbackID,
+  duration: fakeContent.duration,
+};
 
 export const fakeVideo: IVideo = {
   id: fakeIDs[0],

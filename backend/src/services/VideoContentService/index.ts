@@ -107,7 +107,12 @@ export async function handleMuxAssetReady(
     playbackID: muxEvent.playbackID,
     duration: muxEvent.duration,
   };
-  await knexInstance.table<IVideoContentSchema>('content').insert(videoContent);
+  await knexInstance.table<IVideoContentSchema>('content').insert({
+    id: videoContent.id,
+    asset_id: videoContent.assetID,
+    playback_id: videoContent.playbackID,
+    duration: videoContent.duration,
+  });
 
   // Notify the VideoDataService so it can update the record
   await VideoDataService.updateContent(
@@ -180,7 +185,13 @@ export async function getVideo(
       'More than one content record was found with matching ID',
     );
   }
-  return rows[0];
+  const schema = rows[0];
+  return {
+    id: schema.id,
+    playbackID: schema.playback_id,
+    assetID: schema.asset_id,
+    duration: schema.duration,
+  };
 }
 
 /**

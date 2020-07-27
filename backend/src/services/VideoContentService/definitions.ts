@@ -15,8 +15,8 @@ export interface IVideoContent {
  */
 export interface IVideoContentSchema {
   id: tID;
-  assetID: string;
-  playbackID: string;
+  asset_id: string;
+  playback_id: string;
   duration: number;
 }
 
