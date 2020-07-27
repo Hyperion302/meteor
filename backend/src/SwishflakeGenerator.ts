@@ -1,4 +1,5 @@
 import { NODE_BITS, NONCE_BITS, EPOCH_BITS, EPOCH } from '@/constants';
+import { InternalError } from './errors';
 // Inspired by https://github.com/twitter/snowflake/tree/snowflake-2010
 export class SwishflakeGenerator {
   maxNode = Math.pow(2, NODE_BITS);
@@ -7,6 +8,7 @@ export class SwishflakeGenerator {
   nonce: number = 0;
   node: number;
   lastTimestamp: number;
+  lastID: string;
 
   constructor(nodeID: number) {
     if (nodeID < 0 || nodeID > this.maxNode) {
@@ -36,7 +38,7 @@ export class SwishflakeGenerator {
       this.nonce = 0;
     }
     this.lastTimestamp = currentTimestamp;
-    return BigInt(
+    const id = BigInt(
       `0b${currentTimestamp
         .toString(2)
         .padStart(EPOCH_BITS, '0')}${this.node
@@ -45,6 +47,12 @@ export class SwishflakeGenerator {
         .toString(2)
         .padStart(NONCE_BITS, '0')}`,
     ).toString();
+    // Sanity check
+    if (id === this.lastID) {
+      throw new InternalError('Gateway', `ID COLLISION @ ${id}`);
+    }
+    this.lastID = id;
+    return id;
   }
 
   timestamp(): number {
