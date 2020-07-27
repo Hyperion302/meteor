@@ -152,8 +152,8 @@ export async function queryVideo(
             author: videoSchema.author_id,
             title: videoSchema.title,
             description: videoSchema.description,
-            content: content,
-            channel: channel,
+            content,
+            channel,
           };
         });
       },
