@@ -37,7 +37,7 @@ async function getSingleVideoRecord(
     .select('*')
     .from<IVideoSchema>('video')
     .where('id', id);
-  if (rows.length == 0) {
+  if (rows.length === 0) {
     throw new ResourceNotFoundError('VideoData', 'video', id);
   }
   if (rows.length > 1) {

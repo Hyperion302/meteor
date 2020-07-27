@@ -22,13 +22,12 @@ export class SwishflakeGenerator {
     if (currentTimestamp < this.lastTimestamp) {
       return null;
     }
-    if (currentTimestamp == this.lastTimestamp) {
+    if (currentTimestamp === this.lastTimestamp) {
       // Increment the nonce
       this.nonce++;
       if (this.nonce > this.maxNonce) {
         // Ran out of IDs in this ID space, must block until the next millisecond
-        // FIXME: Probably could be better than this
-        while (currentTimestamp == this.lastTimestamp) {
+        while (currentTimestamp === this.lastTimestamp) {
           currentTimestamp = this.timestamp();
         }
       }
@@ -37,7 +36,6 @@ export class SwishflakeGenerator {
       this.nonce = 0;
     }
     this.lastTimestamp = currentTimestamp;
-    // FIXME: This can be better
     return BigInt(
       `0b${currentTimestamp
         .toString(2)

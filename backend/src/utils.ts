@@ -2,8 +2,7 @@ import { tID } from './definitions';
 import { NONCE_BITS, NODE_BITS } from './constants';
 
 export function millsFromSwishflake(swishflake: string): number {
-  const shiftedBig = BigInt(swishflake) >> BigInt(NONCE_BITS + NODE_BITS);
-  console.log(shiftedBig);
+  const shiftedBig = BigInt(swishflake) >> BigInt(NONCE_BITS + NODE_BITS); // tslint:disable-line:no-bitwise
   return parseInt(shiftedBig.toString(), 10); // This is safe since the number is at most EPOCH_BITS (42) bits long
 }
 

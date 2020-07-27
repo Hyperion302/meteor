@@ -176,7 +176,7 @@ export async function getVideo(
     .select('*')
     .from<IVideoContentSchema>('content')
     .where('id', id);
-  if (rows.length == 0) {
+  if (rows.length === 0) {
     throw new ResourceNotFoundError('VideoContent', 'videoContent', id);
   }
   if (rows.length > 1) {

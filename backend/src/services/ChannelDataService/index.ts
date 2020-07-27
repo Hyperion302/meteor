@@ -33,7 +33,7 @@ async function getSingleChannelRecord(id: tID): Promise<IChannel> {
     .select('*')
     .from<IChannelSchema>('channel')
     .where('id', id);
-  if (rows.length == 0) {
+  if (rows.length === 0) {
     throw new ResourceNotFoundError('ChannelData', 'channel', id);
   }
   if (rows.length > 1) {
@@ -143,7 +143,6 @@ export async function updateChannel(
 
   // Authorization Check
   // Channels can only be updated by the owner
-  console.log(oldChannel);
   if (context.auth.userID !== oldChannel.owner) {
     throw new AuthorizationError('ChannelData', 'update channel');
   }
