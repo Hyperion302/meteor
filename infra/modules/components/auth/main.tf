@@ -1,4 +1,5 @@
 provider "auth0" {
+  version       = "~> 0.12"
   domain        = var.domain
   client_id     = var.client_id
   client_secret = var.client_secret
