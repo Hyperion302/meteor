@@ -79,6 +79,6 @@ export const fakeVideoSearchObject: IVideoSearchObject = {
   type: 'video',
   title: fakeVideo.title,
   description: fakeVideo.description,
-  uploadDate: 17614072142, // From fakeIDs[0]
+  uploadDate: 1595450872142, // From fakeIDs[0]
   watchtime: 0,
 };
