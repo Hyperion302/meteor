@@ -10,4 +10,4 @@ COPY dist/ ./dist
 COPY package.json ./
 COPY node_modules/ ./node_modules
 
-CMD [ "node", "dist/src/main.js" ]
+CMD [ "node", "dist/main.js" ]
