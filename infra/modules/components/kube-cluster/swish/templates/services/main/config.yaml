@@ -21,3 +21,5 @@ data:
   JWKS_URI: "{{ .Values.swishAuthJWKSURI }}"
   JWT_AUDIENCE: "{{ .Values.swishAuthJWTAudience }}"
   JWT_ISSUER: "{{ .Values.swishAuthJWTIssuer }}"
+  SQL_HOST: "127.0.0.1"
+  NODE_ID: "{{ .Values.swishNodeID }}"

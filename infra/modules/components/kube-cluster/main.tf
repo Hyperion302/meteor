@@ -101,6 +101,26 @@ resource "helm_release" "release" {
     name  = "secretTLSKEY"
     value = base64encode(var.tls_key)
   }
+  set_sensitive {
+    name  = "secretSQLUSER"
+    value = base64encode(var.sql_user)
+  }
+  set_sensitive {
+    name  = "secretSQLPASS"
+    value = base64encode(var.sql_pass)
+  }
+  set_sensitive {
+    name  = "secretSQLVIDEOCONTENTDB"
+    value = base64encode(var.sql_video_content_db)
+  }
+  set_sensitive {
+    name  = "secretSQLVIDEODATADB"
+    value = base64encode(var.sql_video_data_db)
+  }
+  set_sensitive {
+    name  = "secretSQLCHANNELDATADB"
+    value = base64encode(var.sql_channel_data_db)
+  }
   set {
     name  = "main.dockerTag"
     value = var.main_docker_tag
@@ -148,5 +168,9 @@ resource "helm_release" "release" {
   set {
     name  = "swishAuthJWTIssuer"
     value = var.auth_jwt_issuer
+  }
+  set {
+    name  = "gcpSQLInstanceConnectionName"
+    value = var.gcp_sql_instance_connection
   }
 }

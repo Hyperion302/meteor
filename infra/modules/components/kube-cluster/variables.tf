@@ -73,6 +73,26 @@ variable "tls_key" {
   description = "TLS key"
   type        = string
 }
+variable "sql_user" {
+  description = "SQL User"
+  type        = string
+}
+variable "sql_pass" {
+  description = "SQL Password"
+  type        = string
+}
+variable "sql_video_content_db" {
+  description = "Database name for the video content service"
+  type        = string
+}
+variable "sql_video_data_db" {
+  description = "Database name for the video data service"
+  type        = string
+}
+variable "sql_channel_data_db" {
+  description = "Database name for the channel data service"
+  type        = string
+}
 variable "main_docker_tag" {
   description = "Tag for the main service image"
   type        = string
@@ -122,5 +142,9 @@ variable "auth_jwt_audience" {
 }
 variable "auth_jwt_issuer" {
   description = "Issuer for JWT checking"
+  type        = string
+}
+variable "gcp_sql_instance_connection" {
+  description = "GCP SQL Instance connection name"
   type        = string
 }

@@ -10,6 +10,11 @@ secretTLSCRT: secretTLSCRT
 secretTLSKEY: secretTLSKEY
 secretDockerUser: secretDockerUser
 secretDockerPass: secretDockerPass
+secretSQLUSER: secretSQLUSER
+secretSQLPASS: secretSQLPASS
+secretSQLVIDEOCONTENTDB: secretSQLVIDEOCONTENTDB
+secretSQLVIDEODATADB: secretSQLVIDEODATADB
+secretSQLCHANNELDATADB: secretSQLCHANNELDATADB
 
 nameOverride: ""
 fullnameOverride: ""
@@ -32,8 +37,12 @@ swishRedisDBDev: 0
 swishAuthJWKSURI: "https://dev-swish.auth0.com/.well-known/jwks.json"
 swishAuthJWTAudience: backend
 swishAuthJWTIssuer: "https://dev-swish.auth0.com/"
+swishNodeID: 0
 
 gcsStaticIPName: swish-backend-ip
+gcpSQLSidecarImage: gcr.io/cloudsql-docker/gce-proxy:1.17
+gcpSQLInstanceConnectionName: gcpSQLInstanceConnectionName
+gcpSQLSidecarPort: 3306
 
 # Services
 main:

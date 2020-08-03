@@ -78,6 +78,7 @@ module "database" {
   instance_tier        = var.sql_instance_tier
   databases            = var.sql_databases
   application_user     = var.sql_application_user
+  application_pass     = var.sql_application_pass
   devops_user          = var.sql_devops_user
 }
 
@@ -110,22 +111,28 @@ module "cluster" {
   node_cpus   = 1
   node_memory = 3072
 
-  release_name       = var.helm_release
-  dev_mux_id         = var.dev_mux_id
-  prod_mux_id        = var.prod_mux_id
-  dev_mux_secret     = var.dev_mux_secret
-  prod_mux_secret    = var.prod_mux_secret
-  algolia_id         = var.algolia_id
-  algolia_secret     = var.algolia_secret
-  main_docker_image  = "${var.gcp_project_id}/swish-main"
-  main_docker_tag    = var.main_docker_tag # data.github_branch.master.sha
-  ssr_docker_image   = "${var.gcp_project_id}/swish-ssr"
-  ssr_docker_tag     = var.ssr_docker_tag # data.github_branch.master.sha
-  tls_cert           = module.edge.certificate_pem
-  tls_key            = module.edge.certificate_key
-  prod_redis_address = module.watchtime_store.redis_host
-  auth_jwks_uri      = module.auth.jwks_uri
-  auth_jwt_audience  = module.auth.jwt_audience
-  auth_jwt_issuer    = module.auth.jwt_issuer
+  release_name                = var.helm_release
+  dev_mux_id                  = var.dev_mux_id
+  prod_mux_id                 = var.prod_mux_id
+  dev_mux_secret              = var.dev_mux_secret
+  prod_mux_secret             = var.prod_mux_secret
+  algolia_id                  = var.algolia_id
+  algolia_secret              = var.algolia_secret
+  main_docker_image           = "${var.gcp_project_id}/swish-main"
+  main_docker_tag             = var.main_docker_tag # data.github_branch.master.sha
+  ssr_docker_image            = "${var.gcp_project_id}/swish-ssr"
+  ssr_docker_tag              = var.ssr_docker_tag # data.github_branch.master.sha
+  tls_cert                    = module.edge.certificate_pem
+  tls_key                     = module.edge.certificate_key
+  sql_user                    = module.database.application_user
+  sql_pass                    = module.database.application_pass
+  sql_video_content_db        = var.sql_databases["video-content"]
+  sql_video_data_db           = var.sql_databases["video-data"]
+  sql_channel_data_db         = var.sql_databases["channel-data"]
+  prod_redis_address          = module.watchtime_store.redis_host
+  auth_jwks_uri               = module.auth.jwks_uri
+  auth_jwt_audience           = module.auth.jwt_audience
+  auth_jwt_issuer             = module.auth.jwt_issuer
+  gcp_sql_instance_connection = module.database.connection_name
 }
 
