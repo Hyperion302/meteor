@@ -20,7 +20,7 @@ resource "google_sql_database_instance" "master" {
 # Databases
 #
 resource "google_sql_database" "service_database" {
-  for_each = toset(var.databases)
+  for_each = var.databases
   name     = each.value
   instance = google_sql_database_instance.master.name
 }
@@ -29,6 +29,7 @@ resource "google_sql_database" "service_database" {
 #
 resource "google_sql_user" "application" {
   name     = var.application_user
+  password = var.application_pass
   instance = google_sql_database_instance.master.name
 }
 resource "google_sql_user" "devops" {

@@ -102,11 +102,15 @@ variable "sql_instance_tier" {
   type        = string
 }
 variable "sql_databases" {
-  description = "List of databases for the SQL instance"
-  type        = list(string)
+  description = "Map from internal name to SQL database name"
+  type        = map(string)
 }
 variable "sql_application_user" {
   description = "Username for the SQL application user"
+  type        = string
+}
+variable "sql_application_pass" {
+  description = "Password for the SQL application user"
   type        = string
 }
 variable "sql_devops_user" {
