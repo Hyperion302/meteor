@@ -1,5 +1,8 @@
 function(user, context, callback) {
-  context.idToken['http://swish.tv/swishflake'] = user.app_metadata.swishflake
+  var namespace = 'https://swish.tv';
+  var swishflake = user.app_metadata.swishflake;
+  context.idToken[`${namespace}/swishflake`] = swishflake;
+  context.accessToken[`${namespace}/swishflake`] = swishflake;
 
   callback(null, user, context);
 }
