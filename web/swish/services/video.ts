@@ -12,6 +12,7 @@ import {
   IVideoFragment,
   IVideoSegment,
 } from '~/models/video';
+import { millsFromSwishflake } from '~/util';
 
 export async function uploadVideo(id: string, video: File): Promise<void> {
   if (process.server) {
@@ -60,7 +61,7 @@ export async function createVideo(
     title: data.title,
     author: data.author,
     description: data.description,
-    uploadDate: data.uploadDate,
+    uploadDate: millsFromSwishflake(data.id) / 1000,
     channel: {
       id: data.channel.id,
       name: data.channel.name,
@@ -86,7 +87,7 @@ export async function getVideo(id: string): Promise<IVideo> {
     title: data.title,
     author: data.author,
     description: data.description,
-    uploadDate: data.uploadDate,
+    uploadDate: millsFromSwishflake(data.id) / 1000,
     channel: {
       id: data.channel.id,
       name: data.channel.name,
@@ -120,7 +121,7 @@ export async function queryVideos(channel: string): Promise<IVideo[]> {
       title: video.title,
       author: video.author,
       description: video.description,
-      uploadDate: video.uploadDate,
+      uploadDate: millsFromSwishflake(video.id) / 1000,
       channel: {
         id: video.channel.id,
         name: video.channel.name,
@@ -198,7 +199,7 @@ export async function updateVideo(
     title: data.title,
     author: data.author,
     description: data.description,
-    uploadDate: data.uploadDate,
+    uploadDate: millsFromSwishflake(data.id) / 1000,
     channel: {
       id: data.channel.id,
       name: data.channel.name,

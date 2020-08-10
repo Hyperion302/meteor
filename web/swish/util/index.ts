@@ -95,3 +95,9 @@ export function shortenCount(count: number): string {
   // B with no decimal place
   return `${Math.round(count / 1000000000)}B`;
 }
+
+export function millsFromSwishflake(swishflake: string): number {
+  // eslint-disable-next-line no-undef
+  const shiftedBig = (BigInt(swishflake) >> BigInt(22)) + 1577836800000n; // tslint:disable-line:no-bitwise
+  return parseInt(shiftedBig.toString(), 10); // This is safe since the number is at most EPOCH_BITS (42) bits long
+}

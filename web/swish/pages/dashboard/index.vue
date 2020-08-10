@@ -98,7 +98,9 @@ export default class DashboardPage extends Vue {
     // Run getWatchtime on every video to get wt
     // FIXME: This should not be done here.  I do this process in other parts of the site.  It should
     // be abstracted.  Where, I don't know.
-    const channels = await queryChannels($auth.$state.user.sub);
+    const channels = await queryChannels(
+      $auth.$state.user['https://swish.tv/swishflake'],
+    );
     const channelsWithVideos = await Promise.all(
       channels.map((channel: IChannel) => {
         return queryVideos(channel.id).then((videos: IVideo[]) => {
@@ -128,8 +130,16 @@ export default class DashboardPage extends Vue {
         });
       }),
     );
+    let selected: string;
+    if (query.sel) {
+      selected = decodeURIComponent(query.sel);
+    } else if (channels.length > 0) {
+      selected = channels[0].id;
+    } else {
+      selected = '';
+    }
     return {
-      selected: query.sel ? decodeURIComponent(query.sel) : channels[0].id,
+      selected,
       channels: channelsWithVidsWithWT,
     };
   }

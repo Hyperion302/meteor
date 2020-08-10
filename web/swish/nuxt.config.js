@@ -94,6 +94,7 @@ export default {
     /*
      ** You can extend webpack config here
      */
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     extend(config, ctx) {},
     transpile: ['vue-instantsearch', 'instantsearch.js/es'],
   },
