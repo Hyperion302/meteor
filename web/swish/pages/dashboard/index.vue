@@ -11,6 +11,7 @@
         {{ channel.name }}
       </div>
       <nuxt-link
+        v-if="channels.length"
         tag="div"
         class="channelListElement newChannel"
         :style="drawerOpen ? {} : { display: 'none' }"
@@ -49,7 +50,7 @@
           </div>
         </nuxt-link>
       </div>
-      <div class="videos">
+      <div v-if="currentChannel.videos.length" class="videos">
         <video-tile
           v-for="video in currentChannel.videos"
           :key="video.id"
@@ -64,6 +65,22 @@
           </call-to-action>
         </div>
       </div>
+      <div v-else class="videosZeroState">
+        <img src="/dashvidzerostate.svg" />
+        <p>
+          Looks like you have no videos.
+          <nuxt-link :to="`/dashboard/${currentChannel.id}/upload`"
+            >Upload some here</nuxt-link
+          >
+        </p>
+      </div>
+    </div>
+    <div v-else class="channelsZeroState">
+      <img src="/dashchannelzerostate.svg" />
+      <p>
+        You don't have any channels.
+        <nuxt-link to="/dashboard/create">Create one</nuxt-link>
+      </p>
     </div>
   </div>
 </template>
@@ -130,13 +147,13 @@ export default class DashboardPage extends Vue {
         });
       }),
     );
-    let selected: string;
+    let selected: string | null;
     if (query.sel) {
       selected = decodeURIComponent(query.sel);
     } else if (channels.length > 0) {
       selected = channels[0].id;
     } else {
-      selected = '';
+      selected = null;
     }
     return {
       selected,
@@ -192,6 +209,21 @@ export default class DashboardPage extends Vue {
         color: #000000;
         background-color: #FFFFFF;
         cursor: pointer;
+  .channelsZeroState
+    height: 100%;
+    width: 85%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    img
+      height: 240px;
+    p
+      font-weight: 100;
+      font-size: 24px;
+      a
+        text-decoration: none;
+        color: #cb3b0e;
   .main
     height: 100%;
     width: 85%;
@@ -221,6 +253,19 @@ export default class DashboardPage extends Vue {
           i
             color: #FFFFFF;
             font-size: 32px;
+    .videosZeroState
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      img
+        height: 240px;
+      p
+        font-weight: 100;
+        font-size: 24px;
+        a
+          text-decoration: none;
+          color: #cb3b0e;
     .videos
       display: flex;
       flex-wrap: wrap;
